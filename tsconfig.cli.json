@@ -1,0 +1,19 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "outDir": "./dist/cli",
+    "module": "commonjs",
+    "target": "es2019",
+    "baseUrl": "./src/app",
+    "rootDir": "./",
+    "isolatedModules": false,
+    "declaration": false,
+    "preserveWatchOutput": true
+  },
+  "include": [
+    "scripts/ats-score.ts",
+    "src/app/**/*.ts",
+    "src/app/**/*.tsx"
+  ]
+}

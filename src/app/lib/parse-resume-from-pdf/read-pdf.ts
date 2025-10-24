@@ -21,8 +21,15 @@ import type { TextItem, TextItems } from "lib/parse-resume-from-pdf/types";
  *     const textItems = await readPdf(fileUrl);
  * }
  */
-export const readPdf = async (fileUrl: string): Promise<TextItems> => {
-  const pdfFile = await pdfjs.getDocument(fileUrl).promise;
+export type PdfSource = string | ArrayBufferLike | Uint8Array;
+
+export const readPdf = async (fileSource: PdfSource): Promise<TextItems> => {
+  const loadingTask =
+    typeof fileSource === "string"
+      ? pdfjs.getDocument(fileSource)
+      : pdfjs.getDocument({ data: normalizePdfData(fileSource) });
+
+  const pdfFile = await loadingTask.promise;
   let textItems: TextItems = [];
 
   for (let i = 1; i <= pdfFile.numPages; i++) {
@@ -66,6 +73,7 @@ export const readPdf = async (fileUrl: string): Promise<TextItems> => {
         text: newText,
         x,
         y,
+        page: i,
       };
       return newItem;
     });
@@ -86,4 +94,12 @@ export const readPdf = async (fileUrl: string): Promise<TextItems> => {
   textItems = textItems.filter((textItem) => !isEmptySpace(textItem));
 
   return textItems;
+};
+
+const normalizePdfData = (fileSource: ArrayBufferLike | Uint8Array) => {
+  if (fileSource instanceof Uint8Array) {
+    return fileSource;
+  }
+
+  return new Uint8Array(fileSource);
 };

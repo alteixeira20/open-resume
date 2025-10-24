@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { readPdf } from "lib/parse-resume-from-pdf/read-pdf";
 import type { TextItems } from "lib/parse-resume-from-pdf/types";
 import { groupTextItemsIntoLines } from "lib/parse-resume-from-pdf/group-text-items-into-lines";
@@ -11,6 +11,8 @@ import { Heading, Link, Paragraph } from "components/documentation";
 import { ResumeTable } from "resume-parser/ResumeTable";
 import { FlexboxSpacer } from "components/FlexboxSpacer";
 import { ResumeParserAlgorithmArticle } from "resume-parser/ResumeParserAlgorithmArticle";
+import { calculateAtsScore } from "lib/ats-score";
+import { AtsScoreCard } from "resume-parser/AtsScoreCard";
 
 const RESUME_EXAMPLES = [
   {
@@ -39,9 +41,23 @@ const defaultFileUrl = RESUME_EXAMPLES[0]["fileUrl"];
 export default function ResumeParser() {
   const [fileUrl, setFileUrl] = useState(defaultFileUrl);
   const [textItems, setTextItems] = useState<TextItems>([]);
-  const lines = groupTextItemsIntoLines(textItems || []);
-  const sections = groupLinesIntoSections(lines);
-  const resume = extractResumeFromSections(sections);
+
+  const lines = useMemo(
+    () => groupTextItemsIntoLines(textItems || []),
+    [textItems]
+  );
+  const sections = useMemo(() => groupLinesIntoSections(lines), [lines]);
+  const resume = useMemo(
+    () => extractResumeFromSections(sections),
+    [sections]
+  );
+
+  const atsScore = useMemo(() => {
+    if (!textItems.length) {
+      return null;
+    }
+    return calculateAtsScore({ textItems, lines, sections, resume });
+  }, [textItems, lines, sections, resume]);
 
   useEffect(() => {
     async function test() {
@@ -117,6 +133,7 @@ export default function ResumeParser() {
             <Heading level={2} className="!mt-[1.2em]">
               Resume Parsing Results
             </Heading>
+            <AtsScoreCard result={atsScore} />
             <ResumeTable resume={resume} />
             <ResumeParserAlgorithmArticle
               textItems={textItems}

@@ -1,10 +1,10 @@
-# OpenResume
+# OpenResume (Fork)
 
-OpenResume is a powerful open-source resume builder and resume parser.
+This repository is a fork of [OpenResume](https://github.com/xitanggg/open-resume/) by Xitang (full credit to the original creator). The upstream project delivers an open-source resume builder and parser; this fork keeps that foundation while adding a fully local, deterministic ATS scoring engine with API and CLI access.
 
-The goal of OpenResume is to provide everyone with free access to a modern professional resume design and enable anyone to apply for jobs with confidence.
+The goal remains the same—help everyone produce modern, ATS-friendly resumes—but now with additional guidance on how an Application Tracking System might interpret a given PDF.
 
-Official site: [https://open-resume.com](https://open-resume.com)
+Official site for the original project: [https://open-resume.com](https://open-resume.com)
 
 ## ⚒️ Resume Builder
 
@@ -28,6 +28,25 @@ OpenResume’s second component is the resume parser. For those who have an exis
 ![Resume Parser Demo](https://i.ibb.co/JvSVwNk/resume-parser-demo-optimize.gif)
 
 You can learn more about the resume parser algorithm in the ["Resume Parser Algorithm Deep Dive" section](https://open-resume.com/resume-parser).
+
+### Local ATS Score
+
+This fork introduces a deterministic ATS scoring pipeline that runs completely offline. It reuses the original parsing stages, then grades the resulting data across four dimensions (0–100 total):
+
+1. **Parsing reliability (40 pts)** – Verifies whether critical fields were correctly extracted by the parser: name, email, phone, location, public links, education entries, and work experiences. Partial data yields partial credit, with issue messages for missing or ambiguous values.
+2. **Structure (20 pts)** – Checks single-column layout heuristics, heading detection, bullet consistency, and document length. Suspected multi-column layouts or tables are penalized.
+3. **Keywords vs. job description (30 pts, optional)** – If a job description is supplied, the score measures overlap between contract-critical tech keywords, impact verbs, and environment/tools phrases using stemming and contextual text search. Missing matches are reported per category.
+4. **Readability (10 pts)** – Rewards quantifiable accomplishments, plain URLs, and robust punctuation while flagging run-together words and a lack of metrics.
+
+When no job description is provided, the score rescales the other three categories to 100 so results remain comparable. The return payload always includes a breakdown plus a de-duplicated issues list (e.g., `"Education details incomplete"`, `"Likely multi-column layout"`).
+
+The scoring engine is exposed in three ways:
+
+- **Parser Playground** – Upload a PDF on `/resume-parser`; immediately see the score card, breakdown, and improvement tips alongside the structured parse.
+- **API endpoint** – `POST /api/ats-score` with `textItems` (and optional `lines`, `sections`, `resume`, `jobDescription`). It returns `{ score, breakdown, issues }`.
+- **CLI utility** – Run `npm run ats-score -- --file resume.pdf [--job job.txt] [--json]` to analyze local PDFs from the terminal.
+
+`textItems` should match the shape returned by `readPdf`. Passing precomputed `lines`, `sections`, or `resume` objects avoids recomputing them. All computation remains local—no external services or network calls.
 
 ## 📚 Tech Stack
 

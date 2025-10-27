@@ -6,6 +6,27 @@ The goal remains the same—help everyone produce modern, ATS-friendly resumes�
 
 Official site for the original project: [https://open-resume.com](https://open-resume.com)
 
+## 🚀 ATS Scoring System (Fork Highlight)
+
+![ATS Scoring System](assets/ATS_scoring.png)
+
+The headline upgrade in this fork is a local-first ATS scoring engine that sits on top of the existing parser. Upload a resume on the parser page and you immediately receive a scorecard, improvement tips, and a breakdown of how applicant tracking systems are likely to interpret the document.
+
+- Grades every resume completely offline—no third-party API calls or data sharing.
+- Surfaces structured feedback for parsing reliability, layout heuristics, readability signals, and optional job-description keyword matching.
+- Keeps parity between UI, REST API (`POST /api/ats-score`), and CLI (`npm run ats-score -- --file resume.pdf [--job job.txt] [--json]`) so the scoring engine can be automated or embedded elsewhere.
+
+For direct API consumption, send the parser output (`textItems`, with optional `lines`, `sections`, and `resume`) to the scoring endpoint. Providing precomputed parser artifacts skips redundant work, and every request remains on-device—no external services involved.
+
+**How the score is calculated**
+
+1. **Parsing reliability (40 pts)** – Verifies whether critical fields were correctly extracted by the parser: name, email, phone, location, public links, education entries, and work experiences. Partial data yields partial credit, with issue messages for missing or ambiguous values.
+2. **Structure (20 pts)** – Checks single-column layout heuristics, heading detection, bullet consistency, and document length. Suspected multi-column layouts or tables are penalized.
+3. **Keywords vs. job description (30 pts, optional)** – If a job description is supplied, the score measures overlap between contract-critical tech keywords, impact verbs, and environment/tools phrases using stemming and contextual text search. Missing matches are reported per category.
+4. **Readability (10 pts)** – Rewards quantifiable accomplishments, plain URLs, and robust punctuation while flagging run-together words and a lack of metrics.
+
+When no job description is provided, the score rescales the other three categories to 100 so results remain comparable. The return payload always includes a breakdown plus a de-duplicated issues list (e.g., `"Education details incomplete"`, `"Likely multi-column layout"`).
+
 ## ⚒️ Resume Builder
 
 OpenResume's resume builder allows user to create a modern professional resume easily.
@@ -28,25 +49,6 @@ OpenResume’s second component is the resume parser. For those who have an exis
 ![Resume Parser Demo](https://i.ibb.co/JvSVwNk/resume-parser-demo-optimize.gif)
 
 You can learn more about the resume parser algorithm in the ["Resume Parser Algorithm Deep Dive" section](https://open-resume.com/resume-parser).
-
-### Local ATS Score
-
-This fork introduces a deterministic ATS scoring pipeline that runs completely offline. It reuses the original parsing stages, then grades the resulting data across four dimensions (0–100 total):
-
-1. **Parsing reliability (40 pts)** – Verifies whether critical fields were correctly extracted by the parser: name, email, phone, location, public links, education entries, and work experiences. Partial data yields partial credit, with issue messages for missing or ambiguous values.
-2. **Structure (20 pts)** – Checks single-column layout heuristics, heading detection, bullet consistency, and document length. Suspected multi-column layouts or tables are penalized.
-3. **Keywords vs. job description (30 pts, optional)** – If a job description is supplied, the score measures overlap between contract-critical tech keywords, impact verbs, and environment/tools phrases using stemming and contextual text search. Missing matches are reported per category.
-4. **Readability (10 pts)** – Rewards quantifiable accomplishments, plain URLs, and robust punctuation while flagging run-together words and a lack of metrics.
-
-When no job description is provided, the score rescales the other three categories to 100 so results remain comparable. The return payload always includes a breakdown plus a de-duplicated issues list (e.g., `"Education details incomplete"`, `"Likely multi-column layout"`).
-
-The scoring engine is exposed in three ways:
-
-- **Parser Playground** – Upload a PDF on `/resume-parser`; immediately see the score card, breakdown, and improvement tips alongside the structured parse.
-- **API endpoint** – `POST /api/ats-score` with `textItems` (and optional `lines`, `sections`, `resume`, `jobDescription`). It returns `{ score, breakdown, issues }`.
-- **CLI utility** – Run `npm run ats-score -- --file resume.pdf [--job job.txt] [--json]` to analyze local PDFs from the terminal.
-
-`textItems` should match the shape returned by `readPdf`. Passing precomputed `lines`, `sections`, or `resume` objects avoids recomputing them. All computation remains local—no external services or network calls.
 
 ## 📚 Tech Stack
 
@@ -79,7 +81,7 @@ OpenResume is created with the NextJS web framework and follows its project stru
 2. Change the directory `cd open-resume`
 3. Install the dependency `npm install`
 4. Build a production ready version `npm run build`
-5. Start the App with 'npm start'
+5. Start the App with `npm start`
 6. Open your browser and visit [http://localhost:3000](http://localhost:3000) to see OpenResume live
 
 ### Method 2: Docker

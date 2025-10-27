@@ -1,4 +1,4 @@
-# OpenResume (Fork)
+# OpenResume - ATS Scoring Version
 
 This repository is a fork of [OpenResume](https://github.com/xitanggg/open-resume/) by Xitang (full credit to the original creator). The upstream project delivers an open-source resume builder and parser; this fork keeps that foundation while adding a fully local, deterministic ATS scoring engine with API and CLI access.
 
@@ -75,15 +75,16 @@ OpenResume is created with the NextJS web framework and follows its project stru
 
 ### Method 1: npm
 
-1. Download the repo `git clone https://github.com/xitanggg/open-resume.git`
+1. Download the repo `git clone https://github.com/alteixeira20/open-resume.git`
 2. Change the directory `cd open-resume`
 3. Install the dependency `npm install`
-4. Start a development server `npm run dev`
-5. Open your browser and visit [http://localhost:3000](http://localhost:3000) to see OpenResume live
+4. Build a production ready version `npm run build`
+5. Start the App with 'npm start'
+6. Open your browser and visit [http://localhost:3000](http://localhost:3000) to see OpenResume live
 
 ### Method 2: Docker
 
-1. Download the repo `git clone https://github.com/xitanggg/open-resume.git`
+1. Download the repo `git clone https://github.com/alteixeira20/open-resume.git`
 2. Change the directory `cd open-resume`
 3. Build the container `docker build -t open-resume .`
 4. Start the container `docker run -p 3000:3000 open-resume`

@@ -8,7 +8,7 @@ Official site for the original project: [https://open-resume.com](https://open-r
 
 ## 🚀 ATS Scoring System (Fork Highlight)
 
-![ATS Scoring System](assets/ATS_scoring.png)
+![ATS Scoring System](public/assets/ATS_scoring.png)
 
 The headline upgrade in this fork is a local-first ATS scoring engine that sits on top of the existing parser. Upload a resume on the parser page and you immediately receive a scorecard, improvement tips, and a breakdown of how applicant tracking systems are likely to interpret the document.
 

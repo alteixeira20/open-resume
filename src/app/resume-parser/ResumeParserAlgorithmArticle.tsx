@@ -369,7 +369,11 @@ const step4NameFeatureSetsTable = [
 
 const step4CoreFeatureFunctionTable = [
   ["Resume Attribute", "Core Feature Function", "Regex"],
-  ["Name", "Contains only letters, spaces or periods", "/^[a-zA-Z\\s\\.]+$/"],
+  [
+    "Name",
+    "Contains only letters, spaces or periods",
+    "/^[\\p{L}\\s.'’\\-]+$/u",
+  ],
   [
     "Email",
     <>
@@ -382,19 +386,18 @@ const step4CoreFeatureFunctionTable = [
   [
     "Phone",
     <>
-      Match phone format (xxx)-xxx-xxxx <br /> () and - are optional
+      Match international phone formats (supports +country codes and spaces)
     </>,
-    "/\\(?\\d{3}\\)?[\\s-]?\\d{3}[\\s-]?\\d{4}/",
+    "/^\\+?[\\d\\s\\-()]{7,}$/",
   ],
   [
     "Location",
-    <>Match city and state format {"City, ST"}</>,
-    "/[A-Z][a-zA-Z\\s]+, [A-Z]{2}/",
+    <>Match city and region/country format {"City, ST"} or {"City, Country"}</>,
+    "/[\\p{L}][\\p{L}\\s.'’\\-]+,\\s*[\\p{L}]{2,}$/u",
   ],
   ["Url", "Match url format xxx.xxx/xxx", "/\\S+\\.[a-z]+\\/\\S+/"],
   ["School", "Contains a school keyword, e.g. College, University, School", ""],
   ["Degree", "Contains a degree keyword, e.g. Associate, Bachelor, Master", ""],
-  ["GPA", "Match GPA format x.xx", "/[0-4]\\.\\d{1,2}/"],
   [
     "Date",
     "Contains date keyword related to year, month, seasons or the word Present",

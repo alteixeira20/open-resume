@@ -8,9 +8,9 @@ import { getSectionLinesByKeywords } from "lib/parse-resume-from-pdf/extract-res
 import { divideSectionIntoSubsections } from "lib/parse-resume-from-pdf/extract-resume-from-sections/lib/subsections";
 import {
   DATE_FEATURE_SETS,
-  hasComma,
   hasLetter,
   hasNumber,
+  isBold,
 } from "lib/parse-resume-from-pdf/extract-resume-from-sections/lib/common-features";
 import { getTextWithHighestFeatureScore } from "lib/parse-resume-from-pdf/extract-resume-from-sections/lib/feature-scoring-system";
 import {
@@ -22,7 +22,6 @@ import {
  *              Unique Attribute
  * School       Has school
  * Degree       Has degree
- * GPA          Has number
  */
 
 // prettier-ignore
@@ -34,33 +33,38 @@ const DEGREES = ["Associate", "Bachelor", "Master", "PhD", "Ph."];
 const hasDegree = (item: TextItem) =>
   DEGREES.some((degree) => item.text.includes(degree)) ||
   /[ABM][A-Z\.]/.test(item.text); // Match AA, B.S., MBA, etc.
-const matchGPA = (item: TextItem) => item.text.match(/[0-4]\.\d{1,2}/);
-const matchGrade = (item: TextItem) => {
-  const grade = parseFloat(item.text);
-  if (Number.isFinite(grade) && grade <= 110) {
-    return [String(grade)] as RegExpMatchArray;
-  }
-  return null;
-};
 
 const SCHOOL_FEATURE_SETS: FeatureSet[] = [
   [hasSchool, 4],
+  [isBold, 2],
+  [hasLetter, 1],
   [hasDegree, -4],
   [hasNumber, -4],
 ];
 
 const DEGREE_FEATURE_SETS: FeatureSet[] = [
   [hasDegree, 4],
+  [hasLetter, 2],
   [hasSchool, -4],
   [hasNumber, -3],
 ];
 
-const GPA_FEATURE_SETS: FeatureSet[] = [
-  [matchGPA, 4, true],
-  [matchGrade, 3, true],
-  [hasComma, -3],
-  [hasLetter, -4],
-];
+const isDateLike = (text: string) =>
+  /(?:19|20)\d{2}/.test(text) ||
+  /(January|February|March|April|May|June|July|August|September|October|November|December|Jan|Feb|Mar|Apr|Jun|Jul|Aug|Sep|Oct|Nov|Dec)/.test(
+    text
+  ) ||
+  /(Present|Now)/i.test(text);
+
+const lineToText = (line: TextItem[]) =>
+  line
+    .map((item) => item.text)
+    .join(" ")
+    .replace(/\s+/g, " ")
+    .trim();
+
+const hasLetterText = (text: string) => /[A-Za-z\u00C0-\u024F]/.test(text);
+const isBulletOnly = (text: string) => /^[\s•\-◦·*]+$/.test(text.trim());
 
 export const extractEducation = (sections: ResumeSectionToLines) => {
   const educations: ResumeEducation[] = [];
@@ -77,10 +81,6 @@ export const extractEducation = (sections: ResumeSectionToLines) => {
       textItems,
       DEGREE_FEATURE_SETS
     );
-    const [gpa, gpaScores] = getTextWithHighestFeatureScore(
-      textItems,
-      GPA_FEATURE_SETS
-    );
     const [date, dateScores] = getTextWithHighestFeatureScore(
       textItems,
       DATE_FEATURE_SETS
@@ -93,11 +93,41 @@ export const extractEducation = (sections: ResumeSectionToLines) => {
       descriptions = getBulletPointsFromLines(descriptionsLines);
     }
 
-    educations.push({ school, degree, gpa, date, descriptions });
+    const nonDescriptionLines =
+      descriptionsLineIdx === undefined
+        ? subsectionLines
+        : subsectionLines.slice(0, descriptionsLineIdx);
+    const lineTexts = nonDescriptionLines.map(lineToText).filter(Boolean);
+
+    let finalSchool = school;
+    let finalDegree = degree;
+
+    if (!finalSchool) {
+      finalSchool =
+        lineTexts.find(
+          (text) => hasLetterText(text) && !isDateLike(text) && !isBulletOnly(text)
+        ) ??
+        "";
+    }
+
+    if (!finalDegree) {
+      const schoolIdx = lineTexts.findIndex((text) => text === finalSchool);
+      const startIdx = schoolIdx >= 0 ? schoolIdx + 1 : 0;
+      finalDegree =
+        lineTexts
+          .slice(startIdx)
+          .find((text) => !isDateLike(text) && !isBulletOnly(text)) ?? "";
+    }
+
+    educations.push({
+      school: finalSchool,
+      degree: finalDegree,
+      date,
+      descriptions,
+    });
     educationsScores.push({
       schoolScores,
       degreeScores,
-      gpaScores,
       dateScores,
     });
   }

@@ -46,6 +46,12 @@ export const useSetInitialStore = () => {
         initialResumeState,
         state.resume
       ) as Resume;
+      mergedResumeState.educations = mergedResumeState.educations.map(
+        (education) => {
+          const { gpa, ...rest } = education as any;
+          return rest;
+        }
+      );
       dispatch(setResume(mergedResumeState));
     }
     if (state.settings) {
@@ -55,5 +61,5 @@ export const useSetInitialStore = () => {
       ) as Settings;
       dispatch(setSettings(mergedSettingsState));
     }
-  }, []);
+  }, [dispatch]);
 };

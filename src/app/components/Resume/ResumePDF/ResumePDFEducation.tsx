@@ -20,8 +20,7 @@ export const ResumePDFEducation = ({
 }) => {
   return (
     <ResumePDFSection themeColor={themeColor} heading={heading}>
-      {educations.map(
-        ({ school, degree, date, gpa, descriptions = [] }, idx) => {
+      {educations.map(({ school, degree, date, descriptions = [] }, idx) => {
           // Hide school name if it is the same as the previous school
           const hideSchoolName =
             idx > 0 && school === educations[idx - 1].school;
@@ -30,7 +29,9 @@ export const ResumePDFEducation = ({
           return (
             <View key={idx}>
               {!hideSchoolName && (
-                <ResumePDFText bold={true}>{school}</ResumePDFText>
+                <ResumePDFText bold={true}>
+                  {school.replace(/(\d)\s+(?=[\p{L}])/gu, "$1\u00A0")}
+                </ResumePDFText>
               )}
               <View
                 style={{
@@ -40,11 +41,7 @@ export const ResumePDFEducation = ({
                     : spacing["1.5"],
                 }}
               >
-                <ResumePDFText>{`${
-                  gpa
-                    ? `${degree} - ${Number(gpa) ? gpa + " GPA" : gpa}`
-                    : degree
-                }`}</ResumePDFText>
+                <ResumePDFText>{degree}</ResumePDFText>
                 <ResumePDFText>{date}</ResumePDFText>
               </View>
               {showDescriptions && (

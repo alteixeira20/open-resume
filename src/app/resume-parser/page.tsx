@@ -13,6 +13,7 @@ import { FlexboxSpacer } from "components/FlexboxSpacer";
 import { ResumeParserAlgorithmArticle } from "resume-parser/ResumeParserAlgorithmArticle";
 import { calculateAtsScore } from "lib/ats-score";
 import { AtsScoreCard } from "resume-parser/AtsScoreCard";
+import type { ResumeLocale } from "lib/redux/settingsSlice";
 
 const RESUME_EXAMPLES = [
   {
@@ -38,9 +39,11 @@ const RESUME_EXAMPLES = [
 ];
 
 const defaultFileUrl = RESUME_EXAMPLES[0]["fileUrl"];
+const PARSER_REGION_STORAGE_KEY = "open-resume-parser-region";
 export default function ResumeParser() {
   const [fileUrl, setFileUrl] = useState(defaultFileUrl);
   const [textItems, setTextItems] = useState<TextItems>([]);
+  const [parserRegion, setParserRegion] = useState<ResumeLocale>("eu");
 
   const lines = useMemo(
     () => groupTextItemsIntoLines(textItems || []),
@@ -56,8 +59,14 @@ export default function ResumeParser() {
     if (!textItems.length) {
       return null;
     }
-    return calculateAtsScore({ textItems, lines, sections, resume });
-  }, [textItems, lines, sections, resume]);
+    return calculateAtsScore({
+      textItems,
+      lines,
+      sections,
+      resume,
+      locale: parserRegion,
+    });
+  }, [textItems, lines, sections, resume, parserRegion]);
 
   useEffect(() => {
     async function test() {
@@ -66,6 +75,17 @@ export default function ResumeParser() {
     }
     test();
   }, [fileUrl]);
+
+  useEffect(() => {
+    const stored = localStorage.getItem(PARSER_REGION_STORAGE_KEY);
+    if (stored === "us" || stored === "eu") {
+      setParserRegion(stored);
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem(PARSER_REGION_STORAGE_KEY, parserRegion);
+  }, [parserRegion]);
 
   return (
     <main className="h-full w-full overflow-hidden">
@@ -122,6 +142,34 @@ export default function ResumeParser() {
               is well formatted and easy to read. It is beneficial to have the
               name and email accurately parsed at the very least.
             </Paragraph>
+            <div className="mt-3 rounded-md border border-gray-200 bg-white p-3">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <p className="text-sm font-semibold text-gray-900">
+                    Parser Region
+                  </p>
+                  <p className="text-xs text-gray-600">
+                    Use EU (A4) or US (Letter) expectations for scoring.
+                  </p>
+                </div>
+                <div className="flex gap-2">
+                  {(["eu", "us"] as ResumeLocale[]).map((region) => (
+                    <button
+                      key={region}
+                      type="button"
+                      className={`rounded-md border px-3 py-1.5 text-sm font-medium ${
+                        parserRegion === region
+                          ? "border-gray-900 bg-gray-900 text-white"
+                          : "border-gray-300 text-gray-700 hover:border-gray-400"
+                      }`}
+                      onClick={() => setParserRegion(region)}
+                    >
+                      {region === "eu" ? "EU (A4)" : "US (Letter)"}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
             <div className="mt-3">
               <ResumeDropzone
                 onFileUrlChange={(fileUrl) =>

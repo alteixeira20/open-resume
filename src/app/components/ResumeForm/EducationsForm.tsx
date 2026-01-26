@@ -11,18 +11,25 @@ import type { ResumeEducation } from "lib/redux/types";
 import {
   changeShowBulletPoints,
   selectShowBulletPoints,
+  selectSettings,
 } from "lib/redux/settingsSlice";
+import { RESUME_LOCALE_LABELS } from "lib/resume-locale";
 
 export const EducationsForm = () => {
   const educations = useAppSelector(selectEducations);
+  const settings = useAppSelector(selectSettings);
   const dispatch = useAppDispatch();
   const showDelete = educations.length > 1;
   const form = "educations";
   const showBulletPoints = useAppSelector(selectShowBulletPoints(form));
+  const labels = RESUME_LOCALE_LABELS[settings.resumeLocale];
+
+  const addEducationLabel = `Add ${labels.educationSchoolLabel}`;
+  const deleteEducationLabel = `Delete ${labels.educationSchoolLabel.toLowerCase()}`;
 
   return (
-    <Form form={form} addButtonText="Add School">
-      {educations.map(({ school, degree, gpa, date, descriptions }, idx) => {
+    <Form form={form} addButtonText={addEducationLabel}>
+      {educations.map(({ school, degree, date, descriptions }, idx) => {
         const handleEducationChange = (
           ...[
             field,
@@ -47,10 +54,10 @@ export const EducationsForm = () => {
             showMoveUp={showMoveUp}
             showMoveDown={showMoveDown}
             showDelete={showDelete}
-            deleteButtonTooltipText="Delete school"
+            deleteButtonTooltipText={deleteEducationLabel}
           >
             <Input
-              label="School"
+              label={labels.educationSchoolLabel}
               labelClassName="col-span-4"
               name="school"
               placeholder="Cornell University"
@@ -66,19 +73,11 @@ export const EducationsForm = () => {
               onChange={handleEducationChange}
             />
             <Input
-              label="Degree & Major"
+              label={labels.educationDegreeLabel}
               labelClassName="col-span-4"
               name="degree"
               placeholder="Bachelor of Science in Computer Engineering"
               value={degree}
-              onChange={handleEducationChange}
-            />
-            <Input
-              label="GPA"
-              labelClassName="col-span-2"
-              name="gpa"
-              placeholder="3.81"
-              value={gpa}
               onChange={handleEducationChange}
             />
             <div className="relative col-span-full">
@@ -86,7 +85,7 @@ export const EducationsForm = () => {
                 label="Additional Information (Optional)"
                 labelClassName="col-span-full"
                 name="descriptions"
-                placeholder="Free paragraph space to list out additional activities, courses, awards etc"
+                placeholder={labels.educationAdditionalPlaceholder}
                 value={descriptions}
                 onChange={handleEducationChange}
                 showBulletPoints={showBulletPoints}

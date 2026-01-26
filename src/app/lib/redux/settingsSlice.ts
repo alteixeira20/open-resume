@@ -2,6 +2,7 @@ import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import type { RootState } from "lib/redux/store";
 
 export interface Settings {
+  resumeLocale: ResumeLocale;
   themeColor: string;
   fontFamily: string;
   fontSize: string;
@@ -11,6 +12,7 @@ export interface Settings {
     educations: boolean;
     projects: boolean;
     skills: boolean;
+    languages: boolean;
     custom: boolean;
   };
   formToHeading: {
@@ -18,6 +20,7 @@ export interface Settings {
     educations: string;
     projects: string;
     skills: string;
+    languages: string;
     custom: string;
   };
   formsOrder: ShowForm[];
@@ -35,6 +38,7 @@ export type GeneralSetting = Exclude<
   keyof Settings,
   "formToShow" | "formToHeading" | "formsOrder" | "showBulletPoints"
 >;
+export type ResumeLocale = "us" | "eu";
 
 export const DEFAULT_THEME_COLOR = "#38bdf8"; // sky-400
 export const DEFAULT_FONT_FAMILY = "Roboto";
@@ -42,6 +46,7 @@ export const DEFAULT_FONT_SIZE = "11"; // text-base https://tailwindcss.com/docs
 export const DEFAULT_FONT_COLOR = "#171717"; // text-neutral-800
 
 export const initialSettings: Settings = {
+  resumeLocale: "us",
   themeColor: DEFAULT_THEME_COLOR,
   fontFamily: DEFAULT_FONT_FAMILY,
   fontSize: DEFAULT_FONT_SIZE,
@@ -51,6 +56,7 @@ export const initialSettings: Settings = {
     educations: true,
     projects: true,
     skills: true,
+    languages: true,
     custom: false,
   },
   formToHeading: {
@@ -58,14 +64,66 @@ export const initialSettings: Settings = {
     educations: "EDUCATION",
     projects: "PROJECT",
     skills: "SKILLS",
+    languages: "LANGUAGES",
     custom: "CUSTOM SECTION",
   },
-  formsOrder: ["workExperiences", "educations", "projects", "skills", "custom"],
+  formsOrder: [
+    "workExperiences",
+    "educations",
+    "projects",
+    "skills",
+    "languages",
+    "custom",
+  ],
   showBulletPoints: {
     educations: true,
     projects: true,
     skills: true,
     custom: true,
+  },
+};
+
+const RESUME_LOCALE_PRESETS: Record<
+  ResumeLocale,
+  Pick<Settings, "documentSize" | "formToHeading" | "formsOrder">
+> = {
+  us: {
+    documentSize: "Letter",
+    formToHeading: {
+      workExperiences: "WORK EXPERIENCE",
+      educations: "EDUCATION",
+      projects: "PROJECTS",
+      skills: "SKILLS",
+      languages: "LANGUAGES",
+      custom: "CUSTOM SECTION",
+    },
+    formsOrder: [
+      "workExperiences",
+      "educations",
+      "projects",
+      "skills",
+      "languages",
+      "custom",
+    ],
+  },
+  eu: {
+    documentSize: "A4",
+    formToHeading: {
+      workExperiences: "PROFESSIONAL EXPERIENCE",
+      educations: "EDUCATION",
+      projects: "PROJECTS",
+      skills: "SKILLS",
+      languages: "LANGUAGES",
+      custom: "ADDITIONAL INFORMATION",
+    },
+    formsOrder: [
+      "workExperiences",
+      "educations",
+      "projects",
+      "skills",
+      "languages",
+      "custom",
+    ],
   },
 };
 
@@ -75,9 +133,16 @@ export const settingsSlice = createSlice({
   reducers: {
     changeSettings: (
       draft,
-      action: PayloadAction<{ field: GeneralSetting; value: string }>
+      action: PayloadAction<{
+        field: GeneralSetting;
+        value: string;
+      }>
     ) => {
       const { field, value } = action.payload;
+      if (field === "resumeLocale") {
+        draft.resumeLocale = value as ResumeLocale;
+        return;
+      }
       draft[field] = value;
     },
     changeShowForm: (
@@ -121,6 +186,17 @@ export const settingsSlice = createSlice({
       const { field, value } = action.payload;
       draft["showBulletPoints"][field] = value;
     },
+    applyResumeLocalePreset: (
+      draft,
+      action: PayloadAction<{ locale: ResumeLocale }>
+    ) => {
+      const { locale } = action.payload;
+      const preset = RESUME_LOCALE_PRESETS[locale];
+      draft.resumeLocale = locale;
+      draft.documentSize = preset.documentSize;
+      draft.formToHeading = preset.formToHeading;
+      draft.formsOrder = preset.formsOrder;
+    },
     setSettings: (draft, action: PayloadAction<Settings>) => {
       return action.payload;
     },
@@ -133,6 +209,7 @@ export const {
   changeFormHeading,
   changeFormOrder,
   changeShowBulletPoints,
+  applyResumeLocalePreset,
   setSettings,
 } = settingsSlice.actions;
 

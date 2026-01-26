@@ -8,6 +8,7 @@ import type {
   TextItems,
 } from "lib/parse-resume-from-pdf/types";
 import type { Resume } from "lib/redux/types";
+import type { ResumeLocale } from "lib/redux/settingsSlice";
 import { PROFILE_SECTION } from "lib/parse-resume-from-pdf/group-lines-into-sections";
 
 export interface AtsScoreBreakdown {
@@ -29,6 +30,7 @@ export interface AtsScoreInput {
   lines?: Lines;
   sections?: ResumeSectionToLines;
   jobDescription?: string;
+  locale?: ResumeLocale;
 }
 
 export const calculateAtsScore = (input: AtsScoreInput): AtsScoreResult => {
@@ -36,12 +38,25 @@ export const calculateAtsScore = (input: AtsScoreInput): AtsScoreResult => {
   const lines = input.lines ?? groupTextItemsIntoLines(textItems);
   const sections = input.sections ?? groupLinesIntoSections(lines);
   const resume = input.resume ?? extractResumeFromSections(sections);
+  const locale = input.locale ?? detectLocale(resume);
   const jobDescription = input.jobDescription?.trim();
 
   const issues: string[] = [];
 
-  const parsingScore = scoreParsingReliability(resume, textItems, lines, issues);
-  const structureScore = scoreStructure(textItems, lines, sections, issues);
+  const parsingScore = scoreParsingReliability(
+    resume,
+    textItems,
+    lines,
+    issues,
+    locale
+  );
+  const structureScore = scoreStructure(
+    textItems,
+    lines,
+    sections,
+    issues,
+    locale
+  );
   const readabilityScore = scoreReadability(resume, lines, issues);
 
   let keywordsScore: number | undefined;
@@ -80,15 +95,16 @@ const scoreParsingReliability = (
   resume: Resume,
   textItems: TextItems,
   lines: Lines,
-  issues: string[]
+  issues: string[],
+  locale: ResumeLocale
 ) => {
   const { profile, educations, workExperiences } = resume;
 
   const score =
     scoreNameField(profile?.name, lines, issues) +
     scoreEmailField(profile?.email, issues) +
-    scorePhoneField(profile?.phone, issues) +
-    scoreLocationField(profile?.location, lines, issues) +
+    scorePhoneField(profile?.phone, issues, locale) +
+    scoreLocationField(profile?.location, lines, issues, locale) +
     scoreLinks(resume, textItems, issues) +
     scoreEducationSection(educations, issues) +
     scoreWorkSection(workExperiences, issues);
@@ -102,9 +118,10 @@ const scoreLinks = (
   issues: string[]
 ) => {
   const profileUrl = resume.profile?.url ?? "";
+  const githubUrl = resume.profile?.github ?? "";
   const textMatches = textItems.some((item) => containsUrl(item.text));
 
-  if (containsUrl(profileUrl) || textMatches) {
+  if (containsUrl(profileUrl) || containsUrl(githubUrl) || textMatches) {
     return 5;
   }
 
@@ -116,14 +133,15 @@ const scoreStructure = (
   textItems: TextItems,
   lines: Lines,
   sections: ResumeSectionToLines,
-  issues: string[]
+  issues: string[],
+  locale: ResumeLocale
 ) => {
   let score = 0;
 
   score += scoreSingleColumn(lines, issues);
   score += scoreHeadings(sections, issues);
   score += scoreBulletStyle(lines, issues);
-  score += scoreLength(textItems, issues);
+  score += scoreLength(textItems, issues, locale);
 
   return clamp(score, 0, 20);
 };
@@ -206,13 +224,30 @@ const scoreEmailField = (email: string | undefined, issues: string[]) => {
   return 6;
 };
 
-const scorePhoneField = (phone: string | undefined, issues: string[]) => {
+const scorePhoneField = (
+  phone: string | undefined,
+  issues: string[],
+  locale: ResumeLocale
+) => {
   if (!hasValue(phone)) {
     issues.push("Phone number missing");
     return 0;
   }
 
   const digits = (phone.match(/\d/g) ?? []).length;
+  if (locale === "us") {
+    const usPattern =
+      /^(?:\+1\s?)?(?:\(\d{3}\)|\d{3})[\s-]?\d{3}[\s-]?\d{4}$/;
+    if (usPattern.test(phone.trim())) {
+      return 6;
+    }
+  } else {
+    const euPattern = /^\+?[\d\s\-()]{7,}$/;
+    if (digits >= 9 && digits <= 15 && euPattern.test(phone.trim())) {
+      return 6;
+    }
+  }
+
   if (digits >= 9 && /^\+?[\d\s\-()]{7,}$/.test(phone.trim())) {
     return 6;
   }
@@ -224,14 +259,18 @@ const scorePhoneField = (phone: string | undefined, issues: string[]) => {
 const scoreLocationField = (
   location: string | undefined,
   lines: Lines,
-  issues: string[]
+  issues: string[],
+  locale: ResumeLocale
 ) => {
   if (!hasValue(location)) {
     issues.push("Location not detected");
     return 0;
   }
 
-  const canonicalPattern = /.+,\s*[A-Za-z]{2,}$/;
+  const canonicalPattern =
+    locale === "us"
+      ? /.+,\s*[A-Z]{2}$/
+      : /.+,\s*[\p{L}]{2,}$/u;
   const normalizedLocation = normalizeComparable(location);
   const appears = lines.some((line) =>
     normalizeComparable(lineToText(line)).includes(normalizedLocation)
@@ -243,6 +282,22 @@ const scoreLocationField = (
 
   issues.push("Location format unusual");
   return appears ? 3 : 1;
+};
+
+const detectLocale = (resume: Resume): ResumeLocale => {
+  const location = resume.profile?.location ?? "";
+  const phone = resume.profile?.phone ?? "";
+
+  const hasPlusPhone = phone.trim().startsWith("+");
+  const usLocationPattern = /,\s*[A-Z]{2}$/;
+  const euLocationPattern = /,\s*[\p{L}]{2,}$/u;
+  const hasDiacritics = /[^\u0000-\u007F]/.test(location);
+
+  if (hasPlusPhone) return "eu";
+  if (usLocationPattern.test(location.trim())) return "us";
+  if (euLocationPattern.test(location.trim()) || hasDiacritics) return "eu";
+
+  return "us";
 };
 
 const scoreEducationSection = (
@@ -316,6 +371,7 @@ const scoreHeadings = (
     "work experience",
     "projects",
     "skills",
+    "languages",
     "certifications",
     "awards",
   ]);
@@ -375,7 +431,11 @@ const scoreBulletStyle = (lines: Lines, issues: string[]) => {
   return 2;
 };
 
-const scoreLength = (textItems: TextItems, issues: string[]) => {
+const scoreLength = (
+  textItems: TextItems,
+  issues: string[],
+  locale: ResumeLocale
+) => {
   if (!textItems.length) return 4;
 
   const pages = aggregatePages(textItems);
@@ -385,11 +445,14 @@ const scoreLength = (textItems: TextItems, issues: string[]) => {
 
   const effectiveLength = pages.reduce((acc, page) => acc + page.effectiveHeight, 0);
 
-  if (pageCount === 1 && effectiveLength <= 1.05) {
+  const singlePageThreshold = locale === "eu" ? 1.1 : 1.05;
+  const slightOverThreshold = locale === "eu" ? 1.3 : 1.25;
+
+  if (pageCount === 1 && effectiveLength <= singlePageThreshold) {
     return 4;
   }
 
-  if (effectiveLength <= 1.25) {
+  if (effectiveLength <= slightOverThreshold) {
     issues.push("Slightly over one page");
     return 3;
   }

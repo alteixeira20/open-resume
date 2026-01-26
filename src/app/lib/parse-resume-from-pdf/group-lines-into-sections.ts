@@ -46,6 +46,7 @@ const SECTION_TITLE_PRIMARY_KEYWORDS = [
   "education",
   "project",
   "skill",
+  "language",
 ];
 const SECTION_TITLE_SECONDARY_KEYWORDS = [
   "job",

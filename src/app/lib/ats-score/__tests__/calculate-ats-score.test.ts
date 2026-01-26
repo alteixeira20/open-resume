@@ -91,13 +91,13 @@ describe("calculateAtsScore", () => {
           school: "State University",
           degree: "B.S. Computer Science",
           date: "2019",
-          gpa: "3.8",
           descriptions: ["C systems programming and automation projects"],
         },
       ],
       projects: [
         {
           project: "Automation Platform",
+          link: "",
           date: "2022",
           descriptions: [
             "Designed ubuntu observability stack with kubernetes containers and scripting",

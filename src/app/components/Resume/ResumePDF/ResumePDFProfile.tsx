@@ -20,8 +20,8 @@ export const ResumePDFProfile = ({
   themeColor: string;
   isPDF: boolean;
 }) => {
-  const { name, email, phone, url, summary, location } = profile;
-  const iconProps = { email, phone, location, url };
+  const { name, email, phone, url, github, summary, location } = profile;
+  const iconProps = { email, phone, location, url, github };
 
   return (
     <ResumePDFSection style={{ marginTop: spacing["4"] }}>
@@ -43,16 +43,33 @@ export const ResumePDFProfile = ({
         {Object.entries(iconProps).map(([key, value]) => {
           if (!value) return null;
 
-          let iconType = key as IconType;
-          if (key === "url") {
-            if (value.includes("github")) {
+          let iconType: IconType;
+          switch (key) {
+            case "email":
+              iconType = "email";
+              break;
+            case "phone":
+              iconType = "phone";
+              break;
+            case "location":
+              iconType = "location";
+              break;
+            case "github":
               iconType = "url_github";
-            } else if (value.includes("linkedin")) {
-              iconType = "url_linkedin";
-            }
+              break;
+            case "url":
+            default:
+              if (value.includes("github")) {
+                iconType = "url_github";
+              } else if (value.includes("linkedin")) {
+                iconType = "url_linkedin";
+              } else {
+                iconType = "url";
+              }
+              break;
           }
 
-          const shouldUseLinkWrapper = ["email", "url", "phone"].includes(key);
+          const shouldUseLinkWrapper = ["email", "url", "phone", "github"].includes(key);
           const Wrapper = ({ children }: { children: React.ReactNode }) => {
             if (!shouldUseLinkWrapper) return <>{children}</>;
 

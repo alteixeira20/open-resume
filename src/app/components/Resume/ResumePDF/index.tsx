@@ -5,6 +5,7 @@ import { ResumePDFWorkExperience } from "components/Resume/ResumePDF/ResumePDFWo
 import { ResumePDFEducation } from "components/Resume/ResumePDF/ResumePDFEducation";
 import { ResumePDFProject } from "components/Resume/ResumePDF/ResumePDFProject";
 import { ResumePDFSkills } from "components/Resume/ResumePDF/ResumePDFSkills";
+import { ResumePDFLanguages } from "components/Resume/ResumePDF/ResumePDFLanguages";
 import { ResumePDFCustom } from "components/Resume/ResumePDF/ResumePDFCustom";
 import { DEFAULT_FONT_COLOR } from "lib/redux/settingsSlice";
 import type { Settings, ShowForm } from "lib/redux/settingsSlice";
@@ -35,8 +36,15 @@ export const ResumePDF = ({
   settings: Settings;
   isPDF?: boolean;
 }) => {
-  const { profile, workExperiences, educations, projects, skills, custom } =
-    resume;
+  const {
+    profile,
+    workExperiences,
+    educations,
+    projects,
+    skills,
+    languages,
+    custom,
+  } = resume;
   const { name } = profile;
   const {
     fontFamily,
@@ -72,6 +80,7 @@ export const ResumePDF = ({
         heading={formToHeading["projects"]}
         projects={projects}
         themeColor={themeColor}
+        isPDF={isPDF}
       />
     ),
     skills: () => (
@@ -80,6 +89,13 @@ export const ResumePDF = ({
         skills={skills}
         themeColor={themeColor}
         showBulletPoints={showBulletPoints["skills"]}
+      />
+    ),
+    languages: () => (
+      <ResumePDFLanguages
+        heading={formToHeading["languages"]}
+        languages={languages}
+        themeColor={themeColor}
       />
     ),
     custom: () => (

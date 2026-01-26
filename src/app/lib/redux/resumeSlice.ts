@@ -4,6 +4,7 @@ import type {
   FeaturedSkill,
   Resume,
   ResumeEducation,
+  ResumeLanguage,
   ResumeProfile,
   ResumeProject,
   ResumeSkills,
@@ -18,6 +19,7 @@ export const initialProfile: ResumeProfile = {
   phone: "",
   location: "",
   url: "",
+  github: "",
 };
 
 export const initialWorkExperience: ResumeWorkExperience = {
@@ -30,15 +32,20 @@ export const initialWorkExperience: ResumeWorkExperience = {
 export const initialEducation: ResumeEducation = {
   school: "",
   degree: "",
-  gpa: "",
   date: "",
   descriptions: [],
 };
 
 export const initialProject: ResumeProject = {
   project: "",
+  link: "",
   date: "",
   descriptions: [],
+};
+
+export const initialLanguage: ResumeLanguage = {
+  language: "",
+  proficiency: "",
 };
 
 export const initialFeaturedSkill: FeaturedSkill = { skill: "", rating: 4 };
@@ -60,6 +67,7 @@ export const initialResumeState: Resume = {
   educations: [initialEducation],
   projects: [initialProject],
   skills: initialSkills,
+  languages: [initialLanguage],
   custom: initialCustom,
 };
 
@@ -111,6 +119,19 @@ export const resumeSlice = createSlice({
       const project = draft.projects[idx];
       project[field] = value as any;
     },
+    changeLanguages: (
+      draft,
+      action: PayloadAction<
+        { idx: number } & {
+          field: keyof ResumeLanguage;
+          value: string;
+        }
+      >
+    ) => {
+      const { idx, field, value } = action.payload;
+      const language = draft.languages[idx];
+      language[field] = value;
+    },
     changeSkills: (
       draft,
       action: PayloadAction<
@@ -154,6 +175,10 @@ export const resumeSlice = createSlice({
         }
         case "projects": {
           draft.projects.push(structuredClone(initialProject));
+          return draft;
+        }
+        case "languages": {
+          draft.languages.push(structuredClone(initialLanguage));
           return draft;
         }
       }
@@ -205,6 +230,7 @@ export const {
   changeWorkExperiences,
   changeEducations,
   changeProjects,
+  changeLanguages,
   changeSkills,
   changeCustom,
   addSectionInForm,
@@ -220,6 +246,7 @@ export const selectWorkExperiences = (state: RootState) =>
 export const selectEducations = (state: RootState) => state.resume.educations;
 export const selectProjects = (state: RootState) => state.resume.projects;
 export const selectSkills = (state: RootState) => state.resume.skills;
+export const selectLanguages = (state: RootState) => state.resume.languages;
 export const selectCustom = (state: RootState) => state.resume.custom;
 
 export default resumeSlice.reducer;

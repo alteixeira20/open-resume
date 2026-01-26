@@ -16,6 +16,7 @@ export const END_HOME_RESUME: Resume = {
     phone: "123-456-7890",
     location: "NYC, NY",
     url: "linkedin.com/in/john-doe",
+    github: "github.com/johndoe",
   },
   workExperiences: [
     {
@@ -53,7 +54,6 @@ export const END_HOME_RESUME: Resume = {
       school: "XYZ University",
       degree: "Bachelor of Science in Computer Science",
       date: "Sep 2019 - May 2023",
-      gpa: "3.8",
       descriptions: [
         "Won 1st place in 2022 Education Hackathon, 2nd place in 2023 Health Tech Competition",
         "Teaching Assistant for Programming for the Web (2022 - 2023)",
@@ -64,6 +64,7 @@ export const END_HOME_RESUME: Resume = {
   projects: [
     {
       project: "OpenResume",
+      link: "",
       date: "Spring 2023",
       descriptions: [
         "Created and launched a free resume builder web app that allows thousands of users to create professional resume easily and land their dream jobs",
@@ -84,6 +85,10 @@ export const END_HOME_RESUME: Resume = {
       "Soft: Teamwork, Creative Problem Solving, Communication, Learning Mindset, Agile",
     ],
   },
+  languages: [
+    { language: "English", proficiency: "Native" },
+    { language: "Spanish", proficiency: "Professional" },
+  ],
   custom: {
     descriptions: [],
   },
@@ -103,6 +108,10 @@ export const START_HOME_RESUME: Resume = {
     })),
     descriptions: [],
   },
+  languages: END_HOME_RESUME.languages.map((item) => ({
+    language: "",
+    proficiency: item.proficiency,
+  })),
   custom: {
     descriptions: [],
   },

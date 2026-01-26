@@ -3,6 +3,7 @@ export interface ResumeProfile {
   email: string;
   phone: string;
   url: string;
+  github: string;
   summary: string;
   location: string;
 }
@@ -18,14 +19,19 @@ export interface ResumeEducation {
   school: string;
   degree: string;
   date: string;
-  gpa: string;
   descriptions: string[];
 }
 
 export interface ResumeProject {
   project: string;
+  link: string;
   date: string;
   descriptions: string[];
+}
+
+export interface ResumeLanguage {
+  language: string;
+  proficiency: string;
 }
 
 export interface FeaturedSkill {
@@ -48,6 +54,7 @@ export interface Resume {
   educations: ResumeEducation[];
   projects: ResumeProject[];
   skills: ResumeSkills;
+  languages: ResumeLanguage[];
   custom: ResumeCustom;
 }
 

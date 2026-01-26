@@ -65,13 +65,13 @@ export const ResumeTable = ({ resume }: { resume: Resume }) => {
         <TableRow label="Phone" value={resume.profile.phone} />
         <TableRow label="Location" value={resume.profile.location} />
         <TableRow label="Link" value={resume.profile.url} />
+        <TableRow label="GitHub" value={resume.profile.github} />
         <TableRow label="Summary" value={resume.profile.summary} />
         <TableRowHeader>Education</TableRowHeader>
         {educations.map((education, idx) => (
           <Fragment key={idx}>
             <TableRow label="School" value={education.school} />
             <TableRow label="Degree" value={education.degree} />
-            <TableRow label="GPA" value={education.gpa} />
             <TableRow label="Date" value={education.date} />
             <TableRow
               label="Descriptions"
@@ -107,6 +107,7 @@ export const ResumeTable = ({ resume }: { resume: Resume }) => {
         {resume.projects.map((project, idx) => (
           <Fragment key={idx}>
             <TableRow label="Project" value={project.project} />
+            <TableRow label="Link" value={project.link} />
             <TableRow label="Date" value={project.date} />
             <TableRow
               label="Descriptions"
@@ -121,6 +122,15 @@ export const ResumeTable = ({ resume }: { resume: Resume }) => {
         ))}
         <TableRowHeader>Skills</TableRowHeader>
         <TableRow label="Descriptions" value={skills} />
+        {resume.languages.length > 0 && (
+          <TableRowHeader>Languages</TableRowHeader>
+        )}
+        {resume.languages.map((language, idx) => (
+          <Fragment key={idx}>
+            <TableRow label="Language" value={language.language} />
+            <TableRow label="Proficiency" value={language.proficiency} />
+          </Fragment>
+        ))}
       </tbody>
     </table>
   );

@@ -15,7 +15,7 @@ import { getTextWithHighestFeatureScore } from "lib/parse-resume-from-pdf/extrac
 
 // Name
 export const matchOnlyLetterSpaceOrPeriod = (item: TextItem) =>
-  item.text.match(/^[a-zA-Z\s\.]+$/);
+  item.text.match(/^[\p{L}\s.'’\-]+$/u);
 
 // Email
 // Simple email regex: xxx@xxx.xxx (xxx = anything not space)
@@ -24,14 +24,17 @@ const hasAt = (item: TextItem) => item.text.includes("@");
 
 // Phone
 // Simple phone regex that matches (xxx)-xxx-xxxx where () and - are optional, - can also be space
-export const matchPhone = (item: TextItem) =>
-  item.text.match(/\(?\d{3}\)?[\s-]?\d{3}[\s-]?\d{4}/);
+export const matchPhone = (item: TextItem) => {
+  const digits = (item.text.match(/\d/g) ?? []).length;
+  if (digits < 9) return null;
+  return item.text.match(/^\+?[\d\s\-()]{7,}$/);
+};
 const hasParenthesis = (item: TextItem) => /\([0-9]+\)/.test(item.text);
 
 // Location
 // Simple location regex that matches "<City>, <ST>"
-export const matchCityAndState = (item: TextItem) =>
-  item.text.match(/[A-Z][a-zA-Z\s]+, [A-Z]{2}/);
+export const matchLocation = (item: TextItem) =>
+  item.text.match(/[\p{L}][\p{L}\s.'’\-]+,\s*[\p{L}]{2,}$/u);
 
 // Url
 // Simple url regex that matches "xxx.xxx/xxx" (xxx = anything not space)
@@ -45,6 +48,7 @@ const matchUrlWwwFallback = (item: TextItem) =>
 const hasSlash = (item: TextItem) => item.text.includes("/");
 
 // Summary
+const has3OrMoreWords = (item: TextItem) => item.text.split(" ").length >= 3;
 const has4OrMoreWords = (item: TextItem) => item.text.split(" ").length >= 4;
 
 /**
@@ -94,7 +98,7 @@ const PHONE_FEATURE_SETS: FeatureSet[] = [
 
 // Location -> match location regex <City>, <ST>
 const LOCATION_FEATURE_SETS: FeatureSet[] = [
-  [matchCityAndState, 4, true],
+  [matchLocation, 4, true],
   [isBold, -1], // Name
   [hasAt, -4], // Email
   [hasParenthesis, -3], // Phone
@@ -116,11 +120,21 @@ const URL_FEATURE_SETS: FeatureSet[] = [
 // Summary -> has 4 or more words
 const SUMMARY_FEATURE_SETS: FeatureSet[] = [
   [has4OrMoreWords, 4],
+  [has3OrMoreWords, 2],
   [isBold, -1], // Name
   [hasAt, -4], // Email
   [hasParenthesis, -3], // Phone
-  [matchCityAndState, -4, false], // Location
+  [matchLocation, -4, false], // Location
 ];
+
+const getUrlsFromTextItems = (items: TextItem[]) =>
+  items
+    .map((item) => item.text.trim())
+    .filter((text) =>
+      matchUrl({ text } as TextItem) ||
+      matchUrlHttpFallback({ text } as TextItem) ||
+      matchUrlWwwFallback({ text } as TextItem)
+    );
 
 export const extractProfile = (sections: ResumeSectionToLines) => {
   const lines = sections.profile || [];
@@ -164,13 +178,21 @@ export const extractProfile = (sections: ResumeSectionToLines) => {
     .map((textItem) => textItem.text)
     .join(" ");
 
+  const urls = getUrlsFromTextItems(textItems);
+  const githubUrl =
+    urls.find((value) => value.toLowerCase().includes("github.com")) || "";
+  const linkedInUrl =
+    urls.find((value) => value.toLowerCase().includes("linkedin.com")) || "";
+  const fallbackUrl = urls.find((value) => value !== githubUrl) || "";
+
   return {
     profile: {
       name,
       email,
       phone,
       location,
-      url,
+      url: linkedInUrl || url || fallbackUrl,
+      github: githubUrl,
       // Dedicated section takes higher precedence over profile summary
       summary: summarySection || objectiveSection || summary,
     },

@@ -1,16 +1,24 @@
-# OpenResume - ATS Scoring Version
+# OpenResume — ATS Scoring + EU/US CV Builder
 
-This repository is a fork of [OpenResume](https://github.com/xitanggg/open-resume/) by Xitang (full credit to the original creator). The upstream project delivers an open-source resume builder and parser; this fork keeps that foundation while adding a fully local, deterministic ATS scoring engine with API and CLI access.
-
-The goal remains the same—help everyone produce modern, ATS-friendly resumes—but now with additional guidance on how an Application Tracking System might interpret a given PDF.
+This repository is a fork of [OpenResume](https://github.com/xitanggg/open-resume/) by Xitang (full credit to the original creator). The upstream project delivers an open-source resume builder and parser; this fork keeps that foundation while adding ATS scoring, EU/US CV presets, and extra resume fields geared for real-world hiring workflows.
 
 Official site for the original project: [https://open-resume.com](https://open-resume.com)
 
-## 🚀 ATS Scoring System (Fork Highlight)
+## ⭐ Fork Highlights (What’s new here)
+
+- **Local ATS scoring** with UI + API + CLI access (`/resume-parser`, `POST /api/ats-score`, `npm run ats-score -- ...`)
+- **EU vs US resume presets** (A4 vs Letter, headings) directly in the builder
+- **GitHub profile field** in contact details
+- **Project link field** that turns project titles into clickable links in the PDF
+- **Languages section** with proficiency levels (Native / C2 / B1, etc.)
+- **GPA removed** to reduce parsing noise (education is based on school/degree/date only)
+- **Makefile workflow** for install/build/run convenience
+
+## 🚀 ATS Scoring System
 
 ![ATS Scoring System](public/assets/ATS_scoring.png)
 
-The headline upgrade in this fork is a local-first ATS scoring engine that sits on top of the existing parser. Upload a resume on the parser page and you immediately receive a scorecard, improvement tips, and a breakdown of how applicant tracking systems are likely to interpret the document.
+The local-first ATS scoring engine sits on top of the existing parser. Upload a resume on the parser page and you immediately receive a scorecard, improvement tips, and a breakdown of how applicant tracking systems are likely to interpret the document.
 
 - Grades every resume completely offline—no third-party API calls or data sharing.
 - Surfaces structured feedback for parsing reliability, layout heuristics, readability signals, and optional job-description keyword matching.
@@ -37,7 +45,7 @@ It has 5 Core Features:
 | <div style="width:285px">**Feature**</div> | **Description** |
 |---|---|
 | **1. Real Time UI Update** | The resume PDF is updated in real time as you enter your resume information, so you can easily see the final output. |
-| **2. Modern Professional Resume Design** | The resume PDF is a modern professional design that adheres to U.S. best practices and is ATS friendly to top ATS platforms such as Greenhouse and Lever. It automatically formats fonts, sizes, margins, bullet points to ensure consistency and avoid human errors. |
+| **2. Modern Professional Resume Design** | The resume PDF is a modern professional design that adheres to ATS best practices. It automatically formats fonts, sizes, margins, bullet points to ensure consistency and avoid human errors. |
 | **3. Privacy Focus** | The app only runs locally on your browser, meaning no sign up is required and no data ever leaves your browser, so it gives you peace of mind on your personal data. (Fun fact: Running only locally means the app still works even if you disconnect the internet.) |
 | **4. Import From Existing Resume PDF** | If you already have an existing resume PDF, you have the option to import it directly, so you can update your resume design to a modern professional design in literally a few seconds. |
 | **5. Successful Track Record** | OpenResume users have landed interviews and offers from top companies, such as Dropbox, Google, Meta to name a few. It has been proven to work and liken by recruiters and hiring managers. |
@@ -49,6 +57,18 @@ OpenResume’s second component is the resume parser. For those who have an exis
 ![Resume Parser Demo](https://i.ibb.co/JvSVwNk/resume-parser-demo-optimize.gif)
 
 You can learn more about the resume parser algorithm in the ["Resume Parser Algorithm Deep Dive" section](https://open-resume.com/resume-parser).
+
+## 🌍 EU vs US Resume Presets
+
+The builder includes a one-click toggle for **US Resume** vs **EU CV**. It sets sensible defaults for paper size (Letter vs A4) and section headings while keeping ATS-friendly formatting.
+
+The **parser now includes an EU/US toggle** as well, so ATS scoring expectations match your region (A4 vs Letter assumptions).
+
+## 🧩 Extra Fields Added
+
+- **GitHub profile** in the contact section
+- **Project links** (title becomes a link when provided)
+- **Languages** with proficiency level
 
 ## 📚 Tech Stack
 
@@ -82,6 +102,15 @@ OpenResume is created with the NextJS web framework and follows its project stru
 3. Install the dependency `npm install`
 4. Build a production ready version `npm run build`
 5. Start the App with `npm start`
+6. Open your browser and visit [http://localhost:3000](http://localhost:3000) to see OpenResume live
+
+### Method 1b: Makefile
+
+1. Download the repo `git clone https://github.com/alteixeira20/open-resume.git`
+2. Change the directory `cd open-resume`
+3. Install the dependency `make install`
+4. Build a production ready version `make build`
+5. Start the App with `make run`
 6. Open your browser and visit [http://localhost:3000](http://localhost:3000) to see OpenResume live
 
 ### Method 2: Docker

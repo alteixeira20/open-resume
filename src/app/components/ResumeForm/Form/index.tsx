@@ -36,12 +36,15 @@ import {
 export const BaseForm = ({
   children,
   className,
+  id,
 }: {
   children: React.ReactNode;
   className?: string;
+  id?: string;
 }) => (
   <section
-    className={`flex flex-col gap-3 rounded-md bg-white p-6 pt-4 shadow transition-opacity duration-200 ${className}`}
+    id={id}
+    className={`flex flex-col gap-3 rounded-md border border-gray-200 bg-white p-6 pt-4 shadow-sm transition-opacity duration-200 ${className}`}
   >
     {children}
   </section>
@@ -87,6 +90,7 @@ export const Form = ({
 
   return (
     <BaseForm
+      id={`section-${form}`}
       className={`transition-opacity duration-200 ${
         showForm ? "pb-6" : "pb-2 opacity-60"
       }`}

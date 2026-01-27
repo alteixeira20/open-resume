@@ -1,26 +1,16 @@
 "use client";
+import { BaseForm } from "components/ResumeForm/Form";
 import { useAppDispatch, useAppSelector } from "lib/redux/hooks";
 import {
   applyResumeLocalePreset,
   selectSettings,
   type ResumeLocale,
 } from "lib/redux/settingsSlice";
+import { MapPinIcon } from "@heroicons/react/24/outline";
 
-const LOCALE_OPTIONS: Array<{
-  id: ResumeLocale;
-  label: string;
-  hint: string;
-}> = [
-  {
-    id: "us",
-    label: "US Resume",
-    hint: "Letter • US-style headings",
-  },
-  {
-    id: "eu",
-    label: "EU CV",
-    hint: "A4 • EU-style headings",
-  },
+const LOCALE_OPTIONS: Array<{ id: ResumeLocale; label: string }> = [
+  { id: "eu", label: "EU (A4)" },
+  { id: "us", label: "US (Letter)" },
 ];
 
 export const ResumeLocaleToggle = () => {
@@ -28,34 +18,28 @@ export const ResumeLocaleToggle = () => {
   const dispatch = useAppDispatch();
 
   return (
-    <section className="mx-auto mb-4 w-full max-w-5xl rounded-lg border border-gray-200 bg-white px-4 py-3 shadow-sm">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h2 className="text-sm font-semibold text-gray-900">Resume Region</h2>
-          <p className="text-xs text-gray-600">
-            Switch between US and EU presets (headings + paper size).
-          </p>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          {LOCALE_OPTIONS.map((option) => (
-            <button
-              key={option.id}
-              type="button"
-              className={`rounded-md border px-3 py-2 text-left text-sm font-medium transition-colors ${
-                settings.resumeLocale === option.id
-                  ? "border-gray-900 bg-gray-900 text-white"
-                  : "border-gray-300 bg-white text-gray-700 hover:border-gray-400"
-              }`}
-              onClick={() =>
-                dispatch(applyResumeLocalePreset({ locale: option.id }))
-              }
-            >
-              <div>{option.label}</div>
-              <div className="text-xs opacity-80">{option.hint}</div>
-            </button>
-          ))}
-        </div>
+    <div className="flex flex-wrap items-center justify-between gap-3">
+      <div className="flex items-center gap-2">
+        <MapPinIcon className="h-5 w-5 text-gray-600" aria-hidden="true" />
+        <h2 className="text-sm font-semibold text-gray-900">Resume Region</h2>
       </div>
-    </section>
+      <select
+        className="h-9 rounded-md border border-gray-300 bg-white px-2 text-sm font-medium text-gray-700 shadow-sm focus:border-gray-400 focus:outline-none"
+        value={settings.resumeLocale}
+        onChange={(event) =>
+          dispatch(
+            applyResumeLocalePreset({
+              locale: event.target.value as ResumeLocale,
+            })
+          )
+        }
+      >
+        {LOCALE_OPTIONS.map((option) => (
+          <option key={option.id} value={option.id}>
+            {option.label}
+          </option>
+        ))}
+      </select>
+    </div>
   );
 };

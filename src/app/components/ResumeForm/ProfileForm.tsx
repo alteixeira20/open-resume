@@ -5,6 +5,7 @@ import { changeProfile, selectProfile } from "lib/redux/resumeSlice";
 import { selectSettings } from "lib/redux/settingsSlice";
 import { ResumeProfile } from "lib/redux/types";
 import { RESUME_LOCALE_LABELS } from "lib/resume-locale";
+import { UserCircleIcon } from "@heroicons/react/24/outline";
 
 export const ProfileForm = () => {
   const profile = useAppSelector(selectProfile);
@@ -18,7 +19,13 @@ export const ProfileForm = () => {
   };
 
   return (
-    <BaseForm>
+    <BaseForm id="section-profile">
+      <div className="flex items-center gap-2">
+        <UserCircleIcon className="h-6 w-6 text-gray-600" aria-hidden="true" />
+        <h1 className="text-lg font-semibold tracking-wide text-gray-900">
+          Personal Information
+        </h1>
+      </div>
       <div className="grid grid-cols-6 gap-3">
         <Input
           label="Name"

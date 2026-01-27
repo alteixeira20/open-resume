@@ -7,6 +7,7 @@ import {
   FontFamilySelectionsCSR,
   FontSizeSelections,
 } from "components/ResumeForm/ThemeForm/Selection";
+import { ResumeLocaleToggle } from "components/ResumeForm/ResumeLocaleToggle";
 import {
   changeSettings,
   DEFAULT_THEME_COLOR,
@@ -28,14 +29,15 @@ export const ThemeForm = () => {
   };
 
   return (
-    <BaseForm>
+    <BaseForm id="section-settings">
       <div className="flex flex-col gap-6">
         <div className="flex items-center gap-2">
           <Cog6ToothIcon className="h-6 w-6 text-gray-600" aria-hidden="true" />
           <h1 className="text-lg font-semibold tracking-wide text-gray-900 ">
-            Resume Setting
+            Resume Settings
           </h1>
         </div>
+        <ResumeLocaleToggle />
         <div>
           <InlineInput
             label="Theme Color"

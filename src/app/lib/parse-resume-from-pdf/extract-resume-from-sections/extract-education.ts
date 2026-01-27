@@ -39,7 +39,7 @@ const SCHOOL_FEATURE_SETS: FeatureSet[] = [
   [isBold, 2],
   [hasLetter, 1],
   [hasDegree, -4],
-  [hasNumber, -4],
+  [(item) => /^\d+$/.test(item.text.trim()), -4],
 ];
 
 const DEGREE_FEATURE_SETS: FeatureSet[] = [
@@ -72,35 +72,45 @@ export const extractEducation = (sections: ResumeSectionToLines) => {
   const lines = getSectionLinesByKeywords(sections, ["education"]);
   const subsections = divideSectionIntoSubsections(lines);
   for (const subsectionLines of subsections) {
-    const textItems = subsectionLines.flat();
-    const [school, schoolScores] = getTextWithHighestFeatureScore(
-      textItems,
-      SCHOOL_FEATURE_SETS
-    );
-    const [degree, degreeScores] = getTextWithHighestFeatureScore(
-      textItems,
-      DEGREE_FEATURE_SETS
-    );
-    const [date, dateScores] = getTextWithHighestFeatureScore(
-      textItems,
-      DATE_FEATURE_SETS
-    );
-
-    let descriptions: string[] = [];
     const descriptionsLineIdx = getDescriptionsLineIdx(subsectionLines);
-    if (descriptionsLineIdx !== undefined) {
-      const descriptionsLines = subsectionLines.slice(descriptionsLineIdx);
-      descriptions = getBulletPointsFromLines(descriptionsLines);
-    }
-
     const nonDescriptionLines =
       descriptionsLineIdx === undefined
         ? subsectionLines
         : subsectionLines.slice(0, descriptionsLineIdx);
+    const scoringTextItems = nonDescriptionLines
+      .flat()
+      .filter((item) => !isBulletOnly(item.text));
+    const [school, schoolScores] = getTextWithHighestFeatureScore(
+      scoringTextItems,
+      SCHOOL_FEATURE_SETS
+    );
+    const [degree, degreeScores] = getTextWithHighestFeatureScore(
+      scoringTextItems,
+      DEGREE_FEATURE_SETS
+    );
+    const [date, dateScores] = getTextWithHighestFeatureScore(
+      scoringTextItems,
+      DATE_FEATURE_SETS
+    );
+
+    let descriptions: string[] = [];
+    if (descriptionsLineIdx !== undefined) {
+      const descriptionsLines = subsectionLines.slice(descriptionsLineIdx);
+      descriptions = getBulletPointsFromLines(descriptionsLines);
+    }
     const lineTexts = nonDescriptionLines.map(lineToText).filter(Boolean);
 
     let finalSchool = school;
     let finalDegree = degree;
+
+    if (
+      lineTexts.length >= 2 &&
+      isDateLike(lineTexts[1]) &&
+      hasLetterText(lineTexts[0]) &&
+      !isBulletOnly(lineTexts[0])
+    ) {
+      finalSchool = lineTexts[0];
+    }
 
     if (!finalSchool) {
       finalSchool =

@@ -21,7 +21,7 @@ import {
 // prettier-ignore
 const WORK_EXPERIENCE_KEYWORDS_LOWERCASE = ['work', 'experience', 'employment', 'history', 'job'];
 // prettier-ignore
-const JOB_TITLES = ['Accountant', 'Administrator', 'Advisor', 'Agent', 'Analyst', 'Apprentice', 'Architect', 'Assistant', 'Associate', 'Auditor', 'Bartender', 'Biologist', 'Bookkeeper', 'Buyer', 'Carpenter', 'Cashier', 'CEO', 'Clerk', 'Co-op', 'Co-Founder', 'Consultant', 'Coordinator', 'CTO', 'Developer', 'Designer', 'Director', 'Driver', 'Editor', 'Electrician', 'Engineer', 'Extern', 'Founder', 'Freelancer', 'Head', 'Intern', 'Janitor', 'Journalist', 'Laborer', 'Lawyer', 'Lead', 'Manager', 'Mechanic', 'Member', 'Nurse', 'Officer', 'Operator', 'Operation', 'Photographer', 'President', 'Producer', 'Recruiter', 'Representative', 'Researcher', 'Sales', 'Server', 'Scientist', 'Specialist', 'Supervisor', 'Teacher', 'Technician', 'Trader', 'Trainee', 'Treasurer', 'Tutor', 'Vice', 'VP', 'Volunteer', 'Webmaster', 'Worker'];
+const JOB_TITLES = ['Accountant', 'Administrator', 'Advisor', 'Agent', 'Analyst', 'Apprentice', 'Architect', 'Assistant', 'Associate', 'Auditor', 'Bartender', 'Biologist', 'Bookkeeper', 'Buyer', 'Carpenter', 'Cashier', 'CEO', 'Chef', 'Clerk', 'Co-op', 'Co-Founder', 'Consultant', 'Coordinator', 'Cook', 'CTO', 'Developer', 'Designer', 'Director', 'Driver', 'Editor', 'Electrician', 'Engineer', 'Extern', 'Founder', 'Freelancer', 'Head', 'Intern', 'Janitor', 'Journalist', 'Laborer', 'Lawyer', 'Lead', 'Manager', 'Mechanic', 'Member', 'Nurse', 'Officer', 'Operator', 'Operation', 'Operations', 'Owner', 'Photographer', 'President', 'Producer', 'Recruiter', 'Representative', 'Researcher', 'Sales', 'Server', 'Scientist', 'Specialist', 'Supervisor', 'Teacher', 'Technician', 'Trader', 'Trainee', 'Treasurer', 'Tutor', 'Vice', 'VP', 'Volunteer', 'Webmaster', 'Worker'];
 
 const hasJobTitle = (item: TextItem) =>
   JOB_TITLES.some((jobTitle) =>
@@ -33,6 +33,32 @@ const JOB_TITLE_FEATURE_SET: FeatureSet[] = [
   [hasNumber, -4],
   [hasMoreThan5Words, -2],
 ];
+
+const isDateLike = (text: string) =>
+  /(?:19|20)\d{2}/.test(text) ||
+  /(January|February|March|April|May|June|July|August|September|October|November|December|Jan|Feb|Mar|Apr|Jun|Jul|Aug|Sep|Oct|Nov|Dec)/.test(
+    text
+  ) ||
+  /(Present|Now)/i.test(text);
+
+const lineToText = (line: TextItem[]) =>
+  line
+    .map((item) => item.text)
+    .join(" ")
+    .replace(/\s+/g, " ")
+    .trim();
+
+const hasLetterText = (text: string) => /[A-Za-z\u00C0-\u024F]/.test(text);
+const isBulletOnly = (text: string) => /^[\s•\-◦·*]+$/.test(text.trim());
+
+const DATE_TOKEN_RE =
+  /\b(?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:t(?:ember)?)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?|(?:19|20)\d{2}|Present|Now)\b/i;
+
+const stripDateFromText = (text: string) => {
+  const idx = text.search(DATE_TOKEN_RE);
+  if (idx === -1) return text.trim();
+  return text.slice(0, idx).trim();
+};
 
 export const extractWorkExperience = (sections: ResumeSectionToLines) => {
   const workExperiences: ResumeWorkExperience[] = [];
@@ -46,9 +72,8 @@ export const extractWorkExperience = (sections: ResumeSectionToLines) => {
   for (const subsectionLines of subsections) {
     const descriptionsLineIdx = getDescriptionsLineIdx(subsectionLines) ?? 2;
 
-    const subsectionInfoTextItems = subsectionLines
-      .slice(0, descriptionsLineIdx)
-      .flat();
+    const subsectionInfoLines = subsectionLines.slice(0, descriptionsLineIdx);
+    const subsectionInfoTextItems = subsectionInfoLines.flat();
     const [date, dateScores] = getTextWithHighestFeatureScore(
       subsectionInfoTextItems,
       DATE_FEATURE_SETS
@@ -57,10 +82,32 @@ export const extractWorkExperience = (sections: ResumeSectionToLines) => {
       subsectionInfoTextItems,
       JOB_TITLE_FEATURE_SET
     );
+    const lineEntries = subsectionInfoLines
+      .map((line) => ({
+        text: lineToText(line),
+        bold: line[0] ? isBold(line[0]) : false,
+      }))
+      .filter((entry) => entry.text.length > 0);
+    const lineCandidates = lineEntries
+      .map((entry) => ({
+        ...entry,
+        cleaned: stripDateFromText(entry.text),
+      }))
+      .filter(
+        (entry) =>
+          hasLetterText(entry.cleaned) &&
+          !isDateLike(entry.cleaned) &&
+          !isBulletOnly(entry.cleaned)
+      );
+    const nonBoldCandidates = lineCandidates.filter((entry) => !entry.bold);
+    const fallbackJobTitle =
+      (nonBoldCandidates.length ? nonBoldCandidates : lineCandidates)[0]
+        ?.cleaned ?? "";
+    const finalJobTitle = jobTitle || fallbackJobTitle;
     const COMPANY_FEATURE_SET: FeatureSet[] = [
       [isBold, 2],
       [getHasText(date), -4],
-      [getHasText(jobTitle), -4],
+      [getHasText(finalJobTitle), -4],
     ];
     const [company, companyScores] = getTextWithHighestFeatureScore(
       subsectionInfoTextItems,
@@ -72,7 +119,12 @@ export const extractWorkExperience = (sections: ResumeSectionToLines) => {
       subsectionLines.slice(descriptionsLineIdx);
     const descriptions = getBulletPointsFromLines(subsectionDescriptionsLines);
 
-    workExperiences.push({ company, jobTitle, date, descriptions });
+    workExperiences.push({
+      company,
+      jobTitle: finalJobTitle,
+      date,
+      descriptions,
+    });
     workExperiencesScores.push({
       companyScores,
       jobTitleScores,

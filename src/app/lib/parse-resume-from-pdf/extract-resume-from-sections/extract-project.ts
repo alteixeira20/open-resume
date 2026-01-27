@@ -16,6 +16,23 @@ import {
   getDescriptionsLineIdx,
 } from "lib/parse-resume-from-pdf/extract-resume-from-sections/lib/bullet-points";
 
+const extractFirstUrl = (textItems: { text: string }[]) => {
+  for (const item of textItems) {
+    const match = item.text.match(
+      /(https?:\/\/|www\.)[^\s)]+/i
+    );
+    if (match) {
+      return match[0].replace(/[.,;:)\]]+$/, "");
+    }
+  }
+  return "";
+};
+
+const normalizeUrl = (value: string) => {
+  if (!value) return "";
+  return value.startsWith("http") ? value : `https://${value}`;
+};
+
 export const extractProject = (sections: ResumeSectionToLines) => {
   const projects: ResumeProject[] = [];
   const projectsScores = [];
@@ -45,7 +62,10 @@ export const extractProject = (sections: ResumeSectionToLines) => {
     const descriptionsLines = subsectionLines.slice(descriptionsLineIdx);
     const descriptions = getBulletPointsFromLines(descriptionsLines);
 
-    projects.push({ project, link: "", date, descriptions });
+    const rawLink = extractFirstUrl(subsectionLines.flat());
+    const link = normalizeUrl(rawLink);
+
+    projects.push({ project, link, date, descriptions });
     projectsScores.push({
       projectScores,
       dateScores,

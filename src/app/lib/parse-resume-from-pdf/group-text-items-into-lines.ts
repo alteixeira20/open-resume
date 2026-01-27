@@ -61,10 +61,27 @@ export const groupTextItemsIntoLines = (textItems: TextItems): Lines => {
 const shouldAddSpaceBetweenText = (leftText: string, rightText: string) => {
   const leftTextEnd = leftText[leftText.length - 1];
   const rightTextStart = rightText[0];
+  const rightTextTrimmed = rightText.trim();
+  const startsWithMonth = /^(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec|January|February|March|April|June|July|August|September|October|November|December)\b/.test(
+    rightTextTrimmed
+  );
+  const startsWithSeason = /^(Spring|Summer|Fall|Winter)\b/.test(
+    rightTextTrimmed
+  );
+  const startsWithYear = /^(?:19|20)\d{2}\b/.test(rightTextTrimmed);
+  const startsWithPresent = /^Present\b/i.test(rightTextTrimmed);
+  const endsWithLetter = /[A-Za-z]$/.test(leftTextEnd);
+  const endsWithDigit = /\d$/.test(leftTextEnd);
+  const startsWithLetter = /[A-Za-z]/.test(rightTextStart);
+  const startsWithDigit = /\d/.test(rightTextStart);
   const conditions = [
     [":", ",", "|", ".", ...BULLET_POINTS].includes(leftTextEnd) &&
       rightTextStart !== " ",
     leftTextEnd !== " " && ["|", ...BULLET_POINTS].includes(rightTextStart),
+    endsWithLetter && startsWithDigit,
+    endsWithDigit && startsWithLetter,
+    leftTextEnd !== " " &&
+      (startsWithMonth || startsWithSeason || startsWithYear || startsWithPresent),
   ];
 
   return conditions.some((condition) => condition);

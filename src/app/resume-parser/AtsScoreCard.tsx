@@ -1,3 +1,5 @@
+"use client";
+import { useState } from "react";
 import type { AtsScoreResult } from "lib/ats-score";
 import { cx } from "lib/cx";
 
@@ -28,6 +30,9 @@ const breakdownLabels = (
 
 export const AtsScoreCard = ({ result }: AtsScoreCardProps) => {
   const breakdown = breakdownLabels(result);
+  const [expandedIssues, setExpandedIssues] = useState<Set<string>>(
+    () => new Set()
+  );
 
   if (!result) {
     return (
@@ -87,15 +92,60 @@ export const AtsScoreCard = ({ result }: AtsScoreCardProps) => {
             Suggested improvements
           </h3>
           <ul className="mt-3 space-y-2 text-sm text-gray-700">
-            {result.issues.map((issue) => (
-              <li
-                key={issue}
-                className="flex items-start gap-2 rounded-md border border-gray-100 bg-gray-50 px-3 py-2"
-              >
-                <span className="mt-0.5 h-2 w-2 rounded-full bg-primary" aria-hidden />
-                <span>{issue}</span>
-              </li>
-            ))}
+            {result.issues.map((issue) => {
+              const details = result.issueDetails?.[issue] ?? [];
+              const isExpanded = expandedIssues.has(issue);
+              return (
+                <li
+                  key={issue}
+                  className="rounded-md border border-gray-100 bg-gray-50 px-3 py-2"
+                >
+                  <div className="flex items-start gap-2">
+                    <span
+                      className="mt-0.5 h-2 w-2 rounded-full bg-primary"
+                      aria-hidden
+                    />
+                    <span className="flex-1">{issue}</span>
+                    {details.length > 0 && (
+                      <button
+                        type="button"
+                        className="text-xs font-semibold text-primary hover:underline"
+                        onClick={() =>
+                          setExpandedIssues((prev) => {
+                            const next = new Set(prev);
+                            if (next.has(issue)) {
+                              next.delete(issue);
+                            } else {
+                              next.add(issue);
+                            }
+                            return next;
+                          })
+                        }
+                      >
+                        {isExpanded ? "Hide details" : "Show details"}
+                      </button>
+                    )}
+                  </div>
+                  {details.length > 0 && isExpanded && (
+                    <div className="mt-2 rounded-md border border-gray-200 bg-white px-3 py-2 text-xs text-gray-600">
+                      <p className="font-semibold text-gray-700">
+                        Detected tokens
+                      </p>
+                      <div className="mt-1 flex flex-wrap gap-2">
+                        {details.map((token) => (
+                          <span
+                            key={token}
+                            className="rounded-full border border-gray-200 bg-gray-50 px-2 py-0.5 font-mono"
+                          >
+                            {token}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </li>
+              );
+            })}
           </ul>
         </div>
       )}

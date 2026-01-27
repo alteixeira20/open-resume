@@ -22,6 +22,7 @@ export interface AtsScoreResult {
   score: number;
   breakdown: AtsScoreBreakdown;
   issues: string[];
+  issueDetails?: Record<string, string[]>;
 }
 
 export interface AtsScoreInput {
@@ -42,12 +43,14 @@ export const calculateAtsScore = (input: AtsScoreInput): AtsScoreResult => {
   const jobDescription = input.jobDescription?.trim();
 
   const issues: string[] = [];
+  const issueDetails: Record<string, string[]> = {};
 
   const parsingScore = scoreParsingReliability(
     resume,
     textItems,
     lines,
     issues,
+    issueDetails,
     locale
   );
   const structureScore = scoreStructure(
@@ -55,15 +58,21 @@ export const calculateAtsScore = (input: AtsScoreInput): AtsScoreResult => {
     lines,
     sections,
     issues,
+    issueDetails,
     locale
   );
-  const readabilityScore = scoreReadability(resume, lines, issues);
+  const readabilityScore = scoreReadability(
+    resume,
+    lines,
+    issues,
+    issueDetails
+  );
 
   let keywordsScore: number | undefined;
   let total = parsingScore + structureScore + readabilityScore;
 
   if (jobDescription) {
-    keywordsScore = scoreKeywords(resume, jobDescription, issues);
+    keywordsScore = scoreKeywords(resume, jobDescription, issues, issueDetails);
     total += keywordsScore;
   } else {
     total = rescaleWithoutKeywords(total);
@@ -80,6 +89,8 @@ export const calculateAtsScore = (input: AtsScoreInput): AtsScoreResult => {
       ...(keywordsScore !== undefined ? { keywords: keywordsScore } : {}),
     },
     issues: Array.from(new Set(issues)),
+    issueDetails:
+      Object.keys(issueDetails).length > 0 ? issueDetails : undefined,
   };
 
   return result;
@@ -91,23 +102,34 @@ const rescaleWithoutKeywords = (scoreWithoutKeywords: number) => {
   return clamp(rescaled, 0, 100);
 };
 
+const addIssueDetail = (
+  issueDetails: Record<string, string[]>,
+  issue: string,
+  details: string[]
+) => {
+  if (!details.length) return;
+  const existing = issueDetails[issue] ?? [];
+  issueDetails[issue] = Array.from(new Set([...existing, ...details]));
+};
+
 const scoreParsingReliability = (
   resume: Resume,
   textItems: TextItems,
   lines: Lines,
   issues: string[],
+  issueDetails: Record<string, string[]>,
   locale: ResumeLocale
 ) => {
   const { profile, educations, workExperiences } = resume;
 
   const score =
-    scoreNameField(profile?.name, lines, issues) +
-    scoreEmailField(profile?.email, issues) +
-    scorePhoneField(profile?.phone, issues, locale) +
-    scoreLocationField(profile?.location, lines, issues, locale) +
-    scoreLinks(resume, textItems, issues) +
-    scoreEducationSection(educations, issues) +
-    scoreWorkSection(workExperiences, issues);
+    scoreNameField(profile?.name, lines, issues, issueDetails) +
+    scoreEmailField(profile?.email, issues, issueDetails) +
+    scorePhoneField(profile?.phone, issues, issueDetails, locale) +
+    scoreLocationField(profile?.location, lines, issues, issueDetails, locale) +
+    scoreLinks(resume, textItems, issues, issueDetails) +
+    scoreEducationSection(educations, issues, issueDetails) +
+    scoreWorkSection(workExperiences, issues, issueDetails);
 
   return clamp(score, 0, 40);
 };
@@ -115,7 +137,8 @@ const scoreParsingReliability = (
 const scoreLinks = (
   resume: Resume,
   textItems: TextItems,
-  issues: string[]
+  issues: string[],
+  issueDetails: Record<string, string[]>
 ) => {
   const profileUrl = resume.profile?.url ?? "";
   const githubUrl = resume.profile?.github ?? "";
@@ -126,6 +149,9 @@ const scoreLinks = (
   }
 
   issues.push("No links detected");
+  addIssueDetail(issueDetails, "No links detected", [
+    "No URL-like text found in profile or body. Add LinkedIn/GitHub or project links.",
+  ]);
   return 0;
 };
 
@@ -134,19 +160,24 @@ const scoreStructure = (
   lines: Lines,
   sections: ResumeSectionToLines,
   issues: string[],
+  issueDetails: Record<string, string[]>,
   locale: ResumeLocale
 ) => {
   let score = 0;
 
-  score += scoreSingleColumn(lines, issues);
-  score += scoreHeadings(sections, issues);
-  score += scoreBulletStyle(lines, issues);
-  score += scoreLength(textItems, issues, locale);
+  score += scoreSingleColumn(lines, issues, issueDetails);
+  score += scoreHeadings(sections, issues, issueDetails);
+  score += scoreBulletStyle(lines, issues, issueDetails);
+  score += scoreLength(textItems, issues, issueDetails, locale);
 
   return clamp(score, 0, 20);
 };
 
-const scoreSingleColumn = (lines: Lines, issues: string[]) => {
+const scoreSingleColumn = (
+  lines: Lines,
+  issues: string[],
+  issueDetails: Record<string, string[]>
+) => {
   const leftPositions = lines
     .map((line) => getLineLeft(line))
     .filter((value): value is number => value !== undefined);
@@ -169,6 +200,11 @@ const scoreSingleColumn = (lines: Lines, issues: string[]) => {
     significant[significant.length - 1][0] - significant[0][0];
   if (spread > 120) {
     issues.push("Likely multi-column layout");
+    addIssueDetail(issueDetails, "Likely multi-column layout", [
+      `Detected ${significant.length} left-alignment clusters; spread ≈ ${Math.round(
+        spread
+      )}pt.`,
+    ]);
     return 0;
   }
 
@@ -189,9 +225,17 @@ const bucketize = (values: number[], size: number) => {
   return buckets;
 };
 
-const scoreNameField = (name: string | undefined, lines: Lines, issues: string[]) => {
+const scoreNameField = (
+  name: string | undefined,
+  lines: Lines,
+  issues: string[],
+  issueDetails: Record<string, string[]>
+) => {
   if (!hasValue(name)) {
     issues.push("Name not found");
+    addIssueDetail(issueDetails, "Name not found", [
+      "Ensure your name is a single bold line near the top (letters only).",
+    ]);
     return 0;
   }
 
@@ -209,6 +253,11 @@ const scoreNameField = (name: string | undefined, lines: Lines, issues: string[]
   }
 
   issues.push("Name recognition uncertain");
+  const nameChecks: string[] = [];
+  if (!lettersOnly) nameChecks.push("Contains non-letter symbols.");
+  if (!hasTwoWords) nameChecks.push("Less than two words.");
+  if (!appearsInHeader) nameChecks.push("Not detected in top lines.");
+  addIssueDetail(issueDetails, "Name recognition uncertain", nameChecks);
   if (hasTwoWords || appearsInHeader) {
     return 4;
   }
@@ -216,9 +265,16 @@ const scoreNameField = (name: string | undefined, lines: Lines, issues: string[]
   return 0;
 };
 
-const scoreEmailField = (email: string | undefined, issues: string[]) => {
+const scoreEmailField = (
+  email: string | undefined,
+  issues: string[],
+  issueDetails: Record<string, string[]>
+) => {
   if (!isValidEmail(email)) {
     issues.push("Email not found");
+    addIssueDetail(issueDetails, "Email not found", [
+      "Use a standard format like name@domain.com.",
+    ]);
     return 0;
   }
   return 6;
@@ -227,10 +283,14 @@ const scoreEmailField = (email: string | undefined, issues: string[]) => {
 const scorePhoneField = (
   phone: string | undefined,
   issues: string[],
+  issueDetails: Record<string, string[]>,
   locale: ResumeLocale
 ) => {
   if (!hasValue(phone)) {
     issues.push("Phone number missing");
+    addIssueDetail(issueDetails, "Phone number missing", [
+      "Include a full phone number (country code recommended).",
+    ]);
     return 0;
   }
 
@@ -253,6 +313,10 @@ const scorePhoneField = (
   }
 
   issues.push("Phone number format unclear");
+  addIssueDetail(issueDetails, "Phone number format unclear", [
+    `Detected: "${phone}"`,
+    "Try +351 9xx xxx xxx (EU) or (123) 456-7890 (US).",
+  ]);
   return 2;
 };
 
@@ -260,10 +324,14 @@ const scoreLocationField = (
   location: string | undefined,
   lines: Lines,
   issues: string[],
+  issueDetails: Record<string, string[]>,
   locale: ResumeLocale
 ) => {
   if (!hasValue(location)) {
     issues.push("Location not detected");
+    addIssueDetail(issueDetails, "Location not detected", [
+      "Use City, Country (EU) or City, ST (US).",
+    ]);
     return 0;
   }
 
@@ -281,6 +349,10 @@ const scoreLocationField = (
   }
 
   issues.push("Location format unusual");
+  addIssueDetail(issueDetails, "Location format unusual", [
+    `Detected: "${location}"`,
+    "Use City, Country (EU) or City, ST (US).",
+  ]);
   return appears ? 3 : 1;
 };
 
@@ -302,10 +374,14 @@ const detectLocale = (resume: Resume): ResumeLocale => {
 
 const scoreEducationSection = (
   educations: Resume["educations"],
-  issues: string[]
+  issues: string[],
+  issueDetails: Record<string, string[]>
 ) => {
   if (!educations?.length) {
     issues.push("Education section missing");
+    addIssueDetail(issueDetails, "Education section missing", [
+      "Add school + degree (and date if possible).",
+    ]);
     return 0;
   }
 
@@ -325,15 +401,29 @@ const scoreEducationSection = (
   );
 
   issues.push("Education details incomplete");
+  const missing = educations.map((education, idx) => {
+    const missingFields = [];
+    if (!hasValue(education.school)) missingFields.push("school");
+    if (!hasValue(education.degree)) missingFields.push("degree");
+    if (!hasValue(education.date)) missingFields.push("date");
+    return missingFields.length
+      ? `Entry ${idx + 1} missing: ${missingFields.join(", ")}`
+      : null;
+  }).filter(Boolean) as string[];
+  addIssueDetail(issueDetails, "Education details incomplete", missing);
   return partial ? 3 : 1;
 };
 
 const scoreWorkSection = (
   workExperiences: Resume["workExperiences"],
-  issues: string[]
+  issues: string[],
+  issueDetails: Record<string, string[]>
 ) => {
   if (!workExperiences?.length) {
     issues.push("Work experience section missing");
+    addIssueDetail(issueDetails, "Work experience section missing", [
+      "Add company, title, and date (or descriptions).",
+    ]);
     return 0;
   }
 
@@ -355,12 +445,23 @@ const scoreWorkSection = (
   );
 
   issues.push("Work experience details incomplete");
+  const missing = workExperiences.map((experience, idx) => {
+    const missingFields = [];
+    if (!hasValue(experience.company)) missingFields.push("company");
+    if (!hasValue(experience.jobTitle)) missingFields.push("job title");
+    if (!hasValue(experience.date)) missingFields.push("date");
+    return missingFields.length
+      ? `Entry ${idx + 1} missing: ${missingFields.join(", ")}`
+      : null;
+  }).filter(Boolean) as string[];
+  addIssueDetail(issueDetails, "Work experience details incomplete", missing);
   return partial ? 3 : 1;
 };
 
 const scoreHeadings = (
   sections: ResumeSectionToLines,
-  issues: string[]
+  issues: string[],
+  issueDetails: Record<string, string[]>
 ) => {
   const canonicalHeadings = new Set([
     "profile",
@@ -382,6 +483,9 @@ const scoreHeadings = (
 
   if (headings.length === 0) {
     issues.push("Section headings not found");
+    addIssueDetail(issueDetails, "Section headings not found", [
+      "Use clear section headers like EXPERIENCE, EDUCATION, PROJECTS.",
+    ]);
     return 0;
   }
 
@@ -399,16 +503,26 @@ const scoreHeadings = (
   }
   if (recognized.length > 0) {
     issues.push("Some headings may be hard to detect");
+    addIssueDetail(issueDetails, "Some headings may be hard to detect", [
+      `Detected headings: ${headings.join(", ")}`,
+    ]);
     return 4;
   }
 
   issues.push("Headings formatting unclear");
+  addIssueDetail(issueDetails, "Headings formatting unclear", [
+    `Detected headings: ${headings.join(", ")}`,
+  ]);
   return 2;
 };
 
 const hasTitleShape = (text: string) => /[A-Z][a-z]+/.test(text);
 
-const scoreBulletStyle = (lines: Lines, issues: string[]) => {
+const scoreBulletStyle = (
+  lines: Lines,
+  issues: string[],
+  issueDetails: Record<string, string[]>
+) => {
   if (!lines.length) return 4;
 
   const textLines = lines.map((line) => line.map((item) => item.text).join(" "));
@@ -418,6 +532,9 @@ const scoreBulletStyle = (lines: Lines, issues: string[]) => {
 
   if (tableLines / textLines.length > 0.1) {
     issues.push("Table-like layout detected");
+    addIssueDetail(issueDetails, "Table-like layout detected", [
+      `${tableLines} lines contain table separators (|).`,
+    ]);
   }
 
   if (cleanBullets / textLines.length >= 0.1) {
@@ -428,12 +545,16 @@ const scoreBulletStyle = (lines: Lines, issues: string[]) => {
   }
 
   issues.push("Few bullet points detected");
+  addIssueDetail(issueDetails, "Few bullet points detected", [
+    `Detected ${cleanBullets} bullet lines.`,
+  ]);
   return 2;
 };
 
 const scoreLength = (
   textItems: TextItems,
   issues: string[],
+  issueDetails: Record<string, string[]>,
   locale: ResumeLocale
 ) => {
   if (!textItems.length) return 4;
@@ -454,15 +575,24 @@ const scoreLength = (
 
   if (effectiveLength <= slightOverThreshold) {
     issues.push("Slightly over one page");
+    addIssueDetail(issueDetails, "Slightly over one page", [
+      `Estimated length ≈ ${(effectiveLength * 100).toFixed(0)}% of one page.`,
+    ]);
     return 3;
   }
 
   if (effectiveLength <= 2) {
     issues.push("Resume over 1.5 pages");
+    addIssueDetail(issueDetails, "Resume over 1.5 pages", [
+      `Estimated length ≈ ${(effectiveLength * 100).toFixed(0)}% of one page.`,
+    ]);
     return 2;
   }
 
   issues.push("Resume length exceeds two pages");
+  addIssueDetail(issueDetails, "Resume length exceeds two pages", [
+    `Estimated length ≈ ${(effectiveLength * 100).toFixed(0)}% of one page.`,
+  ]);
   return 0;
 };
 
@@ -500,7 +630,8 @@ const aggregatePages = (textItems: TextItems): PageHeight[] => {
 const scoreKeywords = (
   resume: Resume,
   jobDescription: string,
-  issues: string[]
+  issues: string[],
+  issueDetails: Record<string, string[]>
 ) => {
   const resumeCorpus = resumeText(resume).toLowerCase();
   const jdCorpus = jobDescription.toLowerCase();
@@ -584,7 +715,9 @@ const scoreKeywords = (
         )
         .map(({ original }) => original);
       if (missing.length) {
-        issues.push(`Missing JD keywords (${label}): ${missing.join(", ")}`);
+        const issue = `Missing JD keywords (${label}): ${missing.join(", ")}`;
+        issues.push(issue);
+        addIssueDetail(issueDetails, issue, missing);
       }
     }
   });
@@ -694,18 +827,27 @@ const stem = (word: string) => {
   return result;
 };
 
-const scoreReadability = (resume: Resume, lines: Lines, issues: string[]) => {
+const scoreReadability = (
+  resume: Resume,
+  lines: Lines,
+  issues: string[],
+  issueDetails: Record<string, string[]>
+) => {
   const textLines = lines.map((line) => line.map((item) => item.text).join(" "));
   const joinedText = textLines.join(" ");
 
-  const metricsScore = scoreMetrics(joinedText, issues);
-  const urlsScore = scorePlainUrls(joinedText, issues);
-  const punctuationScore = scoreGluedWords(joinedText, issues);
+  const metricsScore = scoreMetrics(joinedText, issues, issueDetails);
+  const urlsScore = scorePlainUrls(joinedText, issues, issueDetails);
+  const punctuationScore = scoreGluedWords(joinedText, issues, issueDetails);
 
   return clamp(metricsScore + urlsScore + punctuationScore, 0, 10);
 };
 
-const scoreMetrics = (text: string, issues: string[]) => {
+const scoreMetrics = (
+  text: string,
+  issues: string[],
+  issueDetails: Record<string, string[]>
+) => {
   const metrics = collectMetricTokens(text);
 
   if (metrics.size >= 3) {
@@ -713,31 +855,58 @@ const scoreMetrics = (text: string, issues: string[]) => {
   }
   if (metrics.size >= 1) {
     issues.push("Limited quantifiable impact statements");
+    addIssueDetail(
+      issueDetails,
+      "Limited quantifiable impact statements",
+      Array.from(metrics).slice(0, 8)
+    );
     return 3;
   }
 
   issues.push("Few metrics detected");
+  addIssueDetail(issueDetails, "Few metrics detected", [
+    "Add concrete numbers (%, $, time saved, scale, volume).",
+  ]);
   return 1;
 };
 
-const scorePlainUrls = (text: string, issues: string[]) => {
+const scorePlainUrls = (
+  text: string,
+  issues: string[],
+  issueDetails: Record<string, string[]>
+) => {
   if (containsUrl(text)) {
     return 3;
   }
   issues.push("Consider adding raw URLs");
+  addIssueDetail(issueDetails, "Consider adding raw URLs", [
+    "Include full LinkedIn/GitHub or project URLs as visible text.",
+  ]);
   return 1;
 };
 
-const scoreGluedWords = (text: string, issues: string[]) => {
+const scoreGluedWords = (
+  text: string,
+  issues: string[],
+  issueDetails: Record<string, string[]>
+) => {
   const rawTokens = text.split(/\s+/).filter(Boolean);
   const gluedTokens = rawTokens.filter((token) => {
-    const lettersOnly = token.replace(/[^A-Za-z]/g, "");
+    const cleaned = token.replace(/^[^A-Za-z0-9]+|[^A-Za-z0-9]+$/g, "");
+    if (!cleaned) return false;
+    if (cleaned.includes("@")) return false;
+    if (cleaned.includes("http") || cleaned.includes("www.")) return false;
+    if (cleaned.includes("/")) return false;
+    const lettersOnly = cleaned.replace(/[^A-Za-z]/g, "");
     if (lettersOnly.length === 0) {
       return false;
     }
-    const hasInternalCaps = /[a-z]{3,}[A-Z][a-z]+/.test(token);
+    const hasInternalCaps = /[a-z]{3,}[A-Z][a-z]+/.test(cleaned);
     const tooLong = lettersOnly.length >= 18;
-    return hasInternalCaps || tooLong;
+    if (hasInternalCaps && lettersOnly.length >= 12) {
+      return true;
+    }
+    return tooLong;
   });
 
   if (!gluedTokens.length) {
@@ -746,10 +915,20 @@ const scoreGluedWords = (text: string, issues: string[]) => {
 
   if (gluedTokens.length <= 2) {
     issues.push("Minor spacing issues detected");
+    addIssueDetail(
+      issueDetails,
+      "Minor spacing issues detected",
+      Array.from(new Set(gluedTokens)).slice(0, 10)
+    );
     return 1;
   }
 
   issues.push("Multiple run-together words detected");
+  addIssueDetail(
+    issueDetails,
+    "Multiple run-together words detected",
+    Array.from(new Set(gluedTokens)).slice(0, 12)
+  );
   return 0;
 };
 

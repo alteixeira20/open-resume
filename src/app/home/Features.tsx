@@ -13,8 +13,8 @@ const FEATURES = [
   },
   {
     src: featureUSSrc,
-    title: "U.S. Best Practices",
-    text: "OpenResume has built-in best practices for the U.S. job market and works well with top ATS platforms such as Greenhouse and Lever",
+    title: "EU + US Presets",
+    text: "Built-in A4 and Letter defaults with regional headings and ATS-friendly formatting.",
   },
   {
     src: featurePrivacySrc,
@@ -26,11 +26,11 @@ const FEATURES = [
     title: "Open-Source",
     text: (
       <>
-        OpenResume is an open-source project, and its source code can be viewed
-        by anyone on its{" "}
-        <Link href="https://github.com/xitanggg/open-resume">
-          GitHub repository
+        OpenResume is an open-source project. This fork is maintained at{" "}
+        <Link href="https://github.com/alteixeira20/open-resume">
+          GitHub
         </Link>
+        , with the original project credited and preserved.
       </>
     ),
   },

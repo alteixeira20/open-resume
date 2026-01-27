@@ -1,12 +1,11 @@
 "use client";
-import { BaseForm } from "components/ResumeForm/Form";
+import { InputGroupWrapper } from "components/ResumeForm/Form/InputGroup";
 import { useAppDispatch, useAppSelector } from "lib/redux/hooks";
 import {
   applyResumeLocalePreset,
   selectSettings,
   type ResumeLocale,
 } from "lib/redux/settingsSlice";
-import { MapPinIcon } from "@heroicons/react/24/outline";
 
 const LOCALE_OPTIONS: Array<{ id: ResumeLocale; label: string }> = [
   { id: "eu", label: "EU (A4)" },
@@ -18,13 +17,10 @@ export const ResumeLocaleToggle = () => {
   const dispatch = useAppDispatch();
 
   return (
-    <div className="flex flex-wrap items-center justify-between gap-3">
-      <div className="flex items-center gap-2">
-        <MapPinIcon className="h-5 w-5 text-gray-600" aria-hidden="true" />
-        <h2 className="text-sm font-semibold text-gray-900">Resume Region</h2>
-      </div>
+    <div>
+      <InputGroupWrapper label="Resume Region" />
       <select
-        className="h-9 rounded-md border border-gray-300 bg-white px-2 text-sm font-medium text-gray-700 shadow-sm focus:border-gray-400 focus:outline-none"
+        className="mt-2 h-9 w-full rounded-md border border-gray-300 bg-white px-2 text-sm font-medium text-gray-700 shadow-sm focus:border-gray-400 focus:outline-none"
         value={settings.resumeLocale}
         onChange={(event) =>
           dispatch(

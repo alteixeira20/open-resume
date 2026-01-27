@@ -6,6 +6,10 @@ export interface Settings {
   themeColor: string;
   fontFamily: string;
   fontSize: string;
+  lineHeight: string;
+  sectionSpacing: string;
+  nameFontSize: string;
+  sectionHeadingSize: string;
   documentSize: string;
   formToShow: {
     workExperiences: boolean;
@@ -50,6 +54,10 @@ export const initialSettings: Settings = {
   themeColor: DEFAULT_THEME_COLOR,
   fontFamily: DEFAULT_FONT_FAMILY,
   fontSize: DEFAULT_FONT_SIZE,
+  lineHeight: "1.3",
+  sectionSpacing: "normal",
+  nameFontSize: "20",
+  sectionHeadingSize: "11",
   documentSize: "A4",
   formToShow: {
     workExperiences: true,
@@ -65,7 +73,7 @@ export const initialSettings: Settings = {
     projects: "PROJECTS",
     skills: "SKILLS",
     languages: "LANGUAGES",
-    custom: "ADDITIONAL INFORMATION",
+    custom: "ADDITIONAL SECTION",
   },
   formsOrder: [
     "workExperiences",

@@ -9,6 +9,7 @@ import {
   ResumePDFSection,
   ResumePDFText,
 } from "components/Resume/ResumePDF/common";
+import { useResumePDFStyle } from "components/Resume/ResumePDF/common/ResumePDFStyleContext";
 import type { ResumeProfile } from "lib/redux/types";
 
 export const ResumePDFProfile = ({
@@ -22,17 +23,17 @@ export const ResumePDFProfile = ({
 }) => {
   const { name, email, phone, url, github, summary, location } = profile;
   const iconProps = { email, phone, location, url, github };
+  const { nameFontSize } = useResumePDFStyle();
 
   return (
     <ResumePDFSection style={{ marginTop: spacing["4"] }}>
       <ResumePDFText
         bold={true}
         themeColor={themeColor}
-        style={{ fontSize: "20pt" }}
+        style={{ fontSize: `${nameFontSize}pt` }}
       >
         {name}
       </ResumePDFText>
-      {summary && <ResumePDFText>{summary}</ResumePDFText>}
       <View
         style={{
           ...styles.flexRowBetween,
@@ -112,6 +113,7 @@ export const ResumePDFProfile = ({
           );
         })}
       </View>
+      {summary && <ResumePDFText style={{ marginTop: spacing["1"] }}>{summary}</ResumePDFText>}
     </ResumePDFSection>
   );
 };

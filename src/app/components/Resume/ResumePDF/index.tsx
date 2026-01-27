@@ -11,6 +11,7 @@ import { DEFAULT_FONT_COLOR } from "lib/redux/settingsSlice";
 import type { Settings, ShowForm } from "lib/redux/settingsSlice";
 import type { Resume } from "lib/redux/types";
 import { SuppressResumePDFErrorMessage } from "components/Resume/ResumePDF/common/SuppressResumePDFErrorMessage";
+import { ResumePDFStyleProvider } from "components/Resume/ResumePDF/common/ResumePDFStyleContext";
 
 /**
  * Note: ResumePDF is supposed to be rendered inside PDFViewer. However,
@@ -54,6 +55,10 @@ export const ResumePDF = ({
     formToShow,
     formsOrder,
     showBulletPoints,
+    lineHeight,
+    sectionSpacing,
+    nameFontSize,
+    sectionHeadingSize,
   } = settings;
   const themeColor = settings.themeColor || DEFAULT_FONT_COLOR;
 
@@ -130,22 +135,31 @@ export const ResumePDF = ({
               }}
             />
           )}
-          <View
-            style={{
-              ...styles.flexCol,
-              padding: `${spacing[0]} ${spacing[20]}`,
+          <ResumePDFStyleProvider
+            value={{
+              lineHeight: Number(lineHeight) || 1.3,
+              sectionSpacing: Number(sectionSpacing) || 1,
+              nameFontSize: Number(nameFontSize) || 20,
+              sectionHeadingSize: Number(sectionHeadingSize) || 11,
             }}
           >
-            <ResumePDFProfile
-              profile={profile}
-              themeColor={themeColor}
-              isPDF={isPDF}
-            />
-            {showFormsOrder.map((form) => {
-              const Component = formTypeToComponent[form];
-              return <Component key={form} />;
-            })}
-          </View>
+            <View
+              style={{
+                ...styles.flexCol,
+                padding: `${spacing[0]} ${spacing[20]}`,
+              }}
+            >
+              <ResumePDFProfile
+                profile={profile}
+                themeColor={themeColor}
+                isPDF={isPDF}
+              />
+              {showFormsOrder.map((form) => {
+                const Component = formTypeToComponent[form];
+                return <Component key={form} />;
+              })}
+            </View>
+          </ResumePDFStyleProvider>
         </Page>
       </Document>
       <SuppressResumePDFErrorMessage />

@@ -2,7 +2,7 @@
 
 This repository is a fork of [OpenResume](https://github.com/xitanggg/open-resume/) by Xitang (full credit to the original creator). The upstream project delivers an open-source resume builder and parser; this fork keeps that foundation while adding ATS scoring, EU/US CV presets, and extra resume fields geared for real-world hiring workflows.
 
-OpenResume is a **free, open‑source resume builder and resume parser** you can run locally. It helps you **build a professional resume**, **evaluate ATS readability**, and get a **resume score** without sending data to third‑party services.
+OpenResume is a **free, open‑source resume/CV builder and resume parser** you can run locally. It helps you **build a professional resume**, **evaluate ATS readability**, and get a **resume score** without sending data to third‑party services. It also works as a **resume evaluator** and **ATS resume scoring** tool for testing PDFs before you apply.
 
 Official site for the original project: [https://open-resume.com](https://open-resume.com)
 
@@ -16,7 +16,18 @@ Official site for the original project: [https://open-resume.com](https://open-r
 - **Project link field** that makes titles clickable **and** prints the URL as visible text for parsing
 - **Languages section** with proficiency levels (Native / C2 / B1, etc.)
 - **GPA field (US only)** — optional in the US builder; only renders when filled
+- **Section navigation sidebar** for fast jumps between form sections
 - **Makefile workflow** for install/build/run/clean convenience
+
+If you’re looking for a **free CV builder**, **open‑source resume builder**, or **ATS resume scoring** tool, this fork is designed to be self‑hosted and run fully offline.
+
+## ✅ Use Cases
+
+- Build a resume/CV locally with a clean, ATS‑friendly PDF.
+- Test a resume with a resume evaluator before applying.
+- Run ATS resume scoring offline to validate parsing quality.
+- Compare EU (A4) vs US (Letter) assumptions without changing content.
+- Use it as a free resume builder and CV builder you can self‑host.
 
 ## 🚀 ATS Scoring System
 
@@ -34,6 +45,7 @@ For direct API consumption, send the parser output (`textItems`, with optional `
 Docs:
 - `docs/ATS_SCORING.md` — full scoring logic breakdown
 - `docs/ATS_ISSUES.md` — complete list of detected issues and triggers
+- `docs/SELF_HOSTING.md` — self‑hosting guide (local only)
 
 **How the score is calculated**
 
@@ -46,7 +58,7 @@ When no job description is provided, the score rescales the other three categori
 
 ## ⚒️ Resume Builder
 
-OpenResume's resume builder allows user to create a modern professional resume easily.
+OpenResume's resume builder allows users to create a modern professional resume easily.
 
 ![Resume Builder Demo](https://i.ibb.co/jzcrrt8/resume-builder-demo-optimize.gif)
 
@@ -55,9 +67,9 @@ It has 5 Core Features:
 |---|---|
 | **1. Real Time UI Update** | The resume PDF is updated in real time as you enter your resume information, so you can easily see the final output. |
 | **2. Modern Professional Resume Design** | The resume PDF is a modern professional design that adheres to ATS best practices. It automatically formats fonts, sizes, margins, bullet points to ensure consistency and avoid human errors. |
-| **3. Privacy Focus** | The app only runs locally on your browser, meaning no sign up is required and no data ever leaves your browser, so it gives you peace of mind on your personal data. (Fun fact: Running only locally means the app still works even if you disconnect the internet.) |
-| **4. Import From Existing Resume PDF** | If you already have an existing resume PDF, you have the option to import it directly, so you can update your resume design to a modern professional design in literally a few seconds. |
-| **5. Successful Track Record** | OpenResume users have landed interviews and offers from top companies, such as Dropbox, Google, Meta to name a few. It has been proven to work and liken by recruiters and hiring managers. |
+| **3. Privacy Focus** | The app runs locally in your browser. No sign‑up is required and no data leaves your machine. |
+| **4. Import From Existing Resume PDF** | Import an existing PDF to update it into the OpenResume format and continue editing. |
+| **5. Successful Track Record** | OpenResume users have landed interviews and offers from top companies, such as Dropbox, Google, and Meta. |
 
 ## 🔍 Resume Parser
 
@@ -105,7 +117,7 @@ OpenResume is created with the NextJS web framework and follows its project stru
 | / | /page.tsx | Home page that contains hero, auto typing resume, steps, testimonials, logo cloud, etc |
 | /resume-import | /resume-import/page.tsx | Resume import page, where you can choose to import data from an existing resume PDF. The main component used is `ResumeDropzone` (`/components/ResumeDropzone.tsx`) |
 | /resume-builder | /resume-builder/page.tsx | Resume builder page to build and download a resume PDF. The main components used are `ResumeForm` (`/components/ResumeForm`) and `Resume` (`/components/Resume`) |
-| /resume-parser | /resume-parser/page.tsx | Resume parser page to test a resume’s AST readability. The main library util used is `parseResumeFromPdf` (`/lib/parse-resume-from-pdf`) |
+| /resume-parser | /resume-parser/page.tsx | Resume parser page to test a resume’s ATS readability. The main library util used is `parseResumeFromPdf` (`/lib/parse-resume-from-pdf`) |
 
 ## 💻 Local Development
 
@@ -115,6 +127,12 @@ OpenResume is created with the NextJS web framework and follows its project stru
 - **npm** (comes with Node.js)
 
 This repo uses Next.js, React, and a Makefile wrapper around npm commands. All builds run locally.
+
+### Why self‑host
+
+- Your resume data never leaves your machine.
+- ATS scoring and parsing run offline.
+- You can customize templates and fields for your workflow.
 
 ### Method 1: npm
 

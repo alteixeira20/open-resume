@@ -29,7 +29,7 @@ export const EducationsForm = () => {
 
   return (
     <Form form={form} addButtonText={addEducationLabel}>
-      {educations.map(({ school, degree, date, descriptions }, idx) => {
+      {educations.map(({ school, degree, gpa, date, descriptions }, idx) => {
         const handleEducationChange = (
           ...[
             field,
@@ -80,6 +80,16 @@ export const EducationsForm = () => {
               value={degree}
               onChange={handleEducationChange}
             />
+            {settings.resumeLocale === "us" && (
+              <Input
+                label={labels.educationGpaLabel}
+                labelClassName="col-span-2"
+                name="gpa"
+                placeholder="3.8"
+                value={gpa}
+                onChange={handleEducationChange}
+              />
+            )}
             <div className="relative col-span-full">
               <BulletListTextarea
                 label="Additional Information (Optional)"

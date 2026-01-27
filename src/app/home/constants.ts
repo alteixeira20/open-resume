@@ -53,6 +53,7 @@ export const END_HOME_RESUME: Resume = {
     {
       school: "XYZ University",
       degree: "Bachelor of Science in Computer Science",
+      gpa: "3.8",
       date: "Sep 2019 - May 2023",
       descriptions: [
         "Won 1st place in 2022 Education Hackathon, 2nd place in 2023 Health Tech Competition",

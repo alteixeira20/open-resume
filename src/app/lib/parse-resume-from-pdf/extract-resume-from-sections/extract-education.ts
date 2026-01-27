@@ -132,6 +132,7 @@ export const extractEducation = (sections: ResumeSectionToLines) => {
     educations.push({
       school: finalSchool,
       degree: finalDegree,
+      gpa: "",
       date,
       descriptions,
     });

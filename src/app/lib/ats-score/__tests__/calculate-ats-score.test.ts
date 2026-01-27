@@ -90,6 +90,7 @@ describe("calculateAtsScore", () => {
         {
           school: "State University",
           degree: "B.S. Computer Science",
+          gpa: "",
           date: "2019",
           descriptions: ["C systems programming and automation projects"],
         },

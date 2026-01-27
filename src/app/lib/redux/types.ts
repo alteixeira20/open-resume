@@ -18,6 +18,7 @@ export interface ResumeWorkExperience {
 export interface ResumeEducation {
   school: string;
   degree: string;
+  gpa: string;
   date: string;
   descriptions: string[];
 }

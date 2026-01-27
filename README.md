@@ -15,7 +15,7 @@ Official site for the original project: [https://open-resume.com](https://open-r
 - **GitHub profile field** in contact details
 - **Project link field** that makes titles clickable **and** prints the URL as visible text for parsing
 - **Languages section** with proficiency levels (Native / C2 / B1, etc.)
-- **GPA removed** to reduce parsing noise (education is based on school/degree/date only)
+- **GPA field (US only)** — shown in the builder and PDF for US resumes, hidden for EU
 - **Makefile workflow** for install/build/run/clean convenience
 
 ## 🚀 ATS Scoring System

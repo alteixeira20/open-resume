@@ -73,6 +73,7 @@ export const ResumePDF = ({
         educations={educations}
         themeColor={themeColor}
         showBulletPoints={showBulletPoints["educations"]}
+        showGpa={settings.resumeLocale === "us"}
       />
     ),
     projects: () => (

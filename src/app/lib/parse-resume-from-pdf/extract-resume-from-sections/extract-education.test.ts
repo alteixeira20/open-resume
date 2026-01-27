@@ -27,6 +27,6 @@ describe("extract-education", () => {
     expect(educations[0].school).toBe("42 Porto");
     expect(educations[0].degree).toBe("Software Engineering");
     expect(educations[0].date).toBe("Oct 2024 - Present");
-    expect((educations[0] as any).gpa).toBeUndefined();
+    expect(educations[0].gpa).toBe("");
   });
 });

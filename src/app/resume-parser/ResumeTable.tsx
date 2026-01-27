@@ -72,6 +72,7 @@ export const ResumeTable = ({ resume }: { resume: Resume }) => {
           <Fragment key={idx}>
             <TableRow label="School" value={education.school} />
             <TableRow label="Degree" value={education.degree} />
+            {education.gpa && <TableRow label="GPA" value={education.gpa} />}
             <TableRow label="Date" value={education.date} />
             <TableRow
               label="Descriptions"

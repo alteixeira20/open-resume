@@ -10,6 +10,7 @@ export type ResumeLocaleLabels = {
   profileLocationPlaceholder: string;
   educationSchoolLabel: string;
   educationDegreeLabel: string;
+  educationGpaLabel: string;
   educationAdditionalPlaceholder: string;
 };
 
@@ -25,6 +26,7 @@ export const RESUME_LOCALE_LABELS: Record<ResumeLocale, ResumeLocaleLabels> = {
     profileLocationPlaceholder: "NYC, NY",
     educationSchoolLabel: "School",
     educationDegreeLabel: "Degree & Major",
+    educationGpaLabel: "GPA (Optional)",
     educationAdditionalPlaceholder:
       "Free paragraph space to list out additional activities, courses, awards etc",
   },
@@ -39,6 +41,7 @@ export const RESUME_LOCALE_LABELS: Record<ResumeLocale, ResumeLocaleLabels> = {
     profileLocationPlaceholder: "Lisbon, PT",
     educationSchoolLabel: "Institution",
     educationDegreeLabel: "Degree / Qualification",
+    educationGpaLabel: "GPA (Optional)",
     educationAdditionalPlaceholder:
       "Optional: key modules, awards, Erasmus or thesis highlights",
   },

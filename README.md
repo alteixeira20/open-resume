@@ -2,17 +2,21 @@
 
 This repository is a fork of [OpenResume](https://github.com/xitanggg/open-resume/) by Xitang (full credit to the original creator). The upstream project delivers an open-source resume builder and parser; this fork keeps that foundation while adding ATS scoring, EU/US CV presets, and extra resume fields geared for real-world hiring workflows.
 
+OpenResume is a **free, open‑source resume builder and resume parser** you can run locally. It helps you **build a professional resume**, **evaluate ATS readability**, and get a **resume score** without sending data to third‑party services.
+
 Official site for the original project: [https://open-resume.com](https://open-resume.com)
 
 ## ⭐ Fork Highlights (What’s new here)
 
 - **Local ATS scoring** with UI + API + CLI access (`/resume-parser`, `POST /api/ats-score`, `npm run ats-score -- ...`)
-- **EU vs US resume presets** (A4 vs Letter, headings) directly in the builder
+- **ATS issue details panel** (toggleable diagnostics for every suggested improvement)
+- **EU vs US resume presets** (A4 vs Letter + headings) in the builder
+- **EU/US parser toggle** so scoring expectations match your region
 - **GitHub profile field** in contact details
-- **Project link field** that turns project titles into clickable links in the PDF
+- **Project link field** that makes titles clickable **and** prints the URL as visible text for parsing
 - **Languages section** with proficiency levels (Native / C2 / B1, etc.)
 - **GPA removed** to reduce parsing noise (education is based on school/degree/date only)
-- **Makefile workflow** for install/build/run convenience
+- **Makefile workflow** for install/build/run/clean convenience
 
 ## 🚀 ATS Scoring System
 
@@ -22,9 +26,14 @@ The local-first ATS scoring engine sits on top of the existing parser. Upload a 
 
 - Grades every resume completely offline—no third-party API calls or data sharing.
 - Surfaces structured feedback for parsing reliability, layout heuristics, readability signals, and optional job-description keyword matching.
+- Each suggestion can be expanded to show **exact detections** (e.g., glued tokens, missing fields, page-length estimate).
 - Keeps parity between UI, REST API (`POST /api/ats-score`), and CLI (`npm run ats-score -- --file resume.pdf [--job job.txt] [--json]`) so the scoring engine can be automated or embedded elsewhere.
 
 For direct API consumption, send the parser output (`textItems`, with optional `lines`, `sections`, and `resume`) to the scoring endpoint. Providing precomputed parser artifacts skips redundant work, and every request remains on-device—no external services involved.
+
+Docs:
+- `docs/ATS_SCORING.md` — full scoring logic breakdown
+- `docs/ATS_ISSUES.md` — complete list of detected issues and triggers
 
 **How the score is calculated**
 
@@ -56,6 +65,11 @@ OpenResume’s second component is the resume parser. For those who have an exis
 
 ![Resume Parser Demo](https://i.ibb.co/JvSVwNk/resume-parser-demo-optimize.gif)
 
+**What’s improved in this fork**
+- EU-friendly phone/location detection
+- More robust education/work/project extraction
+- ATS issue details (toggleable)
+
 You can learn more about the resume parser algorithm in the ["Resume Parser Algorithm Deep Dive" section](https://open-resume.com/resume-parser).
 
 ## 🌍 EU vs US Resume Presets
@@ -67,7 +81,7 @@ The **parser now includes an EU/US toggle** as well, so ATS scoring expectations
 ## 🧩 Extra Fields Added
 
 - **GitHub profile** in the contact section
-- **Project links** (title becomes a link when provided)
+- **Project links** (title becomes a link and URL is printed as visible text for parsing)
 - **Languages** with proficiency level
 
 ## 📚 Tech Stack
@@ -95,6 +109,13 @@ OpenResume is created with the NextJS web framework and follows its project stru
 
 ## 💻 Local Development
 
+### Prerequisites
+
+- **Node.js 18+** (includes npm)
+- **npm** (comes with Node.js)
+
+This repo uses Next.js, React, and a Makefile wrapper around npm commands. All builds run locally.
+
 ### Method 1: npm
 
 1. Download the repo `git clone https://github.com/alteixeira20/open-resume.git`
@@ -112,6 +133,12 @@ OpenResume is created with the NextJS web framework and follows its project stru
 4. Build a production ready version `make build`
 5. Start the App with `make run`
 6. Open your browser and visit [http://localhost:3000](http://localhost:3000) to see OpenResume live
+
+Other useful targets:
+- `make lint` — run ESLint
+- `make test` — run tests
+- `make ats-score ARGS="--file resume.pdf --json"` — CLI scoring
+- `make fclean` — remove `node_modules` and build artifacts
 
 ### Method 2: Docker
 

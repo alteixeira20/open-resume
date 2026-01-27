@@ -28,7 +28,8 @@ export const ResumePDFEducation = ({
             idx > 0 && school === educations[idx - 1].school;
           const showDescriptions = descriptions.join() !== "";
           const dateText = date ? `\u00A0${date}` : "";
-          const gpaText = showGpa && gpa ? `GPA: ${gpa}` : "";
+          const gpaText =
+            showGpa && gpa ? `\u00A0-\u00A0GPA: ${gpa}` : "";
 
           return (
             <View key={idx}>
@@ -45,14 +46,16 @@ export const ResumePDFEducation = ({
                     : spacing["1.5"],
                 }}
               >
-                <ResumePDFText>{degree}</ResumePDFText>
+                <View style={{ ...styles.flexRow, flexGrow: 1, flexBasis: 0 }}>
+                  <ResumePDFText>{degree}</ResumePDFText>
+                  {gpaText && (
+                    <ResumePDFText style={{ fontSize: "9pt" }}>
+                      {gpaText}
+                    </ResumePDFText>
+                  )}
+                </View>
                 <ResumePDFText>{dateText}</ResumePDFText>
               </View>
-              {gpaText && (
-                <ResumePDFText style={{ marginTop: spacing["0.5"] }}>
-                  {gpaText}
-                </ResumePDFText>
-              )}
               {showDescriptions && (
                 <View style={{ ...styles.flexCol, marginTop: spacing["1.5"] }}>
                   <ResumePDFBulletList

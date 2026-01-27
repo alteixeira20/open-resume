@@ -11,11 +11,11 @@ Official site for the original project: [https://open-resume.com](https://open-r
 - **Local ATS scoring** with UI + API + CLI access (`/resume-parser`, `POST /api/ats-score`, `npm run ats-score -- ...`)
 - **ATS issue details panel** (toggleable diagnostics for every suggested improvement)
 - **EU vs US resume presets** (A4 vs Letter + headings) in the builder
-- **EU/US parser toggle** so scoring expectations match your region
+- **EU/US parser toggle** so scoring expectations match your region (auto‑syncs from the builder when available)
 - **GitHub profile field** in contact details
 - **Project link field** that makes titles clickable **and** prints the URL as visible text for parsing
 - **Languages section** with proficiency levels (Native / C2 / B1, etc.)
-- **GPA field (US only)** — shown in the builder and PDF for US resumes, hidden for EU
+- **GPA field (US only)** — optional in the US builder; only renders when filled
 - **Makefile workflow** for install/build/run/clean convenience
 
 ## 🚀 ATS Scoring System

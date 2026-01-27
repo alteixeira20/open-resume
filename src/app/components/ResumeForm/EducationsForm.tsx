@@ -23,7 +23,6 @@ export const EducationsForm = () => {
   const form = "educations";
   const showBulletPoints = useAppSelector(selectShowBulletPoints(form));
   const labels = RESUME_LOCALE_LABELS[settings.resumeLocale];
-
   const addEducationLabel = `Add ${labels.educationSchoolLabel}`;
   const deleteEducationLabel = `Delete ${labels.educationSchoolLabel.toLowerCase()}`;
 
@@ -85,7 +84,6 @@ export const EducationsForm = () => {
                 label={labels.educationGpaLabel}
                 labelClassName="col-span-2"
                 name="gpa"
-                placeholder="3.8"
                 value={gpa}
                 onChange={handleEducationChange}
               />

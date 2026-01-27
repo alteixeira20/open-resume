@@ -16,6 +16,7 @@ import { ThemeForm } from "components/ResumeForm/ThemeForm";
 import { CustomForm } from "components/ResumeForm/CustomForm";
 import { FlexboxSpacer } from "components/FlexboxSpacer";
 import { cx } from "lib/cx";
+import { ResumeLocaleToggle } from "components/ResumeForm/ResumeLocaleToggle";
 
 const formTypeToComponent: { [type in ShowForm]: () => JSX.Element } = {
   workExperiences: WorkExperiencesForm,
@@ -43,6 +44,7 @@ export const ResumeForm = () => {
       onMouseLeave={() => setIsHover(false)}
     >
       <section className="flex max-w-2xl flex-col gap-8 p-[var(--resume-padding)]">
+        <ResumeLocaleToggle />
         <ProfileForm />
         {formsOrder.map((form) => {
           const Component = formTypeToComponent[form];

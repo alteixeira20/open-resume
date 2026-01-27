@@ -40,6 +40,7 @@ const RESUME_EXAMPLES = [
 
 const defaultFileUrl = RESUME_EXAMPLES[0]["fileUrl"];
 const PARSER_REGION_STORAGE_KEY = "open-resume-parser-region";
+const BUILDER_STATE_STORAGE_KEY = "open-resume-state";
 export default function ResumeParser() {
   const [fileUrl, setFileUrl] = useState(defaultFileUrl);
   const [textItems, setTextItems] = useState<TextItems>([]);
@@ -80,6 +81,22 @@ export default function ResumeParser() {
     const stored = localStorage.getItem(PARSER_REGION_STORAGE_KEY);
     if (stored === "us" || stored === "eu") {
       setParserRegion(stored);
+    }
+  }, []);
+
+  useEffect(() => {
+    try {
+      const storedState = localStorage.getItem(BUILDER_STATE_STORAGE_KEY);
+      if (!storedState) return;
+      const parsed = JSON.parse(storedState) as {
+        settings?: { resumeLocale?: ResumeLocale };
+      };
+      const locale = parsed?.settings?.resumeLocale;
+      if (locale === "us" || locale === "eu") {
+        setParserRegion(locale);
+      }
+    } catch {
+      // ignore localStorage parse errors
     }
   }, []);
 

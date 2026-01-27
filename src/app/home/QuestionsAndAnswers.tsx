@@ -40,23 +40,22 @@ const QAS = [
         </p>{" "}
         <p>
           <span className="font-semibold">
-            1. OpenResume is designed specifically for the U.S. job market and
-            best practices.
+            1. OpenResume focuses on ATS‑friendly, single‑column resumes with
+            clear EU/US presets.
           </span>
           <br />
           Unlike other resume builders that target a global audience and offer
           many customization options, OpenResume intentionally only offers
-          options that are aligned with U.S. best practices. For example, it
+          options that are aligned with ATS best practices. For example, it
           excludes the option to add a profile picture to avoid bias and
-          discrimination. It offers only the core sections, e.g. profile, work
-          experience, education, and skills, while omitting unnecessary sections
-          like references. Additionally, OpenResume only offers a top down
-          single column resume design as opposed to two column design, because
-          single column design works best for AST. <br />{" "}
+          discrimination. It offers only the core sections (profile, work
+          experience, education, skills) while omitting unnecessary sections
+          like references. It also enforces a single‑column layout because
+          single‑column designs are the most reliably parsed by ATS. <br />{" "}
         </p>
         <p>
           <span className="font-semibold">
-            2. OpenResume is super privacy focus.
+            2. OpenResume is privacy‑focused.
           </span>{" "}
           <br />
           While other resume builders may require email sign up and store user

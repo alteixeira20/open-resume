@@ -55,7 +55,7 @@ export const initialSettings: Settings = {
   fontFamily: DEFAULT_FONT_FAMILY,
   fontSize: DEFAULT_FONT_SIZE,
   lineHeight: "1.3",
-  sectionSpacing: "normal",
+  sectionSpacing: "1.0",
   nameFontSize: "20",
   sectionHeadingSize: "11",
   documentSize: "A4",

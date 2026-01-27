@@ -18,6 +18,9 @@ export const ThemeForm = () => {
   const { fontSize, fontFamily, lineHeight, sectionSpacing } = settings;
   const themeColor = settings.themeColor || DEFAULT_THEME_COLOR;
   const dispatch = useAppDispatch();
+  const sectionSpacingValue = Number.isFinite(Number(sectionSpacing))
+    ? sectionSpacing
+    : "";
 
   const handleSettingsChange = (field: GeneralSetting, value: string) => {
     dispatch(changeSettings({ field, value }));
@@ -58,7 +61,7 @@ export const ThemeForm = () => {
               max="1.6"
               step="0.1"
               className="w-[5rem] border-b border-gray-300 text-center font-semibold leading-3 outline-none"
-              value={sectionSpacing ?? ""}
+              value={sectionSpacingValue}
               onChange={(event) =>
                 handleSettingsChange("sectionSpacing", event.target.value)
               }

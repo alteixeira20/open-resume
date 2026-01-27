@@ -5,6 +5,7 @@ import {
 } from "components/ResumeForm/Form/InputGroup";
 import { FeaturedSkillInput } from "components/ResumeForm/Form/FeaturedSkillInput";
 import { BulletListIconButton } from "components/ResumeForm/Form/IconButton";
+import { useState } from "react";
 import { useAppDispatch, useAppSelector } from "lib/redux/hooks";
 import { selectSkills, changeSkills } from "lib/redux/resumeSlice";
 import {
@@ -20,6 +21,7 @@ export const SkillsForm = () => {
   const form = "skills";
   const showBulletPoints = useAppSelector(selectShowBulletPoints(form));
   const themeColor = useAppSelector(selectThemeColor) || "#38bdf8";
+  const [showFeaturedSkills, setShowFeaturedSkills] = useState(false);
 
   const handleSkillsChange = (field: "descriptions", value: string[]) => {
     dispatch(changeSkills({ field, value }));
@@ -56,29 +58,39 @@ export const SkillsForm = () => {
           </div>
         </div>
         <div className="col-span-full mb-4 mt-6 border-t-2 border-dotted border-gray-200" />
-        <InputGroupWrapper
-          label="Featured Skills (Optional)"
-          className="col-span-full"
-        >
-          <p className="mt-2 text-sm font-normal text-gray-600">
-            Featured skills is optional to highlight top skills, with more
-            circles mean higher proficiency.
-          </p>
-        </InputGroupWrapper>
-
-        {featuredSkills.map(({ skill, rating }, idx) => (
-          <FeaturedSkillInput
-            key={idx}
-            className="col-span-3"
-            skill={skill}
-            rating={rating}
-            setSkillRating={(newSkill, newRating) => {
-              handleFeaturedSkillsChange(idx, newSkill, newRating);
-            }}
-            placeholder={`Featured Skill ${idx + 1}`}
-            circleColor={themeColor}
-          />
-        ))}
+        <div className="col-span-full flex items-center justify-between gap-4">
+          <InputGroupWrapper label="Featured Skills (Optional)" />
+          <button
+            type="button"
+            className="rounded-md border border-gray-300 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-gray-600 hover:border-gray-400 hover:text-gray-800"
+            onClick={() => setShowFeaturedSkills((prev) => !prev)}
+          >
+            {showFeaturedSkills ? "Hide" : "Show"}
+          </button>
+        </div>
+        {showFeaturedSkills && (
+          <>
+            <InputGroupWrapper className="col-span-full">
+              <p className="mt-2 text-sm font-normal text-gray-600">
+                Featured skills is optional to highlight top skills, with more
+                circles mean higher proficiency.
+              </p>
+            </InputGroupWrapper>
+            {featuredSkills.map(({ skill, rating }, idx) => (
+              <FeaturedSkillInput
+                key={idx}
+                className="col-span-3"
+                skill={skill}
+                rating={rating}
+                setSkillRating={(newSkill, newRating) => {
+                  handleFeaturedSkillsChange(idx, newSkill, newRating);
+                }}
+                placeholder={`Featured Skill ${idx + 1}`}
+                circleColor={themeColor}
+              />
+            ))}
+          </>
+        )}
       </div>
     </Form>
   );

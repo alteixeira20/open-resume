@@ -201,7 +201,7 @@ export const ResumeForm = () => {
             </div>
           </nav>
           <div className="flex flex-col gap-8">
-            <div className="sticky top-0 z-10 bg-gray-50">
+            <div className="sticky top-0 z-10 -mb-8 bg-gray-50">
               <div className="h-6 bg-gray-50 md:-mx-2" />
             </div>
             <ProfileForm />

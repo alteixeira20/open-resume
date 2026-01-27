@@ -4,9 +4,7 @@ This repository is a fork of [OpenResume](https://github.com/xitanggg/open-resum
 
 OpenResume is a **free, open‑source resume/CV builder and resume parser** you can run locally. It helps you **build a professional resume**, **evaluate ATS readability**, and get a **resume score** without sending data to third‑party services. It also works as a **resume evaluator** and **ATS resume scoring** tool for testing PDFs before you apply.
 
-Official site for the original project: [https://open-resume.com](https://open-resume.com)
-
-## ⭐ Fork Highlights (What’s new here)
+## Fork Highlights (What’s new here)
 
 - **Local ATS scoring** with UI + API + CLI access (`/resume-parser`, `POST /api/ats-score`, `npm run ats-score -- ...`)
 - **ATS issue details panel** (toggleable diagnostics for every suggested improvement)
@@ -23,7 +21,7 @@ Official site for the original project: [https://open-resume.com](https://open-r
 
 If you’re looking for a **free CV builder**, **open‑source resume builder**, or **ATS resume scoring** tool, this fork is designed to be self‑hosted and run fully offline.
 
-## ✅ Use Cases
+## Use Cases
 
 - Build a resume/CV locally with a clean, ATS‑friendly PDF.
 - Test a resume with a resume evaluator before applying.
@@ -31,7 +29,7 @@ If you’re looking for a **free CV builder**, **open‑source resume builder**,
 - Compare EU (A4) vs US (Letter) assumptions without changing content.
 - Use it as a free resume builder and CV builder you can self‑host.
 
-## 🚀 ATS Scoring System
+## ATS Scoring System
 
 ![ATS Scoring System](public/assets/ATS_scoring.png)
 
@@ -58,7 +56,7 @@ Docs:
 
 When no job description is provided, the score rescales the other three categories to 100 so results remain comparable. The return payload always includes a breakdown plus a de-duplicated issues list (e.g., `"Education details incomplete"`, `"Likely multi-column layout"`).
 
-## ⚒️ Resume Builder
+## Resume Builder
 
 OpenResume's resume builder allows users to create a modern professional resume easily.
 
@@ -73,7 +71,7 @@ It has 5 Core Features:
 | **4. Import From Existing Resume PDF** | Import an existing PDF to update it into the OpenResume format and continue editing. |
 | **5. Successful Track Record** | OpenResume users have landed interviews and offers from top companies, such as Dropbox, Google, and Meta. |
 
-## 🔍 Resume Parser
+## Resume Parser
 
 OpenResume’s second component is the resume parser. For those who have an existing resume, the resume parser can help test and confirm its ATS readability.
 
@@ -84,21 +82,21 @@ OpenResume’s second component is the resume parser. For those who have an exis
 - More robust education/work/project extraction
 - ATS issue details (toggleable)
 
-You can learn more about the resume parser algorithm in the ["Resume Parser Algorithm Deep Dive" section](https://open-resume.com/resume-parser).
+You can learn more about the resume parser algorithm in the "Resume Parser Algorithm Deep Dive" section inside the app.
 
-## 🌍 EU vs US Resume Presets
+## EU vs US Resume Presets
 
 The builder includes a one-click toggle for **US Resume** vs **EU CV**. It sets sensible defaults for paper size (Letter vs A4) and section headings while keeping ATS-friendly formatting.
 
 The **parser now includes an EU/US toggle** as well, so ATS scoring expectations match your region (A4 vs Letter assumptions).
 
-## 🧩 Extra Fields Added
+## Extra Fields Added
 
 - **GitHub profile** in the contact section
 - **Project links** (title becomes a link and URL is printed as visible text for parsing)
 - **Languages** with proficiency level
 
-## 📚 Tech Stack
+## Tech Stack
 
 | <div style="width:140px">**Category**</div> | <div style="width:100px">**Choice**</div> | **Descriptions** |
 |---|---|---|
@@ -106,11 +104,11 @@ The **parser now includes an EU/US toggle** as well, so ATS scoring expectations
 | **UI Library** | [React](https://github.com/facebook/react) | React’s declarative syntax and component-based architecture make it simple to develop reactive reusable components. |
 | **State Management** | [Redux Toolkit](https://github.com/reduxjs/redux-toolkit) | Redux toolkit reduces the boilerplate to set up and update a central redux store, which is used in managing the complex resume state. |
 | **CSS Framework** | [Tailwind CSS](https://github.com/tailwindlabs/tailwindcss) | Tailwind speeds up development by providing helpful css utilities and removing the need to context switch between tsx and css files. |
-| **Web Framework** | [NextJS 13](https://github.com/vercel/next.js) | Next.js supports static site generation and helps build efficient React webpages that support SEO. |
+| **Web Framework** | [NextJS 13](https://github.com/vercel/next.js) | Next.js supports static site generation and helps build efficient React webpages. |
 | **PDF Reader** | [PDF.js](https://github.com/mozilla/pdf.js) | PDF.js reads content from PDF files and is used by the resume parser at its first step to read a resume PDF’s content. |
 | **PDF Renderer** | [React-pdf](https://github.com/diegomura/react-pdf) | React-pdf creates PDF files and is used by the resume builder to create a downloadable PDF file. |
 
-## 📁 Project Structure
+## Project Structure
 
 OpenResume is created with the NextJS web framework and follows its project structure. The source code can be found in `src/app`. There are a total of 4 page routes as shown in the table below. (Code path is relative to `src/app`)
 

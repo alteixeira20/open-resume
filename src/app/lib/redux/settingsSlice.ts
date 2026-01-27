@@ -46,11 +46,11 @@ export const DEFAULT_FONT_SIZE = "11"; // text-base https://tailwindcss.com/docs
 export const DEFAULT_FONT_COLOR = "#171717"; // text-neutral-800
 
 export const initialSettings: Settings = {
-  resumeLocale: "us",
+  resumeLocale: "eu",
   themeColor: DEFAULT_THEME_COLOR,
   fontFamily: DEFAULT_FONT_FAMILY,
   fontSize: DEFAULT_FONT_SIZE,
-  documentSize: "Letter",
+  documentSize: "A4",
   formToShow: {
     workExperiences: true,
     educations: true,
@@ -60,12 +60,12 @@ export const initialSettings: Settings = {
     custom: false,
   },
   formToHeading: {
-    workExperiences: "WORK EXPERIENCE",
+    workExperiences: "PROFESSIONAL EXPERIENCE",
     educations: "EDUCATION",
-    projects: "PROJECT",
+    projects: "PROJECTS",
     skills: "SKILLS",
     languages: "LANGUAGES",
-    custom: "CUSTOM SECTION",
+    custom: "ADDITIONAL INFORMATION",
   },
   formsOrder: [
     "workExperiences",

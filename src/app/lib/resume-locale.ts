@@ -16,7 +16,7 @@ export type ResumeLocaleLabels = {
 
 export const RESUME_LOCALE_LABELS: Record<ResumeLocale, ResumeLocaleLabels> = {
   us: {
-    profileSummaryLabel: "Objective",
+    profileSummaryLabel: "Summary",
     profileSummaryPlaceholder:
       "Entrepreneur and educator obsessed with making education free for anyone",
     profilePhonePlaceholder: "(123)456-7890",
@@ -31,7 +31,7 @@ export const RESUME_LOCALE_LABELS: Record<ResumeLocale, ResumeLocaleLabels> = {
       "Free paragraph space to list out additional activities, courses, awards etc",
   },
   eu: {
-    profileSummaryLabel: "Profile",
+    profileSummaryLabel: "Summary",
     profileSummaryPlaceholder:
       "Senior software engineer focused on scalable systems and measurable impact",
     profilePhonePlaceholder: "+44 20 1234 5678",

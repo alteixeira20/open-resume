@@ -56,6 +56,10 @@ export const AtsScoreCard = ({ result }: AtsScoreCardProps) => {
               ? ", and job description alignment."
               : "."}
           </p>
+          <p className="mt-2 text-xs text-gray-500">
+            Disclaimer: this score is a diagnostic aid, not a guarantee of interviews or outcomes.
+            Use it to check parsing quality and refine layout, and apply your own judgment.
+          </p>
         </div>
         <div className="text-right">
           <p className="text-sm uppercase tracking-wide text-gray-500">Score</p>

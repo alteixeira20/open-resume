@@ -126,6 +126,18 @@ export default function ResumeParser() {
               ability to parse information from a resume PDF. Click around the
               PDF examples below to observe different parsing results.
             </Paragraph>
+            <Paragraph smallMarginTop={true}>
+              Original project by Xitang (2023). Fork maintained and extended by{" "}
+              <a
+                className="text-primary underline underline-offset-2"
+                href="https://github.com/alteixeira20/"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Alexandre Teixeira
+              </a>
+              .
+            </Paragraph>
             <div className="mt-3 flex gap-3">
               {RESUME_EXAMPLES.map((example, idx) => (
                 <article

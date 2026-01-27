@@ -71,39 +71,61 @@ const QAS = [
   {
     question: "Q3. Who created OpenResume and why?",
     answer: (
+      <>
+        <p>
+          OpenResume was created by{" "}
+          <Link href="https://github.com/xitanggg">Xitang Zhao</Link> and designed
+          by <Link href="https://www.linkedin.com/in/imzhi">Zhigang Wen</Link> as
+          a weekend project. As immigrants to the US, we had made many mistakes
+          when creating our first resumes and applying for internships and jobs.
+          It took us a long while to learn some of the best practices. While
+          mentoring first generation students and reviewing their resumes, we
+          noticed students were making the same mistakes that we had made before.
+          This led us to think about how we can be of help with the knowledge and
+          skills we have gained. We started chatting and working over the weekends
+          that led to OpenResume, where we integrated best practices and our
+          knowledge into this resume builder. Our hope is that OpenResume can help
+          anyone to easily create a modern professional resume that follows best
+          practices and enable anyone to apply for jobs with confidence.
+        </p>
+        <p>
+          This fork is maintained by{" "}
+          <Link href="https://github.com/alteixeira20">Alexandre Teixeira</Link>{" "}
+          and extends the project with ATS scoring, EU/US presets, and extra
+          diagnostics to help users validate parsing and layout safely.
+        </p>
+      </>
+    ),
+  },
+  {
+    question: "Q4. Why was this fork built?",
+    answer: (
       <p>
-        OpenResume was created by{" "}
-        <Link href="https://github.com/xitanggg">Xitang Zhao</Link> and designed
-        by <Link href="https://www.linkedin.com/in/imzhi">Zhigang Wen</Link> as
-        a weekend project. As immigrants to the US, we had made many mistakes
-        when creating our first resumes and applying for internships and jobs.
-        It took us a long while to learn some of the best practices. While
-        mentoring first generation students and reviewing their resumes, we
-        noticed students were making the same mistakes that we had made before.
-        This led us to think about how we can be of help with the knowledge and
-        skills we have gained. We started chatting and working over the weekends
-        that led to OpenResume, where we integrated best practices and our
-        knowledge into this resume builder. Our hope is that OpenResume can help
-        anyone to easily create a modern professional resume that follows best
-        practices and enable anyone to apply for jobs with confidence.
+        This fork keeps OpenResume actively maintained and expands it into a
+        local, ATS‑aware workflow. It adds EU/US presets, ATS scoring with
+        detailed diagnostics, richer builder fields (GitHub, projects, languages,
+        optional GPA for US), safer ATS‑friendly output, and more personalization
+        controls (typography, spacing, and navigation). The goal is simple:
+        help people validate formatting and parsing with transparent feedback,
+        without over‑promising outcomes or replacing human judgment.
       </p>
     ),
   },
   {
-    question: "Q4. How can I support OpenResume?",
+    question: "Q5. How can I support OpenResume?",
     answer: (
       <>
         <p>
           The best way to support OpenResume is to share your thoughts and
-          feedback with us to help further improve it. You can send us an email
-          at{" "}
-          <Link href="mailto:hello@open-resume.com">hello@open-resume.com</Link>{" "}
+          feedback with us to help further improve it. You can open an issue at{" "}
+          <Link href="https://github.com/alteixeira20/open-resume/issues/new">
+            this fork’s GitHub repository
+          </Link>{" "}
           or{" "}
           <Link href="https://github.com/xitanggg/open-resume/issues/new">
-            open an issue
-          </Link>{" "}
-          at our Github repository. Whether you like it or not, we would love to
-          hear from you.
+            the original project
+          </Link>
+          . Whether you like it or not, we would love to hear from you.
         </p>
         <p>
           Another great way to support OpenResume is by spreading the words.
@@ -112,8 +134,12 @@ const QAS = [
           with creating their resume, and your word-of-mouth support would be
           greatly appreciated. If you use Github, you can also show your support
           by{" "}
+          <Link href="https://github.com/alteixeira20/open-resume">
+            giving this fork a star
+          </Link>{" "}
+          and, if you’d like,{" "}
           <Link href="https://github.com/xitanggg/open-resume">
-            giving the project a star
+            starring the original project
           </Link>{" "}
           to help increase its popularity and reach.
         </p>

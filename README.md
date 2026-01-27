@@ -17,6 +17,8 @@ Official site for the original project: [https://open-resume.com](https://open-r
 - **Languages section** with proficiency levels (Native / C2 / B1, etc.)
 - **GPA field (US only)** — optional in the US builder; only renders when filled
 - **Section navigation sidebar** for fast jumps between form sections
+- **Typography controls** for body size, name size, section header size, line height, and section spacing
+- **Featured Skills** block that can be expanded/collapsed to reduce form clutter
 - **Makefile workflow** for install/build/run/clean convenience
 
 If you’re looking for a **free CV builder**, **open‑source resume builder**, or **ATS resume scoring** tool, this fork is designed to be self‑hosted and run fully offline.

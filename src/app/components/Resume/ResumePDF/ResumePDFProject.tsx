@@ -1,4 +1,4 @@
-import { View } from "@react-pdf/renderer";
+import { Text, View } from "@react-pdf/renderer";
 import {
   ResumePDFSection,
   ResumePDFBulletList,
@@ -24,6 +24,7 @@ export const ResumePDFProject = ({
       {projects.map(({ project, link, date, descriptions }, idx) => {
         const normalizedLink =
           link && (link.startsWith("http") ? link : `https://${link}`);
+        const dateText = date ? `\u00A0${date}` : "";
         return (
         <View key={idx}>
           <View
@@ -34,12 +35,17 @@ export const ResumePDFProject = ({
           >
             {normalizedLink ? (
               <ResumePDFLink src={normalizedLink} isPDF={isPDF}>
-                <ResumePDFText bold={true}>{project}</ResumePDFText>
+                <ResumePDFText bold={true}>
+                  {project}
+                  <Text style={{ fontWeight: "normal", fontSize: "9pt" }}>
+                    {`\u00A0-\u00A0${normalizedLink}`}
+                  </Text>
+                </ResumePDFText>
               </ResumePDFLink>
             ) : (
               <ResumePDFText bold={true}>{project}</ResumePDFText>
             )}
-            <ResumePDFText>{date}</ResumePDFText>
+            <ResumePDFText>{dateText}</ResumePDFText>
           </View>
           <View style={{ ...styles.flexCol, marginTop: spacing["0.5"] }}>
             <ResumePDFBulletList items={descriptions} />

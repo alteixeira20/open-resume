@@ -22,6 +22,7 @@ export const ResumePDFWorkExperience = ({
         // Hide company name if it is the same as the previous company
         const hideCompanyName =
           idx > 0 && company === workExperiences[idx - 1].company;
+        const dateText = date ? `\u00A0${date}` : "";
 
         return (
           <View key={idx} style={idx !== 0 ? { marginTop: spacing["2"] } : {}}>
@@ -37,7 +38,7 @@ export const ResumePDFWorkExperience = ({
               }}
             >
               <ResumePDFText>{jobTitle}</ResumePDFText>
-              <ResumePDFText>{date}</ResumePDFText>
+              <ResumePDFText>{dateText}</ResumePDFText>
             </View>
             <View style={{ ...styles.flexCol, marginTop: spacing["1.5"] }}>
               <ResumePDFBulletList items={descriptions} />

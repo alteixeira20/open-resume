@@ -25,6 +25,7 @@ export const ResumePDFEducation = ({
           const hideSchoolName =
             idx > 0 && school === educations[idx - 1].school;
           const showDescriptions = descriptions.join() !== "";
+          const dateText = date ? `\u00A0${date}` : "";
 
           return (
             <View key={idx}>
@@ -42,7 +43,7 @@ export const ResumePDFEducation = ({
                 }}
               >
                 <ResumePDFText>{degree}</ResumePDFText>
-                <ResumePDFText>{date}</ResumePDFText>
+                <ResumePDFText>{dateText}</ResumePDFText>
               </View>
               {showDescriptions && (
                 <View style={{ ...styles.flexCol, marginTop: spacing["1.5"] }}>

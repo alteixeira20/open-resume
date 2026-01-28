@@ -1,4 +1,4 @@
-.PHONY: help install build run lint test ats-score clean fclean
+.PHONY: help install build run lint test ats-score clean fclean docker-build docker-up docker-down docker-logs
 
 help:
 	@printf "OpenResume Makefile targets:\n"
@@ -31,6 +31,18 @@ test:
 
 ats-score:
 	npm run ats-score -- $(ARGS)
+
+docker-build:
+	docker compose build
+
+docker-up:
+	docker compose up -d --build
+
+docker-down:
+	docker compose down
+
+docker-logs:
+	docker compose logs -f open-resume
 
 clean:
 	rm -rf .next dist

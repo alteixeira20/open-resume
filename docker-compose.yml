@@ -1,0 +1,20 @@
+services:
+  open-resume:
+    container_name: open-resume
+    build: .
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - edge
+
+networks:
+  edge:
+    external: true

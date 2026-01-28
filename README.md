@@ -165,3 +165,14 @@ Other useful targets:
 3. Build the container `docker build -t open-resume .`
 4. Start the container `docker run -p 3000:3000 open-resume`
 5. Open your browser and visit [http://localhost:3000](http://localhost:3000) to see OpenResume live
+
+## Deploy with Docker (behind reverse proxy)
+
+Use this when running behind a reverse proxy (e.g., Nginx in the same Docker network).
+
+1. `git clone https://github.com/alteixeira20/open-resume.git`
+2. `cd open-resume`
+3. `docker network create edge` (if it doesn't exist)
+4. `docker compose up -d --build`
+5. Verify from the proxy container:
+   `docker exec nginx wget -qO- http://open-resume:3000 | head`

@@ -84,6 +84,7 @@ export const EducationsForm = () => {
                 label={labels.educationGpaLabel}
                 labelClassName="col-span-2"
                 name="gpa"
+                placeholder="3.8"
                 value={gpa}
                 onChange={handleEducationChange}
               />

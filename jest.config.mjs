@@ -12,6 +12,16 @@ const config = {
   setupFilesAfterEnv: ["<rootDir>/jest.setup.ts"],
 
   testEnvironment: "jest-environment-jsdom",
+  moduleDirectories: ["node_modules", "<rootDir>"],
+  modulePaths: ["<rootDir>/src/app"],
+  moduleNameMapper: {
+    "^@testing-library/jest-dom$":
+      "<rootDir>/node_modules/@testing-library/jest-dom",
+    "^\\.\\./\\.\\./@reduxjs/toolkit$":
+      "<rootDir>/node_modules/@reduxjs/toolkit",
+    "^\\.\\./\\.\\./react/jsx-runtime$":
+      "<rootDir>/node_modules/react/jsx-runtime.js",
+  },
 };
 
 // createJestConfig is exported this way to ensure that next/jest can load the Next.js config which is async

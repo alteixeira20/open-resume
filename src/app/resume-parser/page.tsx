@@ -15,12 +15,6 @@ import { calculateAtsScore } from "lib/ats-score";
 import { AtsScoreCard } from "resume-parser/AtsScoreCard";
 import type { ResumeLocale } from "lib/redux/settingsSlice";
 
-export const metadata = {
-  title: "ATS Resume Checker & Parser (EU/US)",
-  description:
-    "Test your resume or CV with a local ATS score, parsing diagnostics, and EU/US layout expectations.",
-};
-
 const RESUME_EXAMPLES = [
   {
     fileUrl: "resume-example/laverne-resume.pdf",

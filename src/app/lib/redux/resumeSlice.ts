@@ -50,9 +50,10 @@ export const initialLanguage: ResumeLanguage = {
 };
 
 export const initialFeaturedSkill: FeaturedSkill = { skill: "", rating: 4 };
-export const initialFeaturedSkills: FeaturedSkill[] = Array(6).fill({
-  ...initialFeaturedSkill,
-});
+export const initialFeaturedSkills: FeaturedSkill[] = Array.from(
+  { length: 6 },
+  () => ({ ...initialFeaturedSkill })
+);
 export const initialSkills: ResumeSkills = {
   featuredSkills: initialFeaturedSkills,
   descriptions: [],

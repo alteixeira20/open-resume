@@ -49,7 +49,7 @@ export const ResumeDropzone = ({
   const onDrop = (event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault();
     const newFile = event.dataTransfer.files[0];
-    if (newFile.name.endsWith(".pdf")) {
+    if (newFile.name.toLowerCase().endsWith(".pdf")) {
       setHasNonPdfFile(false);
       setNewFile(newFile);
     } else {
@@ -63,11 +63,17 @@ export const ResumeDropzone = ({
     if (!files) return;
 
     const newFile = files[0];
+    if (!newFile.name.toLowerCase().endsWith(".pdf")) {
+      setHasNonPdfFile(true);
+      return;
+    }
+    setHasNonPdfFile(false);
     setNewFile(newFile);
   };
 
   const onRemove = () => {
     setFile(defaultFileState);
+    setHasNonPdfFile(false);
     onFileUrlChange("");
   };
 
@@ -78,11 +84,14 @@ export const ResumeDropzone = ({
     // Set formToShow settings based on uploaded resume if users have used the app before
     if (getHasUsedAppBefore()) {
       const sections = Object.keys(settings.formToShow) as ShowForm[];
+      const hasFeaturedSkills =
+        resume.skills.featuredSkills?.some((skill) => skill.skill.trim()) ??
+        false;
       const sectionToFormToShow: Record<ShowForm, boolean> = {
         workExperiences: resume.workExperiences.length > 0,
         educations: resume.educations.length > 0,
         projects: resume.projects.length > 0,
-        skills: resume.skills.descriptions.length > 0,
+        skills: resume.skills.descriptions.length > 0 || hasFeaturedSkills,
         languages: resume.languages.length > 0,
         custom: resume.custom.descriptions.length > 0,
       };

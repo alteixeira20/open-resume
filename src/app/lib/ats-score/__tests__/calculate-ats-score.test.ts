@@ -206,4 +206,66 @@ describe("calculateAtsScore", () => {
     const expected = Math.round((subtotal / 70) * 100);
     expect(result.score).toBe(expected);
   });
+
+  it("does not treat email as a URL", () => {
+    const textItems: TextItems = [
+      baseTextItem({ text: "jane@example.com", x: 60, y: 700 }),
+    ];
+    const lines: Lines = [[textItems[0]]];
+    const sections: ResumeSectionToLines = { profile: [lines[0]] };
+    const resume: Resume = {
+      profile: {
+        name: "Jane Doe",
+        email: "jane@example.com",
+        phone: "+1 555 555 5555",
+        url: "",
+        summary: "",
+        location: "Lisbon, PT",
+      },
+      workExperiences: [],
+      educations: [],
+      projects: [],
+      skills: { featuredSkills: [], descriptions: [] },
+      custom: { descriptions: [] },
+    };
+
+    const result = calculateAtsScore({ textItems, lines, sections, resume });
+    expect(result.issues).toEqual(
+      expect.arrayContaining(["No links detected"])
+    );
+  });
+
+  it("recognizes EU location format when locale is EU", () => {
+    const textItems: TextItems = [
+      baseTextItem({ text: "Lisbon, PT", x: 60, y: 700 }),
+    ];
+    const lines: Lines = [[textItems[0]]];
+    const sections: ResumeSectionToLines = { profile: [lines[0]] };
+    const resume: Resume = {
+      profile: {
+        name: "Jane Doe",
+        email: "jane@example.com",
+        phone: "+351 912 345 678",
+        url: "https://example.com",
+        summary: "",
+        location: "Lisbon, PT",
+      },
+      workExperiences: [],
+      educations: [],
+      projects: [],
+      skills: { featuredSkills: [], descriptions: [] },
+      custom: { descriptions: [] },
+    };
+
+    const result = calculateAtsScore({
+      textItems,
+      lines,
+      sections,
+      resume,
+      locale: "eu",
+    });
+    expect(result.issues).not.toEqual(
+      expect.arrayContaining(["Location format unusual"])
+    );
+  });
 });

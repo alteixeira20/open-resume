@@ -3,6 +3,7 @@ import {
   matchEmail,
   matchPhone,
   matchUrl,
+  matchLocation,
 } from "lib/parse-resume-from-pdf/extract-resume-from-sections/extract-profile";
 import type { TextItem } from "lib/parse-resume-from-pdf/types";
 
@@ -28,6 +29,18 @@ describe("extract-profile tests - ", () => {
     expect(matchPhone(makeTextItem("  (123)456-7890  "))![0]).toBe(
       "(123)456-7890"
     );
+    expect(matchPhone(makeTextItem("  +351 912 345 678  "))![0]).toBe(
+      "+351 912 345 678"
+    );
+    expect(matchPhone(makeTextItem("12345"))).toBeFalsy();
+  });
+
+  it("Location", () => {
+    expect(matchLocation(makeTextItem("Lisbon, PT"))![0]).toBe("Lisbon, PT");
+    expect(matchLocation(makeTextItem("Paris, France"))![0]).toBe(
+      "Paris, France"
+    );
+    expect(matchLocation(makeTextItem("Remote"))).toBeFalsy();
   });
 
   it("Url", () => {

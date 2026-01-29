@@ -77,6 +77,7 @@ const shouldAddSpaceBetweenText = (leftText: string, rightText: string) => {
   const conditions = [
     [":", ",", "|", ".", ...BULLET_POINTS].includes(leftTextEnd) &&
       rightTextStart !== " ",
+    leftText.trim() === "-" && rightTextStart !== " ",
     leftTextEnd !== " " && ["|", ...BULLET_POINTS].includes(rightTextStart),
     endsWithLetter && startsWithDigit,
     endsWithDigit && startsWithLetter,

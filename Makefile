@@ -14,7 +14,7 @@ help:
 	@printf "  make ats-score ARGS=\"--file resume.pdf --json\"\n"
 
 install:
-	npm install
+	npm ci || npm install
 	npx update-browserslist-db@latest
 
 build: install

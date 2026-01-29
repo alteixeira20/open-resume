@@ -18,12 +18,6 @@ export const Hero = () => {
         <Link href="/resume-import" className="btn-primary mt-6 lg:mt-14">
           Create Resume <span aria-hidden="true">→</span>
         </Link>
-        <Link
-          href="https://github.com/alteixeira20/open-resume"
-          className="ml-3 inline-flex items-center rounded-full border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-100"
-        >
-          Star on GitHub
-        </Link>
         <p className="ml-6 mt-3 text-sm text-gray-600">No sign up required</p>
         <p className="mt-3 text-sm text-gray-600 lg:mt-36">
           Already have a resume? Test its ATS readability with the{" "}

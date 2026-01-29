@@ -14,6 +14,7 @@ const config = {
   testEnvironment: "jest-environment-jsdom",
   moduleDirectories: ["node_modules", "<rootDir>"],
   modulePaths: ["<rootDir>/src/app"],
+  modulePathIgnorePatterns: ["<rootDir>/.next/"],
   moduleNameMapper: {
     "^@testing-library/jest-dom$":
       "<rootDir>/node_modules/@testing-library/jest-dom",

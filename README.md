@@ -127,7 +127,7 @@ OpenResume is created with the NextJS web framework and follows its project stru
 
 ### Prerequisites
 
-- **Node.js 18+** (includes npm)
+- **Node.js 20 LTS** (includes npm)
 - **npm** (comes with Node.js)
 
 This repo uses Next.js, React, and a Makefile wrapper around npm commands. All builds run locally.

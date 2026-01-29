@@ -10,13 +10,19 @@ export const Hero = () => {
         <h1 className="text-primary pb-2 text-4xl font-bold lg:text-5xl">
           Create a professional
           <br />
-          resume easily
+          resume or EU CV easily
         </h1>
         <p className="mt-3 text-lg lg:mt-5 lg:text-xl">
-          With this free, open-source, and powerful resume builder
+          Free, open-source CV builder with EU A4 + US Letter presets and local ATS scoring
         </p>
         <Link href="/resume-import" className="btn-primary mt-6 lg:mt-14">
           Create Resume <span aria-hidden="true">→</span>
+        </Link>
+        <Link
+          href="https://github.com/alteixeira20/open-resume"
+          className="ml-3 inline-flex items-center rounded-full border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-100"
+        >
+          Star on GitHub
         </Link>
         <p className="ml-6 mt-3 text-sm text-gray-600">No sign up required</p>
         <p className="mt-3 text-sm text-gray-600 lg:mt-36">

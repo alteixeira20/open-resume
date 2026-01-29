@@ -4,6 +4,12 @@ import { ResumeDropzone } from "components/ResumeDropzone";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 
+export const metadata = {
+  title: "Import Resume PDF",
+  description:
+    "Import an existing resume PDF to edit it in the OpenResume builder or create a new CV from scratch.",
+};
+
 export default function ImportResume() {
   const [hasUsedAppBefore, setHasUsedAppBefore] = useState(false);
   const [hasAddedResume, setHasAddedResume] = useState(false);

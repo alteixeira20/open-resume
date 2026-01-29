@@ -1,5 +1,9 @@
 # OpenResume — ATS Scoring + EU/US CV Builder
 
+![WIP](https://img.shields.io/badge/status-WIP-yellow)
+
+Try the live demo: [open-resume.alexandreteixeira.dev](https://open-resume.alexandreteixeira.dev/)
+
 This repository is a fork of [OpenResume](https://github.com/xitanggg/open-resume/) by Xitang (full credit to the original creator). The upstream project delivers an open-source resume builder and parser; this fork keeps that foundation while adding ATS scoring, EU/US CV presets, and extra resume fields geared for real-world hiring workflows.
 
 OpenResume is a **free, open‑source resume/CV builder and resume parser** you can run locally. It helps you **build a professional resume**, **evaluate ATS readability**, and get a **resume score** without sending data to third‑party services. It also works as a **resume evaluator** and **ATS resume scoring** tool for testing PDFs before you apply.

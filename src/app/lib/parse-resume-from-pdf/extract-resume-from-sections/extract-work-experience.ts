@@ -22,11 +22,12 @@ import {
 const WORK_EXPERIENCE_KEYWORDS_LOWERCASE = ['work', 'experience', 'employment', 'history', 'job'];
 // prettier-ignore
 const JOB_TITLES = ['Accountant', 'Administrator', 'Advisor', 'Agent', 'Analyst', 'Apprentice', 'Architect', 'Assistant', 'Associate', 'Auditor', 'Bartender', 'Biologist', 'Bookkeeper', 'Buyer', 'Carpenter', 'Cashier', 'CEO', 'Chef', 'Clerk', 'Co-op', 'Co-Founder', 'Consultant', 'Coordinator', 'Cook', 'CTO', 'Developer', 'Designer', 'Director', 'Driver', 'Editor', 'Electrician', 'Engineer', 'Extern', 'Founder', 'Freelancer', 'Head', 'Intern', 'Janitor', 'Journalist', 'Laborer', 'Lawyer', 'Lead', 'Manager', 'Mechanic', 'Member', 'Nurse', 'Officer', 'Operator', 'Operation', 'Operations', 'Owner', 'Photographer', 'President', 'Producer', 'Recruiter', 'Representative', 'Researcher', 'Sales', 'Server', 'Scientist', 'Specialist', 'Supervisor', 'Teacher', 'Technician', 'Trader', 'Trainee', 'Treasurer', 'Tutor', 'Vice', 'VP', 'Volunteer', 'Webmaster', 'Worker'];
+const JOB_TITLES_LOWERCASE = JOB_TITLES.map((title) => title.toLowerCase());
 
 const hasJobTitle = (item: TextItem) =>
-  JOB_TITLES.some((jobTitle) =>
-    item.text.split(/\s/).some((word) => word === jobTitle)
-  );
+  item.text
+    .split(/\s+/)
+    .some((word) => JOB_TITLES_LOWERCASE.includes(word.toLowerCase()));
 const hasMoreThan5Words = (item: TextItem) => item.text.split(/\s/).length > 5;
 const JOB_TITLE_FEATURE_SET: FeatureSet[] = [
   [hasJobTitle, 4],

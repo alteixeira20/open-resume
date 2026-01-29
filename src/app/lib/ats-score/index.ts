@@ -948,9 +948,12 @@ const normalizeComparable = (input: string) =>
     .toLowerCase()
     .replace(/[^a-z0-9]/g, "");
 
+const stripEmails = (text: string) =>
+  text.replace(/\S+@\S+\.\S+/g, " ");
+
 const containsUrl = (text: string) => {
   if (!text) return false;
-  const canonical = text.trim();
+  const canonical = stripEmails(text).trim();
   const explicitPattern = /(https?:\/\/|www\.)[\w\-._~:/?#[\]@!$&'()*+,;=%]+/i;
   if (explicitPattern.test(canonical)) {
     return true;

@@ -25,9 +25,10 @@ const hasAt = (item: TextItem) => item.text.includes("@");
 // Phone
 // Simple phone regex that matches (xxx)-xxx-xxxx where () and - are optional, - can also be space
 export const matchPhone = (item: TextItem) => {
-  const digits = (item.text.match(/\d/g) ?? []).length;
+  const text = item.text.trim();
+  const digits = (text.match(/\d/g) ?? []).length;
   if (digits < 9) return null;
-  return item.text.match(/^\+?[\d\s\-()]{7,}$/);
+  return text.match(/^\+?[\d\s\-()]{7,}$/);
 };
 const hasParenthesis = (item: TextItem) => /\([0-9]+\)/.test(item.text);
 

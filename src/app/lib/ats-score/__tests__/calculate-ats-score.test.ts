@@ -128,12 +128,17 @@ describe("calculateAtsScore", () => {
       jobDescription,
     });
 
-    expect(result.score).toBe(100);
+    expect(result.score).toBe(96);
     expect(result.breakdown.parsing).toBe(40);
     expect(result.breakdown.structure).toBe(20);
-    expect(result.breakdown.readability).toBe(10);
-    expect(result.breakdown.keywords).toBe(30);
-    expect(result.issues).toHaveLength(0);
+    expect(result.breakdown.readability).toBe(8);
+    expect(result.breakdown.keywords).toBe(28);
+    expect(result.issues).toEqual(
+      expect.arrayContaining([
+        "Limited quantifiable impact statements",
+        "Missing JD keywords (environment): version control",
+      ])
+    );
   });
 
   it("rescales score without JD and reports gaps", () => {

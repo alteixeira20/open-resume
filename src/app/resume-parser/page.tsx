@@ -106,16 +106,20 @@ export default function ResumeParser() {
 
   return (
     <main className="h-full w-full overflow-hidden">
-      <div className="grid md:grid-cols-6">
-        <div className="flex justify-center px-2 md:col-span-3 md:h-[calc(100vh-var(--top-nav-bar-height))] md:justify-end">
-          <section className="mt-5 grow px-4 md:max-w-[600px] md:px-0">
-            <div className="aspect-h-[9.5] aspect-w-7">
-              <iframe src={`${fileUrl}#navpanes=0`} className="h-full w-full" />
+      <div className="grid md:grid-cols-12">
+        <div className="flex justify-center px-2 md:col-span-7 md:h-[calc(100vh-var(--top-nav-bar-height))] md:justify-end">
+          <section className="mt-5 flex grow flex-col px-4 md:px-0">
+            <div className="h-full w-full rounded-md border border-gray-200 shadow-lg">
+              <iframe
+                src={`${fileUrl}#navpanes=0`}
+                className="h-full w-full min-h-[520px]"
+                style={{ border: "none" }}
+              />
             </div>
           </section>
           <FlexboxSpacer maxWidth={45} className="hidden md:block" />
         </div>
-        <div className="flex px-6 text-gray-900 md:col-span-3 md:h-[calc(100vh-var(--top-nav-bar-height))] md:overflow-y-scroll">
+        <div className="flex px-6 text-gray-900 md:col-span-5 md:h-[calc(100vh-var(--top-nav-bar-height))] md:flex-col md:overflow-y-scroll">
           <FlexboxSpacer maxWidth={45} className="hidden md:block" />
           <section className="max-w-[600px] grow">
             <Heading className="text-primary !mt-4">

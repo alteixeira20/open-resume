@@ -38,3 +38,6 @@ next-env.d.ts
 # local reports
 summary.txt
 template_context_report.md
+
+# pdfjs runtime assets (copied on install)
+/public/pdfjs/

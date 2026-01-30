@@ -9,7 +9,7 @@ const nextConfig = {
   // https://github.com/mozilla/pdf.js/issues/16214
   output: "standalone",
   outputFileTracingRoot: path.join(__dirname),
-  transpilePackages: ["@react-pdf/renderer", "pdfjs-dist"],
+  transpilePackages: ["@react-pdf/renderer"],
   webpack: (config) => {
     // Setting resolve.alias to false tells webpack to ignore a module
     // https://webpack.js.org/configuration/resolve/#resolvealias

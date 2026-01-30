@@ -61,7 +61,7 @@ export const ResumeForm = () => {
   const [activeId, setActiveId] = useState<string>(
     navItems[0]?.id ?? "section-profile"
   );
-  const [isNavOpen, setIsNavOpen] = useState(true);
+  const [isNavOpen, setIsNavOpen] = useState(false);
   const [isNavDocked, setIsNavDocked] = useState(true);
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
 

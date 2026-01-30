@@ -21,8 +21,9 @@ This file documents the maintenance decisions and upgrades applied to this fork 
 - **React types (18.x)**: type packages bumped to satisfy new Redux peer requirements.
 - **Sharp patch**: upgraded to latest 0.34.x for security and stability.
 - **React-PDF upgrade**: moved to 4.x and added `transpilePackages` in Next config to support ESM-only build.
-- **pdfjs-dist upgrade**: moved to 5.x, using `legacy/build/pdf.mjs` with `pdf.worker.min.mjs` to avoid Node DOMMatrix errors during prerendering.
+- **pdfjs-dist upgrade**: moved to 5.x with client-only dynamic import, using `pdfjs-dist/webpack.mjs` so webpack configures the worker in-browser.
 - **Tailwind 4**: upgraded Tailwind CSS to 4.x and `tailwind-scrollbar` to 4.x after verifying lint/tests/build.
+- **Tailwind PostCSS**: switched PostCSS plugin to `@tailwindcss/postcss` per Tailwind 4 requirements.
 
 ### 2026-01 — Version Bump
 - **Package version** updated to **0.2.0** to reflect the accumulated upgrades and tooling changes.

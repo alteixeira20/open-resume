@@ -15,9 +15,17 @@ export const ResumePDFLanguages = ({
   languages: ResumeLanguage[];
   themeColor: string;
 }) => {
-  const filtered = languages.filter(
-    (item) => item.language || item.proficiency
-  );
+  const normalizeLanguage = (value: string) =>
+    value.replace(/[\s\u2012\u2013\u2014\u2015\u2212\u2010\u00ad\-:]+$/g, "").trim();
+  const normalizeProficiency = (value: string) =>
+    value.replace(/^[\s\u2012\u2013\u2014\u2015\u2212\u2010\u00ad\-:]+/g, "").trim();
+
+  const filtered = languages
+    .map((item) => ({
+      language: normalizeLanguage(item.language),
+      proficiency: normalizeProficiency(item.proficiency),
+    }))
+    .filter((item) => item.language || item.proficiency);
 
   return (
     <ResumePDFSection themeColor={themeColor} heading={heading}>

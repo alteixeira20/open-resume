@@ -1,10 +1,4 @@
-import { getDocument, GlobalWorkerOptions } from "pdfjs-dist/legacy/build/pdf.mjs";
-
-const pdfjsWorker = new URL(
-  "pdfjs-dist/legacy/build/pdf.worker.min.mjs",
-  import.meta.url
-);
-GlobalWorkerOptions.workerSrc = pdfjsWorker.toString();
+import type { PDFDocumentProxy } from "pdfjs-dist/types/src/display/api";
 
 import type { TextItem as PdfjsTextItem } from "pdfjs-dist/types/src/display/api";
 import type { TextItem, TextItems } from "lib/parse-resume-from-pdf/types";
@@ -24,13 +18,42 @@ import type { TextItem, TextItems } from "lib/parse-resume-from-pdf/types";
  */
 export type PdfSource = string | ArrayBufferLike | Uint8Array;
 
+type PdfjsModule = typeof import("pdfjs-dist/build/pdf.mjs");
+
+let pdfjsPromise: Promise<PdfjsModule> | null = null;
+
+const loadPdfjs = async () => {
+  if (!pdfjsPromise) {
+    pdfjsPromise = (async () => {
+      const pdfjsUrl = new URL("/pdfjs/pdf.mjs", window.location.origin).toString();
+      const workerUrl = new URL(
+        "/pdfjs/pdf.worker.mjs",
+        window.location.origin
+      ).toString();
+
+      const pdfjs = (await import(
+        /* webpackIgnore: true */ pdfjsUrl
+      )) as PdfjsModule;
+      pdfjs.GlobalWorkerOptions.workerSrc = workerUrl;
+      return pdfjs;
+    })();
+  }
+  return pdfjsPromise;
+};
+
 export const readPdf = async (fileSource: PdfSource): Promise<TextItems> => {
+  if (typeof window === "undefined") {
+    throw new Error("readPdf can only run in the browser");
+  }
+
+  const { getDocument } = await loadPdfjs();
+
   const loadingTask =
     typeof fileSource === "string"
       ? getDocument(fileSource)
       : getDocument({ data: normalizePdfData(fileSource) });
 
-  const pdfFile = await loadingTask.promise;
+  const pdfFile: PDFDocumentProxy = await loadingTask.promise;
   let textItems: TextItems = [];
 
   for (let i = 1; i <= pdfFile.numPages; i++) {

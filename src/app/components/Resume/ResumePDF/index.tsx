@@ -156,6 +156,7 @@ export const ResumePDF = ({
                 profile={profile}
                 themeColor={themeColor}
                 isPDF={isPDF}
+                bodyFontSize={Number(fontSize) || 11}
               />
               {showFormsOrder.map((form) => {
                 const Component = formTypeToComponent[form];

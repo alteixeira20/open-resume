@@ -16,14 +16,17 @@ export const ResumePDFProfile = ({
   profile,
   themeColor,
   isPDF,
+  bodyFontSize,
 }: {
   profile: ResumeProfile;
   themeColor: string;
   isPDF: boolean;
+  bodyFontSize: number;
 }) => {
   const { name, email, phone, url, github, summary, location } = profile;
   const iconProps = { email, phone, location, url, github };
-  const { nameFontSize } = useResumePDFStyle();
+  const { nameFontSize, lineHeight } = useResumePDFStyle();
+  const rowHeight = `${Number(lineHeight) * bodyFontSize}pt`;
 
   return (
     <ResumePDFSection style={{ marginTop: spacing["4"] }}>
@@ -103,9 +106,17 @@ export const ResumePDFProfile = ({
                 ...styles.flexRow,
                 alignItems: "center",
                 gap: spacing["1"],
+                height: rowHeight,
               }}
             >
-              <ResumePDFIcon type={iconType} isPDF={isPDF} />
+              <View
+                style={{
+                  height: rowHeight,
+                  justifyContent: "center",
+                }}
+              >
+                <ResumePDFIcon type={iconType} isPDF={isPDF} />
+              </View>
               <Wrapper>
                 <ResumePDFText>{value}</ResumePDFText>
               </Wrapper>

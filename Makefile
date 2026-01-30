@@ -1,4 +1,4 @@
-.PHONY: help install build run lint test ats-score clean fclean docker-build docker-up docker-down docker-logs
+.PHONY: help install build run lint test ats-score verify clean fclean docker-build docker-up docker-down docker-logs
 
 help:
 	@printf "OpenResume Makefile targets:\n"
@@ -8,6 +8,7 @@ help:
 	@printf "  make lint      Run eslint\n"
 	@printf "  make test      Run tests (watch)\n"
 	@printf "  make ats-score Run ATS score CLI (pass ARGS=...)\n"
+	@printf "  make verify    Run lint + test:ci + build\n"
 	@printf "  make fclean    Remove node_modules and build artifacts\n"
 	@printf "\nExamples:\n"
 	@printf "  make run\n"
@@ -31,6 +32,11 @@ test:
 
 ats-score:
 	npm run ats-score -- $(ARGS)
+
+verify:
+	npm run lint
+	npm run test:ci
+	npm run build
 
 docker-build:
 	docker compose build

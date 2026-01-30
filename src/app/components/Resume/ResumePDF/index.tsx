@@ -12,6 +12,7 @@ import type { Settings, ShowForm } from "lib/redux/settingsSlice";
 import type { Resume } from "lib/redux/types";
 import { SuppressResumePDFErrorMessage } from "components/Resume/ResumePDF/common/SuppressResumePDFErrorMessage";
 import { ResumePDFStyleProvider } from "components/Resume/ResumePDF/common/ResumePDFStyleContext";
+import type { ReactElement } from "react";
 
 /**
  * Note: ResumePDF is supposed to be rendered inside PDFViewer. However,
@@ -64,7 +65,9 @@ export const ResumePDF = ({
 
   const showFormsOrder = formsOrder.filter((form) => formToShow[form]);
 
-  const formTypeToComponent: { [type in ShowForm]: () => JSX.Element } = {
+  const formTypeToComponent: {
+    [type in ShowForm]: () => ReactElement;
+  } = {
     workExperiences: () => (
       <ResumePDFWorkExperience
         heading={formToHeading["workExperiences"]}

@@ -21,8 +21,9 @@ import { ThemeForm } from "components/ResumeForm/ThemeForm";
 import { CustomForm } from "components/ResumeForm/CustomForm";
 import { FlexboxSpacer } from "components/FlexboxSpacer";
 import { cx } from "lib/cx";
+import type { ReactElement } from "react";
 
-const formTypeToComponent: { [type in ShowForm]: () => JSX.Element } = {
+const formTypeToComponent: { [type in ShowForm]: () => ReactElement } = {
   workExperiences: WorkExperiencesForm,
   educations: EducationsForm,
   projects: ProjectsForm,

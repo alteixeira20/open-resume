@@ -1,9 +1,10 @@
-// Getting pdfjs to work is tricky. The following 3 lines would make it work
-// https://stackoverflow.com/a/63486898/7699841
-import * as pdfjs from "pdfjs-dist";
-// @ts-ignore
-import pdfjsWorker from "pdfjs-dist/build/pdf.worker.entry";
-pdfjs.GlobalWorkerOptions.workerSrc = pdfjsWorker;
+import { getDocument, GlobalWorkerOptions } from "pdfjs-dist/legacy/build/pdf.mjs";
+
+const pdfjsWorker = new URL(
+  "pdfjs-dist/legacy/build/pdf.worker.min.mjs",
+  import.meta.url
+);
+GlobalWorkerOptions.workerSrc = pdfjsWorker.toString();
 
 import type { TextItem as PdfjsTextItem } from "pdfjs-dist/types/src/display/api";
 import type { TextItem, TextItems } from "lib/parse-resume-from-pdf/types";
@@ -26,8 +27,8 @@ export type PdfSource = string | ArrayBufferLike | Uint8Array;
 export const readPdf = async (fileSource: PdfSource): Promise<TextItems> => {
   const loadingTask =
     typeof fileSource === "string"
-      ? pdfjs.getDocument(fileSource)
-      : pdfjs.getDocument({ data: normalizePdfData(fileSource) });
+      ? getDocument(fileSource)
+      : getDocument({ data: normalizePdfData(fileSource) });
 
   const pdfFile = await loadingTask.promise;
   let textItems: TextItems = [];

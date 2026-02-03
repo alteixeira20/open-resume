@@ -8,6 +8,7 @@ export const FeaturedSkillInput = ({
   placeholder,
   className,
   circleColor,
+  maxLength,
 }: {
   skill: string;
   rating: number;
@@ -15,6 +16,7 @@ export const FeaturedSkillInput = ({
   placeholder: string;
   className?: string;
   circleColor?: string;
+  maxLength?: number;
 }) => {
   return (
     <div className={`flex ${className}`}>
@@ -22,7 +24,15 @@ export const FeaturedSkillInput = ({
         type="text"
         value={skill}
         placeholder={placeholder}
-        onChange={(e) => setSkillRating(e.target.value, rating)}
+        maxLength={maxLength}
+        onChange={(e) =>
+          setSkillRating(
+            typeof maxLength === "number"
+              ? e.target.value.slice(0, maxLength)
+              : e.target.value,
+            rating
+          )
+        }
         className={INPUT_CLASS_NAME}
       />
       <CircleRating

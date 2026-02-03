@@ -1,5 +1,10 @@
 import { useEffect, useState } from "react";
-import { A4_HEIGHT_PX, LETTER_HEIGHT_PX } from "lib/constants";
+import {
+  A4_HEIGHT_PX,
+  A4_WIDTH_PX,
+  LETTER_HEIGHT_PX,
+  LETTER_WIDTH_PX,
+} from "lib/constants";
 import { getPxPerRem } from "lib/get-px-per-rem";
 import { CSS_VARIABLES } from "globals-css";
 
@@ -22,6 +27,7 @@ export const useSetDefaultScale = ({
   useEffect(() => {
     const getDefaultScale = () => {
       const screenHeightPx = window.innerHeight;
+      const screenWidthPx = window.innerWidth;
       const PX_PER_REM = getPxPerRem();
       const screenHeightRem = screenHeightPx / PX_PER_REM;
       const topNavBarHeightRem = parseFloat(
@@ -32,6 +38,10 @@ export const useSetDefaultScale = ({
       );
       const resumePadding = parseFloat(CSS_VARIABLES["--resume-padding"]);
       const topAndBottomResumePadding = resumePadding * 2;
+      const isSplitLayout = screenWidthPx >= 768;
+      const availableWidthPx =
+        (isSplitLayout ? screenWidthPx / 2 : screenWidthPx) -
+        topAndBottomResumePadding * PX_PER_REM;
       const defaultResumeHeightRem =
         screenHeightRem -
         topNavBarHeightRem -
@@ -39,8 +49,11 @@ export const useSetDefaultScale = ({
         topAndBottomResumePadding;
       const resumeHeightPx = defaultResumeHeightRem * PX_PER_REM;
       const height = documentSize === "A4" ? A4_HEIGHT_PX : LETTER_HEIGHT_PX;
-      const defaultScale = Math.round((resumeHeightPx / height) * 100) / 100;
-      return defaultScale;
+      const width = documentSize === "A4" ? A4_WIDTH_PX : LETTER_WIDTH_PX;
+      const heightScale = resumeHeightPx / height;
+      const widthScale = availableWidthPx / width;
+      const defaultScale = Math.round(Math.min(heightScale, widthScale, 1) * 100) / 100;
+      return Math.max(0.5, defaultScale);
     };
 
     const setDefaultScale = () => {

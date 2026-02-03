@@ -61,6 +61,7 @@ export const EducationsForm = () => {
               name="school"
               placeholder="Cornell University"
               value={school}
+              maxLength={120}
               onChange={handleEducationChange}
             />
             <Input
@@ -69,6 +70,7 @@ export const EducationsForm = () => {
               name="date"
               placeholder="May 2018"
               value={date}
+              maxLength={60}
               onChange={handleEducationChange}
             />
             <Input
@@ -77,6 +79,7 @@ export const EducationsForm = () => {
               name="degree"
               placeholder="Bachelor of Science in Computer Engineering"
               value={degree}
+              maxLength={120}
               onChange={handleEducationChange}
             />
             {settings.resumeLocale === "us" && (
@@ -86,6 +89,7 @@ export const EducationsForm = () => {
                 name="gpa"
                 placeholder="3.8"
                 value={gpa}
+                maxLength={20}
                 onChange={handleEducationChange}
               />
             )}
@@ -96,6 +100,7 @@ export const EducationsForm = () => {
                 name="descriptions"
                 placeholder={labels.educationAdditionalPlaceholder}
                 value={descriptions}
+                maxLength={200}
                 onChange={handleEducationChange}
                 showBulletPoints={showBulletPoints}
               />

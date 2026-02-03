@@ -12,7 +12,7 @@ import {
 import dynamic from "next/dynamic";
 import { getAllFontFamiliesToLoad } from "components/fonts/lib";
 
-const getIframeInitialContent = (isA4: boolean) => {
+const getIframeInitialContent = (isA4: boolean, allowOverflow: boolean) => {
   const width = isA4 ? A4_WIDTH_PT : LETTER_WIDTH_PT;
   const allFontFamilies = getAllFontFamiliesToLoad();
 
@@ -42,7 +42,7 @@ const getIframeInitialContent = (isA4: boolean) => {
       ${allFontFamiliesFontFaces}
     </style>
   </head>
-  <body style='overflow: hidden; width: ${width}pt; margin: 0; padding: 0; -webkit-text-size-adjust:none;'>
+  <body style='overflow: ${allowOverflow ? "auto" : "hidden"}; width: ${width}pt; margin: 0; padding: 0; -webkit-text-size-adjust:none;'>
     <div></div>
   </body>
 </html>`;
@@ -57,16 +57,22 @@ const ResumeIframe = ({
   scale,
   children,
   enablePDFViewer = false,
+  frameClassName = "bg-white shadow-lg",
+  heightPadding = 0,
+  allowOverflow = false,
 }: {
   documentSize: string;
   scale: number;
   children: React.ReactNode;
   enablePDFViewer?: boolean;
+  frameClassName?: string;
+  heightPadding?: number;
+  allowOverflow?: boolean;
 }) => {
   const isA4 = documentSize === "A4";
   const iframeInitialContent = useMemo(
-    () => getIframeInitialContent(isA4),
-    [isA4]
+    () => getIframeInitialContent(isA4, allowOverflow),
+    [isA4, allowOverflow]
   );
 
   if (enablePDFViewer) {
@@ -78,12 +84,13 @@ const ResumeIframe = ({
   }
   const width = isA4 ? A4_WIDTH_PX : LETTER_WIDTH_PX;
   const height = isA4 ? A4_HEIGHT_PX : LETTER_HEIGHT_PX;
+  const paddedHeight = height + heightPadding;
 
   return (
     <div
       style={{
         maxWidth: `${width * scale}px`,
-        maxHeight: `${height * scale}px`,
+        maxHeight: `${paddedHeight * scale}px`,
       }}
     >
       {/* There is an outer div and an inner div here. The inner div sets the iframe width and uses transform scale to zoom in/out the resume iframe.
@@ -92,10 +99,10 @@ const ResumeIframe = ({
       <div
         style={{
           width: `${width}px`,
-          height: `${height}px`,
+          height: `${paddedHeight}px`,
           transform: `scale(${scale})`,
         }}
-        className={`origin-top-left bg-white shadow-lg`}
+        className={`origin-top-left ${frameClassName}`}
       >
         <Frame
           style={{ width: "100%", height: "100%" }}

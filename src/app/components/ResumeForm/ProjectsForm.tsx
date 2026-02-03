@@ -42,6 +42,7 @@ export const ProjectsForm = () => {
               label="Project Name"
               placeholder="OpenResume"
               value={project}
+              maxLength={120}
               onChange={handleProjectChange}
               labelClassName="col-span-4"
             />
@@ -50,6 +51,7 @@ export const ProjectsForm = () => {
               label="Date"
               placeholder="Winter 2022"
               value={date}
+              maxLength={60}
               onChange={handleProjectChange}
               labelClassName="col-span-2"
             />
@@ -58,6 +60,7 @@ export const ProjectsForm = () => {
               label="Project Link (Optional)"
               placeholder="github.com/user/project"
               value={link}
+              maxLength={120}
               onChange={handleProjectChange}
               labelClassName="col-span-full"
             />
@@ -66,6 +69,7 @@ export const ProjectsForm = () => {
               label="Description"
               placeholder="Bullet points"
               value={descriptions}
+              maxLength={200}
               onChange={handleProjectChange}
               labelClassName="col-span-full"
             />

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { LockClosedIcon } from "@heroicons/react/24/solid";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { parseResumeFromPdf } from "lib/parse-resume-from-pdf";
@@ -23,14 +23,17 @@ export const ResumeDropzone = ({
   onFileUrlChange,
   className,
   playgroundView = false,
+  autoOpen = false,
 }: {
   onFileUrlChange: (fileUrl: string) => void;
   className?: string;
   playgroundView?: boolean;
+  autoOpen?: boolean;
 }) => {
   const [file, setFile] = useState(defaultFileState);
   const [isHoveredOnDropzone, setIsHoveredOnDropzone] = useState(false);
   const [hasNonPdfFile, setHasNonPdfFile] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
 
   const hasFile = Boolean(file.name);
@@ -103,6 +106,12 @@ export const ResumeDropzone = ({
     saveStateToLocalStorage({ resume, settings });
     router.push("/resume-builder");
   };
+
+  useEffect(() => {
+    if (autoOpen && !hasFile) {
+      inputRef.current?.click();
+    }
+  }, [autoOpen, hasFile]);
 
   return (
     <div
@@ -179,6 +188,7 @@ export const ResumeDropzone = ({
                   className="sr-only"
                   accept=".pdf"
                   onChange={onInputChange}
+                  ref={inputRef}
                 />
               </label>
               {hasNonPdfFile && (

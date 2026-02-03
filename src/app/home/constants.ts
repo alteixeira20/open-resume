@@ -73,14 +73,7 @@ export const END_HOME_RESUME: Resume = {
     },
   ],
   skills: {
-    featuredSkills: [
-      { skill: "HTML", rating: 4 },
-      { skill: "CSS", rating: 4 },
-      { skill: "Python", rating: 3 },
-      { skill: "TypeScript", rating: 3 },
-      { skill: "React", rating: 3 },
-      { skill: "C++", rating: 2 },
-    ],
+    featuredSkills: [],
     descriptions: [
       "Tech: React Hooks, GraphQL, Node.js, SQL, Postgres, NoSql, Redis, REST API, Git",
       "Soft: Teamwork, Creative Problem Solving, Communication, Learning Mindset, Agile",
@@ -103,15 +96,12 @@ export const START_HOME_RESUME: Resume = {
   educations: [deepClone(initialEducation)],
   projects: [deepClone(initialProject)],
   skills: {
-    featuredSkills: END_HOME_RESUME.skills.featuredSkills.map((item) => ({
-      skill: "",
-      rating: item.rating,
-    })),
+    featuredSkills: [],
     descriptions: [],
   },
   languages: END_HOME_RESUME.languages.map((item) => ({
     language: "",
-    proficiency: item.proficiency,
+    proficiency: "",
   })),
   custom: {
     descriptions: [],

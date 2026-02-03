@@ -80,6 +80,17 @@ export const ResumePDFText = ({
   children: React.ReactNode;
 }) => {
   const { lineHeight } = useResumePDFStyle();
+  const softWrapText = (value: string) => {
+    const chunkSize = 24;
+    if (value.length <= chunkSize) return value;
+    const parts: string[] = [];
+    for (let i = 0; i < value.length; i += chunkSize) {
+      parts.push(value.slice(i, i + chunkSize));
+    }
+    return parts.join("\u200b");
+  };
+  const content =
+    typeof children === "string" ? softWrapText(children) : children;
   return (
     <Text
       style={{
@@ -90,7 +101,7 @@ export const ResumePDFText = ({
       }}
       debug={DEBUG_RESUME_PDF_FLAG}
     >
-      {children}
+      {content}
     </Text>
   );
 };

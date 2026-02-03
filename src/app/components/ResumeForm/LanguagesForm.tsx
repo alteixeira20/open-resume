@@ -40,6 +40,7 @@ export const LanguagesForm = () => {
               label="Language"
               placeholder="English"
               value={language}
+              maxLength={60}
               onChange={handleLanguageChange}
               labelClassName="col-span-3"
             />
@@ -48,6 +49,7 @@ export const LanguagesForm = () => {
               label="Proficiency"
               placeholder="Native / C2 / Fluent"
               value={proficiency}
+              maxLength={60}
               onChange={handleLanguageChange}
               labelClassName="col-span-3"
             />

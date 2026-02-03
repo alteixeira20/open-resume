@@ -1,3 +1,5 @@
+import { Heading } from "components/documentation";
+
 const HIGHLIGHTS = [
   {
     title: "EU + US presets",
@@ -27,14 +29,14 @@ const HIGHLIGHTS = [
 
 export const ForkHighlights = () => {
   return (
-    <section className="py-10">
+    <section className="py-6">
       <div className="mx-auto max-w-4xl">
-        <h2 className="text-center text-2xl font-bold text-gray-900">
-          What’s new in this fork
-        </h2>
+        <div className="text-center">
+          <Heading className="!mt-0 !mb-3">What’s new with this fork</Heading>
+        </div>
         <p className="mt-3 text-center text-sm text-gray-600">
-          This version keeps the original foundation and adds practical upgrades
-          for real‑world hiring workflows.
+          Open‑source resume builder improvements focused on ATS‑safe resumes,
+          EU/US formatting, and privacy‑first parsing.
         </p>
         <div className="mt-6 grid gap-4 md:grid-cols-2">
           {HIGHLIGHTS.map((item) => (

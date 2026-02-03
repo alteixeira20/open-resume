@@ -1,74 +1,62 @@
-import { Link } from "components/documentation";
+import { Heading, Link } from "components/documentation";
 
 const QAS = [
   {
     question:
-      "Q1. What is a resume builder? Why resume builder is better than resume template doc?",
+      "Q1. What is a free resume builder, and how is it better than a resume template?",
     answer: (
       <>
         <p>
-          There are two ways to create a resume today. One option is to use a
-          resume template, such as an office/google doc, and customize it
-          according to your needs. The other option is to use a resume builder,
-          an online tool that allows you to input your information and
-          automatically generates a resume for you.
+          You can create a resume with a template (Word/Google Docs) or use a
+          free resume builder. A resume builder is an online resume maker that
+          formats your content automatically and keeps ATS‑friendly structure
+          consistent.
         </p>
         <p>
-          Using a resume template requires manual formatting work, like copying
-          and pasting text sections and adjusting spacing, which can be
-          time-consuming and error-prone. It is easy to run into formatting
-          issues, such as using different bullet points or font styles after
-          copying and pasting. On the other hand, a resume builder like
-          OpenResume saves time and prevents formatting mistakes by
-          automatically formatting the resume. It also offers the convenience of
-          easily changing font types or sizes with a simple click. In summary, a
-          resume builder is easier to use compared to a resume template.
+          Resume templates require manual formatting and often break spacing or
+          typography. This fork adds EU A4 + US Letter presets, ATS resume
+          scoring, and richer fields (GitHub, projects, languages) so you can
+          focus on content, not layout.
         </p>
       </>
     ),
   },
   {
     question:
-      "Q2. What uniquely sets OpenResume apart from other resume builders and templates?",
+      "Q2. What makes this open-source resume builder different?",
     answer: (
       <>
         <p>
-          Other than OpenResume, there are some great free resume builders out
-          there, e.g. <Link href="https://rxresu.me/">Reactive Resume</Link>,{" "}
-          <Link href="https://flowcv.com/">FlowCV</Link>. However, OpenResume
-          stands out with 2 distinctive features:
+          Other free resume builders exist, e.g.{" "}
+          <Link href="https://rxresu.me/">Reactive Resume</Link> and{" "}
+          <Link href="https://flowcv.com/">FlowCV</Link>. This fork focuses on
+          ATS‑safe output, EU/US page sizes, ATS resume scoring, and local
+          privacy.
         </p>{" "}
         <p>
           <span className="font-semibold">
-            1. OpenResume focuses on ATS‑friendly, single‑column resumes with
-            clear EU/US presets.
+            1. ATS‑friendly resume templates with EU A4 + US Letter presets.
           </span>
           <br />
-          Unlike other resume builders that target a global audience and offer
-          many customization options, OpenResume intentionally only offers
-          options that are aligned with ATS best practices. For example, it
-          excludes the option to add a profile picture to avoid bias and
-          discrimination. It offers only the core sections (profile, work
-          experience, education, skills) while omitting unnecessary sections
-          like references. It also enforces a single‑column layout because
-          single‑column designs are the most reliably parsed by ATS. <br />{" "}
+          Single‑column layouts are the most reliably parsed by ATS systems. The
+          builder keeps formatting consistent and avoids risky elements like
+          profile photos.
+          <br />{" "}
         </p>
         <p>
           <span className="font-semibold">
-            2. OpenResume is privacy‑focused.
+            2. Local‑first privacy, ATS resume scoring, and parser diagnostics.
           </span>{" "}
           <br />
-          While other resume builders may require email sign up and store user
-          data in their databases, OpenResume believes that resume data should
-          remain private and accessible only on user’s local machine. Therefore,
-          OpenResume doesn’t require sign up to use the app, and all inputted
-          data is stored in user’s browser that only user has access to.
+          Your data stays in your browser—no account required. The ATS resume
+          scoring system and resume parser run locally with transparent
+          diagnostics so you can validate parsing and layout.
         </p>
       </>
     ),
   },
   {
-    question: "Q3. Who created OpenResume and why?",
+    question: "Q3. Who created OpenResume and why is it open source?",
     answer: (
       <>
         <p>
@@ -90,28 +78,24 @@ const QAS = [
         <p>
           This fork is maintained by{" "}
           <Link href="https://github.com/alteixeira20">Alexandre Teixeira</Link>{" "}
-          and extends the project with ATS scoring, EU/US presets, and extra
-          diagnostics to help users validate parsing and layout safely.
+          and extends the project with an ATS resume scoring system, EU/US
+          presets, and extra diagnostics to help users validate parsing and
+          layout safely.
         </p>
       </>
     ),
   },
   {
-    question: "Q4. Why was this fork built?",
+    question: "Q4. Does the ATS resume checker upload my data?",
     answer: (
       <p>
-        This fork keeps OpenResume actively maintained and expands it into a
-        local, ATS‑aware workflow. It adds EU/US presets, ATS scoring with
-        detailed diagnostics, richer builder fields (GitHub, projects, languages,
-        optional GPA for US), safer ATS‑friendly output, and more personalization
-        controls (typography, spacing, and navigation). The goal is simple:
-        help people validate formatting and parsing with transparent feedback,
-        without over‑promising outcomes or replacing human judgment.
+        No. The ATS resume checker and resume parser run locally in your browser.
+        Your resume data is not uploaded to any server.
       </p>
     ),
   },
   {
-    question: "Q5. How can I support OpenResume?",
+    question: "Q5. How can I support this free resume builder?",
     answer: (
       <>
         <p>
@@ -149,16 +133,21 @@ const QAS = [
 
 export const QuestionsAndAnswers = () => {
   return (
-    <section className="mx-auto max-w-3xl divide-y divide-gray-300 lg:mt-4 lg:px-2">
-      <h2 className="text-center text-3xl font-bold">Questions & Answers</h2>
+    <section className="mx-auto max-w-3xl divide-y divide-gray-300 py-6 lg:px-2">
+      <div className="text-center">
+        <Heading className="!mt-0 !mb-3">Resume Builder FAQ</Heading>
+      </div>
       <div className="mt-6 divide-y divide-gray-300">
         {QAS.map(({ question, answer }) => (
-          <div key={question} className="py-6">
-            <h3 className="font-semibold leading-7">{question}</h3>
+          <details key={question} className="group py-4">
+            <summary className="flex cursor-pointer items-center justify-between gap-4 font-semibold leading-7 text-gray-900">
+              <span>{question}</span>
+              <span className="text-gray-400 transition group-open:rotate-180">▾</span>
+            </summary>
             <div className="mt-3 grid gap-2 leading-7 text-gray-600">
               {answer}
             </div>
-          </div>
+          </details>
         ))}
       </div>
     </section>

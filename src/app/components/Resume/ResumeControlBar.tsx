@@ -16,12 +16,14 @@ const ResumeControlBar = ({
   documentSize,
   document,
   fileName,
+  onDownloadJson,
 }: {
   scale: number;
   setScale: (scale: number) => void;
   documentSize: string;
   document: ReactElement<DocumentProps>;
   fileName: string;
+  onDownloadJson: () => void;
 }) => {
   const { scaleOnResize, setScaleOnResize } = useSetDefaultScale({
     setScale,
@@ -30,7 +32,6 @@ const ResumeControlBar = ({
 
   const [instance, update] = usePDF({ document });
 
-  // Hook to update pdf when document changes
   useEffect(() => {
     update(document);
   }, [update, document]);
@@ -61,14 +62,30 @@ const ResumeControlBar = ({
           <span className="select-none">Autoscale</span>
         </label>
       </div>
-      <a
-        className="ml-1 flex items-center gap-1 rounded-md border border-gray-300 px-3 py-0.5 hover:bg-gray-100 lg:ml-8"
-        href={instance.url!}
-        download={fileName}
-      >
-        <ArrowDownTrayIcon className="h-4 w-4" />
-        <span className="whitespace-nowrap">Download Resume</span>
-      </a>
+      <div className="ml-1 flex items-center gap-2 lg:ml-8">
+        <button
+          type="button"
+          className="flex items-center gap-1 rounded-md border border-gray-300 px-3 py-0.5 hover:bg-gray-100"
+          onClick={onDownloadJson}
+        >
+          <ArrowDownTrayIcon className="h-4 w-4" />
+          <span className="hidden whitespace-nowrap sm:inline">
+            Download JSON
+          </span>
+          <span className="whitespace-nowrap sm:hidden">JSON</span>
+        </button>
+        <a
+          className="flex items-center gap-1 rounded-md border border-gray-300 px-3 py-0.5 hover:bg-gray-100"
+          href={instance.url ?? undefined}
+          download={fileName}
+        >
+          <ArrowDownTrayIcon className="h-4 w-4" />
+          <span className="hidden whitespace-nowrap sm:inline">
+            Download PDF
+          </span>
+          <span className="whitespace-nowrap sm:hidden">PDF</span>
+        </a>
+      </div>
     </div>
   );
 };

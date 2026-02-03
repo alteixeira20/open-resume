@@ -1,9 +1,10 @@
 import { Hero } from "home/Hero";
 import { Steps } from "home/Steps";
 import { Features } from "home/Features";
-import { Testimonials } from "home/Testimonials";
 import { QuestionsAndAnswers } from "home/QuestionsAndAnswers";
 import { ForkHighlights } from "home/ForkHighlights";
+import { EvaluatorShowcase } from "home/EvaluatorShowcase";
+import { Footer } from "home/Footer";
 
 const structuredData = {
   "@context": "https://schema.org",
@@ -13,7 +14,7 @@ const structuredData = {
   operatingSystem: "Web",
   url: "https://open-resume.alexandreteixeira.dev",
   description:
-    "Free, open-source resume and CV builder with EU A4 + US Letter presets, ATS scoring, and local-first privacy.",
+    "Free, open-source resume builder and CV builder with EU A4 + US Letter presets, ATS resume scoring system, resume parser, and local-first privacy.",
   offers: {
     "@type": "Offer",
     price: "0",
@@ -22,6 +23,8 @@ const structuredData = {
 };
 
 export default function Home() {
+  const sectionDivider = <div className="my-8 h-px bg-gray-200/70" />;
+
   return (
     <main className="mx-auto max-w-screen-2xl bg-dot px-8 pb-32 text-gray-900 lg:px-12">
       <script
@@ -29,11 +32,17 @@ export default function Home() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
       <Hero />
+      {sectionDivider}
+      <EvaluatorShowcase />
+      {sectionDivider}
       <ForkHighlights />
+      {sectionDivider}
       <Steps />
+      {sectionDivider}
       <Features />
-      <Testimonials />
+      {sectionDivider}
       <QuestionsAndAnswers />
+      <Footer />
     </main>
   );
 }

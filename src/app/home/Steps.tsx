@@ -6,8 +6,10 @@ const STEPS = [
 
 export const Steps = () => {
   return (
-    <section className="mx-auto mt-8 rounded-2xl bg-sky-50 bg-dot px-8 pb-12 pt-10 lg:mt-2">
-      <h1 className="text-center text-3xl font-bold">3 Simple Steps</h1>
+    <section className="mx-auto rounded-2xl bg-sky-50 bg-dot px-8 py-8">
+      <h1 className="text-primary text-center text-3xl font-bold">
+        Build a Resume in 3 Steps
+      </h1>
       <div className="mt-8 flex justify-center">
         <dl className="flex flex-col gap-y-10 lg:flex-row lg:justify-center lg:gap-x-20">
           {STEPS.map(({ title, text }, idx) => (

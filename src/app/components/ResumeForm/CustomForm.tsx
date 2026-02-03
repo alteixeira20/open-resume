@@ -33,6 +33,7 @@ export const CustomForm = () => {
             name="descriptions"
             placeholder="Bullet points"
             value={descriptions}
+            maxLength={200}
             onChange={handleCustomChange}
             showBulletPoints={showBulletPoints}
           />

@@ -47,6 +47,7 @@ export const SkillsForm = () => {
             name="descriptions"
             placeholder="Bullet points"
             value={descriptions}
+            maxLength={120}
             onChange={handleSkillsChange}
             showBulletPoints={showBulletPoints}
           />
@@ -90,6 +91,7 @@ export const SkillsForm = () => {
                 }}
                 placeholder={`Featured Skill ${idx + 1}`}
                 circleColor={themeColor}
+                maxLength={60}
               />
             ))}
           </>

@@ -1,12 +1,15 @@
 "use client";
 import { getHasUsedAppBefore } from "lib/redux/local-storage";
 import { ResumeDropzone } from "components/ResumeDropzone";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 
-export default function ImportResume() {
+const ResumeImportBody = () => {
   const [hasUsedAppBefore, setHasUsedAppBefore] = useState(false);
   const [hasAddedResume, setHasAddedResume] = useState(false);
+  const autoOpen =
+    typeof window !== "undefined" &&
+    new URLSearchParams(window.location.search).get("autoOpen") === "1";
   const onFileUrlChange = (fileUrl: string) => {
     setHasAddedResume(Boolean(fileUrl));
   };
@@ -26,6 +29,7 @@ export default function ImportResume() {
             <ResumeDropzone
               onFileUrlChange={onFileUrlChange}
               className="mt-5"
+              autoOpen={autoOpen}
             />
             {!hasAddedResume && (
               <>
@@ -54,11 +58,20 @@ export default function ImportResume() {
             <ResumeDropzone
               onFileUrlChange={onFileUrlChange}
               className="mt-5"
+              autoOpen={autoOpen}
             />
           </>
         )}
       </div>
     </main>
+  );
+};
+
+export default function ImportResume() {
+  return (
+    <Suspense fallback={null}>
+      <ResumeImportBody />
+    </Suspense>
   );
 }
 

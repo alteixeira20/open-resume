@@ -1,0 +1,122 @@
+{
+  "version": 1,
+  "exportedAt": "2026-02-03T00:00:00.000Z",
+  "resume": {
+    "profile": {
+      "name": "Alexandre Teixeira",
+      "summary": "Full-stack engineer focused on clean UX, ATS-friendly resumes, and privacy-first tooling.",
+      "email": "alex@example.com",
+      "phone": "+351 912 345 678",
+      "location": "Porto, Portugal",
+      "url": "alexandreteixeira.dev",
+      "github": "github.com/alteixeira20"
+    },
+    "workExperiences": [
+      {
+        "company": "OpenResume Fork",
+        "jobTitle": "Maintainer",
+        "date": "2024 - Present",
+        "descriptions": [
+          "Built EU A4 + US Letter presets with ATS-safe formatting and local-only storage.",
+          "Implemented ATS resume scoring with parsing, structure, readability, and keyword diagnostics.",
+          "Improved PDF parsing accuracy and added JSON import/export for resume portability."
+        ]
+      },
+      {
+        "company": "Freelance",
+        "jobTitle": "Full‑Stack Developer",
+        "date": "2022 - 2024",
+        "descriptions": [
+          "Shipped modern web apps with React, Next.js, and TypeScript.",
+          "Optimized UI performance and accessibility for responsive layouts."
+        ]
+      }
+    ],
+    "educations": [
+      {
+        "school": "University of Porto",
+        "degree": "BSc in Computer Science",
+        "gpa": "",
+        "date": "2018 - 2021",
+        "descriptions": [
+          "Coursework: Algorithms, Databases, Web Development, Distributed Systems."
+        ]
+      }
+    ],
+    "projects": [
+      {
+        "project": "OpenResume Fork",
+        "link": "open-resume.alexandreteixeira.dev",
+        "date": "2023 - Present",
+        "descriptions": [
+          "Open-source resume builder with ATS resume scoring and EU/US presets."
+        ]
+      }
+    ],
+    "skills": {
+      "featuredSkills": [
+        { "skill": "React", "rating": 5 },
+        { "skill": "TypeScript", "rating": 5 },
+        { "skill": "Next.js", "rating": 4 },
+        { "skill": "Node.js", "rating": 4 },
+        { "skill": "UX", "rating": 4 },
+        { "skill": "ATS", "rating": 4 }
+      ],
+      "descriptions": [
+        "Frontend: React, Next.js, TypeScript, Tailwind CSS",
+        "Backend: Node.js, REST APIs, PostgreSQL",
+        "Practices: Accessibility, performance, testing, CI/CD"
+      ]
+    },
+    "languages": [
+      { "language": "Portuguese", "proficiency": "Native" },
+      { "language": "English", "proficiency": "Fluent" }
+    ],
+    "custom": {
+      "descriptions": [
+        "Open to remote opportunities across EU and US time zones."
+      ]
+    }
+  },
+  "settings": {
+    "resumeLocale": "eu",
+    "themeColor": "#38bdf8",
+    "fontFamily": "Roboto",
+    "fontSize": "11",
+    "lineHeight": "1.3",
+    "sectionSpacing": "1.0",
+    "nameFontSize": "20",
+    "sectionHeadingSize": "11",
+    "documentSize": "A4",
+    "formToShow": {
+      "workExperiences": true,
+      "educations": true,
+      "projects": true,
+      "skills": true,
+      "languages": true,
+      "custom": true
+    },
+    "formToHeading": {
+      "workExperiences": "PROFESSIONAL EXPERIENCE",
+      "educations": "EDUCATION",
+      "projects": "PROJECTS",
+      "skills": "SKILLS",
+      "languages": "LANGUAGES",
+      "custom": "ADDITIONAL INFORMATION"
+    },
+    "formsOrder": [
+      "workExperiences",
+      "educations",
+      "projects",
+      "skills",
+      "languages",
+      "custom"
+    ],
+    "showBulletPoints": {
+      "educations": true,
+      "projects": true,
+      "skills": true,
+      "custom": true
+    }
+  }
+}

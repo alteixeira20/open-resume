@@ -20,7 +20,7 @@ export const ResumeLocaleToggle = () => {
     <div>
       <InputGroupWrapper label="Resume Region" />
       <select
-        className="mt-2 h-9 w-full rounded-md border border-gray-300 bg-white px-2 text-sm font-medium text-gray-700 shadow-sm focus:border-gray-400 focus:outline-none"
+        className="mt-2 inline-flex h-9 w-auto rounded-md border border-gray-300 bg-white px-3 text-sm font-medium text-gray-700 shadow-sm focus:border-gray-400 focus:outline-none"
         value={settings.resumeLocale}
         onChange={(event) =>
           dispatch(

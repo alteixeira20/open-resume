@@ -60,7 +60,12 @@ export const AutoTypingResume = () => {
 
   return (
     <>
-      <ResumeIframeCSR documentSize="Letter" scale={isLg ? 0.7 : 0.5}>
+      <ResumeIframeCSR
+        documentSize="Letter"
+        scale={isLg ? 0.54 : 0.4}
+        frameClassName="bg-white"
+        heightPadding={16}
+      >
         <ResumePDF
           resume={resume}
           settings={{
@@ -72,7 +77,7 @@ export const AutoTypingResume = () => {
                 : "",
               educations: resume.educations[0].school ? "EDUCATION" : "",
               projects: resume.projects[0].project ? "PROJECT" : "",
-              skills: resume.skills.featuredSkills[0].skill ? "SKILLS" : "",
+              skills: resume.skills.descriptions.length ? "SKILLS" : "",
               languages: resume.languages[0].language ? "LANGUAGES" : "",
               custom: "CUSTOM SECTION",
             },

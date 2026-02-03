@@ -33,6 +33,7 @@ export const ProfileForm = () => {
           name="name"
           placeholder="Sal Khan"
           value={name}
+          maxLength={80}
           onChange={handleProfileChange}
         />
         <Textarea
@@ -41,6 +42,7 @@ export const ProfileForm = () => {
           name="summary"
           placeholder={labels.profileSummaryPlaceholder}
           value={summary}
+          maxLength={600}
           onChange={handleProfileChange}
         />
         <Input
@@ -49,6 +51,7 @@ export const ProfileForm = () => {
           name="email"
           placeholder="hello@khanacademy.org"
           value={email}
+          maxLength={120}
           onChange={handleProfileChange}
         />
         <Input
@@ -57,6 +60,7 @@ export const ProfileForm = () => {
           name="phone"
           placeholder={labels.profilePhonePlaceholder}
           value={phone}
+          maxLength={40}
           onChange={handleProfileChange}
         />
         <Input
@@ -65,6 +69,7 @@ export const ProfileForm = () => {
           name="url"
           placeholder="linkedin.com/in/khanacademy"
           value={url}
+          maxLength={120}
           onChange={handleProfileChange}
         />
         <Input
@@ -73,6 +78,7 @@ export const ProfileForm = () => {
           name="github"
           placeholder={labels.profileGithubPlaceholder}
           value={github}
+          maxLength={120}
           onChange={handleProfileChange}
         />
         <Input
@@ -81,6 +87,7 @@ export const ProfileForm = () => {
           name="location"
           placeholder={labels.profileLocationPlaceholder}
           value={location}
+          maxLength={120}
           onChange={handleProfileChange}
         />
       </div>

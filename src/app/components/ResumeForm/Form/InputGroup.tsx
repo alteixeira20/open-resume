@@ -10,6 +10,8 @@ interface InputProps<K extends string, V extends string | string[]> {
   name: K;
   value?: V;
   placeholder: string;
+  maxLength?: number;
+  showCounter?: boolean;
   onChange: (name: K, value: V) => void;
 }
 
@@ -39,20 +41,36 @@ export const Input = <K extends string>({
   name,
   value = "",
   placeholder,
+  maxLength,
+  showCounter = true,
   onChange,
   label,
   labelClassName,
 }: InputProps<K, string>) => {
+  const clampedValue =
+    typeof maxLength === "number" ? value.slice(0, maxLength) : value;
   return (
     <InputGroupWrapper label={label} className={labelClassName}>
       <input
         type="text"
         name={name}
-        value={value}
+        value={clampedValue}
         placeholder={placeholder}
-        onChange={(e) => onChange(name, e.target.value)}
+        maxLength={maxLength}
+        onChange={(e) => {
+          const nextValue =
+            typeof maxLength === "number"
+              ? e.target.value.slice(0, maxLength)
+              : e.target.value;
+          onChange(name, nextValue);
+        }}
         className={INPUT_CLASS_NAME}
       />
+      {typeof maxLength === "number" && showCounter && (
+        <div className="mt-1 text-right text-xs text-gray-500">
+          {clampedValue.length}/{maxLength}
+        </div>
+      )}
     </InputGroupWrapper>
   );
 };
@@ -63,8 +81,12 @@ export const Textarea = <T extends string>({
   name,
   value = "",
   placeholder,
+  maxLength,
+  showCounter = true,
   onChange,
 }: InputProps<T, string>) => {
+  const clampedValue =
+    typeof maxLength === "number" ? value.slice(0, maxLength) : value;
   const textareaRef = useAutosizeTextareaHeight({ value });
 
   return (
@@ -74,9 +96,21 @@ export const Textarea = <T extends string>({
         name={name}
         className={`${INPUT_CLASS_NAME} resize-none overflow-hidden`}
         placeholder={placeholder}
-        value={value}
-        onChange={(e) => onChange(name, e.target.value)}
+        value={clampedValue}
+        maxLength={maxLength}
+        onChange={(e) => {
+          const nextValue =
+            typeof maxLength === "number"
+              ? e.target.value.slice(0, maxLength)
+              : e.target.value;
+          onChange(name, nextValue);
+        }}
       />
+      {typeof maxLength === "number" && showCounter && (
+        <div className="mt-1 text-right text-xs text-gray-500">
+          {clampedValue.length}/{maxLength}
+        </div>
+      )}
     </InputGroupWrapper>
   );
 };
@@ -120,8 +154,15 @@ const BulletListTextareaGeneral = <T extends string>({
   placeholder,
   onChange,
   showBulletPoints = true,
+  maxLength,
+  showCounter = true,
 }: InputProps<T, string[]> & { showBulletPoints?: boolean }) => {
-  const html = getHTMLFromBulletListStrings(bulletListStrings);
+  const normalizedStrings =
+    typeof maxLength === "number"
+      ? bulletListStrings.map((text) => text.slice(0, maxLength))
+      : bulletListStrings;
+  const html = getHTMLFromBulletListStrings(normalizedStrings);
+  const totalLength = normalizedStrings.join("\n").length;
   return (
     <InputGroupWrapper label={label} className={wrapperClassName}>
       <ContentEditable
@@ -133,13 +174,23 @@ const BulletListTextareaGeneral = <T extends string>({
         onChange={(e) => {
           if (e.type === "input") {
             const { innerText } = e.currentTarget as HTMLDivElement;
-            const newBulletListStrings =
+            let newBulletListStrings =
               getBulletListStringsFromInnerText(innerText);
+            if (typeof maxLength === "number") {
+              newBulletListStrings = newBulletListStrings.map((text) =>
+                text.slice(0, maxLength)
+              );
+            }
             onChange(name, newBulletListStrings);
           }
         }}
         html={html}
       />
+      {typeof maxLength === "number" && showCounter && (
+        <div className="mt-1 text-right text-xs text-gray-500">
+          {totalLength}/{maxLength * Math.max(1, normalizedStrings.length)}
+        </div>
+      )}
     </InputGroupWrapper>
   );
 };
@@ -195,9 +246,15 @@ const BulletListTextareaFallback = <T extends string>({
   placeholder,
   onChange,
   showBulletPoints = true,
+  maxLength,
+  showCounter = true,
 }: InputProps<T, string[]> & { showBulletPoints?: boolean }) => {
+  const normalizedStrings =
+    typeof maxLength === "number"
+      ? bulletListStrings.map((text) => text.slice(0, maxLength))
+      : bulletListStrings;
   const textareaValue = getTextareaValueFromBulletListStrings(
-    bulletListStrings,
+    normalizedStrings,
     showBulletPoints
   );
 
@@ -208,11 +265,23 @@ const BulletListTextareaFallback = <T extends string>({
       name={name}
       value={textareaValue}
       placeholder={placeholder}
+      maxLength={
+        typeof maxLength === "number"
+          ? maxLength * Math.max(1, normalizedStrings.length)
+          : undefined
+      }
+      showCounter={showCounter}
       onChange={(name, value) => {
-        onChange(
-          name,
-          getBulletListStringsFromTextareaValue(value, showBulletPoints)
+        let newBulletListStrings = getBulletListStringsFromTextareaValue(
+          value,
+          showBulletPoints
         );
+        if (typeof maxLength === "number") {
+          newBulletListStrings = newBulletListStrings.map((text) =>
+            text.slice(0, maxLength)
+          );
+        }
+        onChange(name, newBulletListStrings);
       }}
     />
   );

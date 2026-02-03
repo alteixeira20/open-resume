@@ -64,8 +64,8 @@ export const Testimonials = ({ children }: { children?: React.ReactNode }) => {
 
   return (
     <section className="mx-auto -mt-2 px-8 pb-24">
-      <h2 className="mb-8 text-center text-3xl font-bold">
-        People{" "}
+      <h2 className="text-primary mb-8 text-center text-3xl font-bold">
+        Resume Builder Reviews{" "}
         <Image src={heartSrc} alt="love" className="-mt-1 inline-block w-7" />{" "}
         OpenResume
       </h2>

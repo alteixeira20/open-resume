@@ -13,37 +13,38 @@ export const TopNavBar = () => {
     <header
       aria-label="Site Header"
       className={cx(
-        "flex h-[var(--top-nav-bar-height)] items-center border-b-2 border-gray-100 px-3 lg:px-12",
+        "relative flex min-h-[calc(var(--top-nav-bar-height)+12px)] items-center px-3 py-2 lg:px-12",
         isHomePage && "bg-dot"
       )}
     >
-      <div className="flex h-10 w-full items-center justify-between">
-        <Link href="/">
+      <div className="pointer-events-none absolute bottom-1 left-1/2 h-[3px] w-[min(100%-2rem,1200px)] -translate-x-1/2 bg-gradient-to-r from-transparent via-gray-200/90 to-transparent" />
+      <div className="mx-auto flex w-full max-w-5xl items-center justify-between">
+        <Link href="/" className="flex items-center">
           <span className="sr-only">OpenResume</span>
           <Image
             src={logoSrc}
             alt="OpenResume Logo"
-            className="h-8 w-full"
+            className="h-9 w-auto"
             priority
           />
         </Link>
         <nav
           aria-label="Site Nav Bar"
-          className="flex items-center gap-2 text-sm font-medium"
+          className="flex items-center gap-3 text-sm font-semibold"
         >
           {[
             ["/resume-builder", "Builder"],
-            ["/resume-parser", "Parser"],
+            ["/resume-parser", "ATS Scoring"],
           ].map(([href, text]) => (
             <Link
               key={text}
-              className="rounded-md px-1.5 py-2 text-gray-500 hover:bg-gray-100 focus-visible:bg-gray-100 lg:px-4"
+              className="inline-flex items-center justify-center rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-800 shadow-sm transition hover:border-gray-300 hover:bg-gray-50 focus-visible:border-gray-300 focus-visible:bg-gray-50 lg:px-5"
               href={href}
             >
               {text}
             </Link>
           ))}
-          <div className="ml-1 mt-1">
+          <div className="ml-2 flex items-center">
             <iframe
               src="https://ghbtns.com/github-btn.html?user=alteixeira20&repo=open-resume&type=star&count=true"
               width="100"

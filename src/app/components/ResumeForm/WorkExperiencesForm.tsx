@@ -50,6 +50,7 @@ export const WorkExperiencesForm = () => {
               name="company"
               placeholder="Khan Academy"
               value={company}
+              maxLength={120}
               onChange={handleWorkExperienceChange}
             />
             <Input
@@ -58,6 +59,7 @@ export const WorkExperiencesForm = () => {
               name="jobTitle"
               placeholder="Software Engineer"
               value={jobTitle}
+              maxLength={100}
               onChange={handleWorkExperienceChange}
             />
             <Input
@@ -66,6 +68,7 @@ export const WorkExperiencesForm = () => {
               name="date"
               placeholder="Jun 2022 - Present"
               value={date}
+              maxLength={60}
               onChange={handleWorkExperienceChange}
             />
             <BulletListTextarea
@@ -74,6 +77,7 @@ export const WorkExperiencesForm = () => {
               name="descriptions"
               placeholder="Bullet points"
               value={descriptions}
+              maxLength={200}
               onChange={handleWorkExperienceChange}
             />
           </FormSection>

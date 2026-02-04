@@ -198,6 +198,8 @@ export const ResumeFeaturedSkill = ({
   style?: Style;
 }) => {
   const numCircles = 5;
+  const circleSize = "9pt";
+  const circleRadius = "4.5pt";
 
   return (
     <View style={{ ...styles.flexRow, alignItems: "center", ...style }}>
@@ -208,11 +210,11 @@ export const ResumeFeaturedSkill = ({
         <View
           key={idx}
           style={{
-            height: "9pt",
-            width: "9pt",
+            height: circleSize,
+            width: circleSize,
             marginLeft: "2.25pt",
             backgroundColor: rating >= idx ? themeColor : "#d9d9d9",
-            borderRadius: "100%",
+            borderRadius: circleRadius,
           }}
         />
       ))}

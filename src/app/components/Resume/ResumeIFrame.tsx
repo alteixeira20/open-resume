@@ -75,43 +75,35 @@ const ResumeIframe = ({
     [isA4, allowOverflow]
   );
 
-  if (enablePDFViewer) {
-    return (
-      <DynamicPDFViewer className="h-full w-full">
-        {children as any}
-      </DynamicPDFViewer>
-    );
-  }
   const width = isA4 ? A4_WIDTH_PX : LETTER_WIDTH_PX;
   const height = isA4 ? A4_HEIGHT_PX : LETTER_HEIGHT_PX;
   const paddedHeight = height + heightPadding;
 
+  const outerStyle = enablePDFViewer
+    ? { maxWidth: `${width * scale}px`, maxHeight: `${paddedHeight * scale}px` }
+    : { maxWidth: `${width * scale}px`, maxHeight: `${paddedHeight * scale}px` };
+  const innerStyle = enablePDFViewer
+    ? { width: `${width * scale}px`, height: `${paddedHeight * scale}px` }
+    : { width: `${width}px`, height: `${paddedHeight}px`, transform: `scale(${scale})` };
+
   return (
-    <div
-      style={{
-        maxWidth: `${width * scale}px`,
-        maxHeight: `${paddedHeight * scale}px`,
-      }}
-    >
-      {/* There is an outer div and an inner div here. The inner div sets the iframe width and uses transform scale to zoom in/out the resume iframe.
-        While zooming out or scaling down via transform, the element appears smaller but still occupies the same width/height. Therefore, we use the 
-        outer div to restrict the max width & height proportionally */}
-      <div
-        style={{
-          width: `${width}px`,
-          height: `${paddedHeight}px`,
-          transform: `scale(${scale})`,
-        }}
-        className={`origin-top-left ${frameClassName}`}
-      >
-        <Frame
-          style={{ width: "100%", height: "100%" }}
-          initialContent={iframeInitialContent}
-          // key is used to force component to re-mount when document size changes
-          key={isA4 ? "A4" : "LETTER"}
-        >
-          {children}
-        </Frame>
+    <div style={outerStyle}>
+      {/* For the DOM iframe preview we use transform scaling (fast). For PDFViewer we size the container directly to avoid bitmap scaling. */}
+      <div style={innerStyle} className={`origin-top-left ${frameClassName}`}>
+        {enablePDFViewer ? (
+          <DynamicPDFViewer className="h-full w-full">
+            {children as any}
+          </DynamicPDFViewer>
+        ) : (
+          <Frame
+            style={{ width: "100%", height: "100%" }}
+            initialContent={iframeInitialContent}
+            // key is used to force component to re-mount when document size changes
+            key={isA4 ? "A4" : "LETTER"}
+          >
+            {children}
+          </Frame>
+        )}
       </div>
     </div>
   );

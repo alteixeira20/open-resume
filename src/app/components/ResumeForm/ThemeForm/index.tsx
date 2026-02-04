@@ -217,8 +217,8 @@ export const ThemeForm = () => {
                 <input
                   type="number"
                   min="0.1"
-                  max="1.6"
-                  step="0.1"
+                  max="3"
+                  step="0.05"
                   className="w-[5rem] border-b border-gray-300 text-center font-semibold leading-3 outline-none"
                   value={sectionSpacingValue}
                   onChange={(event) =>
@@ -248,8 +248,8 @@ export const ThemeForm = () => {
                 <span className="flex w-36 items-center gap-2">Line Height</span>
                 <input
                   type="number"
-                  min="1.0"
-                  max="1.6"
+                  min="0.6"
+                  max="2.5"
                   step="0.05"
                   className="w-[5rem] border-b border-gray-300 text-center font-semibold leading-3 outline-none"
                   value={lineHeight}
@@ -282,8 +282,8 @@ export const ThemeForm = () => {
                 </span>
                 <input
                   type="number"
-                  min="8"
-                  max="16"
+                  min="6"
+                  max="20"
                   step="0.5"
                   name="fontSize"
                   value={fontSize}
@@ -318,8 +318,8 @@ export const ThemeForm = () => {
                 </span>
                 <input
                   type="number"
-                  min="22"
-                  max="32"
+                  min="16"
+                  max="48"
                   step="0.5"
                   value={settings.nameFontSize}
                   onChange={(event) =>
@@ -352,8 +352,8 @@ export const ThemeForm = () => {
                 </span>
                 <input
                   type="number"
-                  min="10"
-                  max="14"
+                  min="8"
+                  max="20"
                   step="0.5"
                   value={settings.sectionHeadingSize}
                   onChange={(event) =>

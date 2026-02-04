@@ -1,12 +1,11 @@
 "use client";
-import { useEffect } from "react";
 import type { ReactElement } from "react";
 import { useSetDefaultScale } from "components/Resume/hooks";
 import {
   MagnifyingGlassIcon,
   ArrowDownTrayIcon,
 } from "@heroicons/react/24/outline";
-import { usePDF } from "@react-pdf/renderer";
+import { pdf } from "@react-pdf/renderer";
 import type { DocumentProps } from "@react-pdf/renderer";
 import dynamic from "next/dynamic";
 
@@ -30,11 +29,16 @@ const ResumeControlBar = ({
     documentSize,
   });
 
-  const [instance, update] = usePDF({ document });
-
-  useEffect(() => {
-    update(document);
-  }, [update, document]);
+  const handleDownloadPdf = async () => {
+    if (typeof window === "undefined") return;
+    const blob = await pdf(document).toBlob();
+    const url = URL.createObjectURL(blob);
+    const link = window.document.createElement("a");
+    link.href = url;
+    link.download = fileName;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
 
   return (
     <div className="sticky bottom-0 left-0 right-0 flex h-[var(--resume-control-bar-height)] items-center justify-center px-[var(--resume-padding)] text-gray-600 lg:justify-between">
@@ -74,17 +78,17 @@ const ResumeControlBar = ({
           </span>
           <span className="whitespace-nowrap sm:hidden">JSON</span>
         </button>
-        <a
+        <button
+          type="button"
           className="flex items-center gap-1 rounded-md border border-gray-300 px-3 py-0.5 hover:bg-gray-100"
-          href={instance.url ?? undefined}
-          download={fileName}
+          onClick={handleDownloadPdf}
         >
           <ArrowDownTrayIcon className="h-4 w-4" />
           <span className="hidden whitespace-nowrap sm:inline">
             Download PDF
           </span>
           <span className="whitespace-nowrap sm:hidden">PDF</span>
-        </a>
+        </button>
       </div>
     </div>
   );

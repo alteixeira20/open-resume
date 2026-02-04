@@ -25,8 +25,9 @@ export const ResumePDFProfile = ({
 }) => {
   const { name, email, phone, url, github, summary, location } = profile;
   const iconProps = { email, phone, location, url, github };
-  const { nameFontSize, lineHeight } = useResumePDFStyle();
-  const rowHeight = `${Number(lineHeight) * bodyFontSize}pt`;
+  const { nameFontSize } = useResumePDFStyle();
+  const iconRowLineHeight = 1.1;
+  const rowHeight = `${iconRowLineHeight * bodyFontSize}pt`;
 
   return (
     <ResumePDFSection style={{ marginTop: spacing["4"] }}>
@@ -74,10 +75,8 @@ export const ResumePDFProfile = ({
           }
 
           const shouldUseLinkWrapper = ["email", "url", "phone", "github"].includes(key);
-          const Wrapper = ({ children }: { children: React.ReactNode }) => {
-            if (!shouldUseLinkWrapper) return <>{children}</>;
-
-            let src = "";
+          let src = "";
+          if (shouldUseLinkWrapper) {
             switch (key) {
               case "email": {
                 src = `mailto:${value}`;
@@ -91,13 +90,7 @@ export const ResumePDFProfile = ({
                 src = value.startsWith("http") ? value : `https://${value}`;
               }
             }
-
-            return (
-              <ResumePDFLink src={src} isPDF={isPDF}>
-                {children}
-              </ResumePDFLink>
-            );
-          };
+          }
 
           return (
             <View
@@ -105,21 +98,57 @@ export const ResumePDFProfile = ({
               style={{
                 ...styles.flexRow,
                 alignItems: "center",
-                gap: spacing["1"],
-                height: rowHeight,
+                marginTop: spacing["0.5"],
               }}
             >
               <View
                 style={{
-                  height: rowHeight,
+                  alignItems: "center",
                   justifyContent: "center",
+                  marginRight: spacing["1"],
                 }}
               >
-                <ResumePDFIcon type={iconType} isPDF={isPDF} />
+                <View
+                  style={{
+                    width: spacing["4"],
+                    height: rowHeight,
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <ResumePDFIcon type={iconType} isPDF={isPDF} />
+                </View>
               </View>
-              <Wrapper>
-                <ResumePDFText>{value}</ResumePDFText>
-              </Wrapper>
+              {shouldUseLinkWrapper ? (
+                <View
+                  style={{
+                    minHeight: rowHeight,
+                    justifyContent: "center",
+                    paddingTop: "8pt",
+                  }}
+                >
+                  <ResumePDFLink src={src} isPDF={isPDF}>
+                    <ResumePDFText
+                      disableSoftWrap={true}
+                      style={{ lineHeight: iconRowLineHeight }}
+                    >
+                      {value}
+                    </ResumePDFText>
+                  </ResumePDFLink>
+                </View>
+              ) : (
+                <View
+                  style={{
+                    minHeight: rowHeight,
+                    justifyContent: "center",
+                    paddingTop: "8pt",
+                  }}
+                >
+                  <ResumePDFText style={{ lineHeight: iconRowLineHeight }}>
+                    {value}
+                  </ResumePDFText>
+                </View>
+              )}
             </View>
           );
         })}

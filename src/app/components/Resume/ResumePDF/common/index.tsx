@@ -1,4 +1,5 @@
 import { Text, View, Link } from "@react-pdf/renderer";
+import { Children } from "react";
 import type { Style } from "@react-pdf/types";
 import { styles, spacing } from "components/Resume/ResumePDF/styles";
 import { DEBUG_RESUME_PDF_FLAG } from "lib/constants";
@@ -28,12 +29,13 @@ export const ResumePDFSection = ({
     marginTop: scalePt(spacing["5"], spacingFactor),
     gap: scalePt(spacing["2"], spacingFactor),
   };
+  const headingContentGap = sectionSpacingValues.marginTop;
+  const contentNodes = Children.toArray(children);
 
   return (
     <View
       style={{
         ...styles.flexCol,
-        gap: sectionSpacingValues.gap,
         marginTop: sectionSpacingValues.marginTop,
         ...style,
       }}
@@ -63,7 +65,13 @@ export const ResumePDFSection = ({
           </Text>
         </View>
       )}
-      {children}
+      <View
+        style={{
+          marginTop: heading ? headingContentGap : spacing["0"],
+        }}
+      >
+        {contentNodes}
+      </View>
     </View>
   );
 };
@@ -72,11 +80,13 @@ export const ResumePDFText = ({
   bold = false,
   themeColor,
   style = {},
+  disableSoftWrap = false,
   children,
 }: {
   bold?: boolean;
   themeColor?: string;
   style?: Style;
+  disableSoftWrap?: boolean;
   children: React.ReactNode;
 }) => {
   const { lineHeight } = useResumePDFStyle();
@@ -90,7 +100,9 @@ export const ResumePDFText = ({
     return parts.join("\u200b");
   };
   const content =
-    typeof children === "string" ? softWrapText(children) : children;
+    typeof children === "string" && !disableSoftWrap
+      ? softWrapText(children)
+      : children;
   return (
     <Text
       style={{
@@ -154,7 +166,10 @@ export const ResumePDFLink = ({
 }) => {
   if (isPDF) {
     return (
-      <Link src={src} style={{ textDecoration: "none" }}>
+      <Link
+        src={src}
+        style={{ textDecoration: "none", color: DEFAULT_FONT_COLOR }}
+      >
         {children}
       </Link>
     );

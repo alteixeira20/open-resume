@@ -29,9 +29,12 @@ export const ResumePDFLanguages = ({
 
   return (
     <ResumePDFSection themeColor={themeColor} heading={heading}>
-      <View style={{ ...styles.flexCol, gap: spacing["1"] }}>
+      <View style={{ ...styles.flexCol }}>
         {filtered.map(({ language, proficiency }, idx) => (
-          <ResumePDFText key={idx}>
+          <ResumePDFText
+            key={idx}
+            style={idx !== 0 ? { marginTop: spacing["1"] } : {}}
+          >
             {language}
             {language && proficiency ? " — " : ""}
             {proficiency}

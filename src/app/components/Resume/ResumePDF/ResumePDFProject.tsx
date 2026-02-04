@@ -1,4 +1,4 @@
-import { Text, View } from "@react-pdf/renderer";
+import { View, Link } from "@react-pdf/renderer";
 import {
   ResumePDFSection,
   ResumePDFBulletList,
@@ -26,31 +26,40 @@ export const ResumePDFProject = ({
           link && (link.startsWith("http") ? link : `https://${link}`);
         const dateText = date ? `\u00A0${date}` : "";
         return (
-        <View key={idx}>
-          <View
-            style={{
-              ...styles.flexRowBetween,
-              marginTop: spacing["0.5"],
-            }}
-          >
-            {normalizedLink ? (
-              <ResumePDFLink src={normalizedLink} isPDF={isPDF}>
-                <ResumePDFText bold={true}>
-                  {project}
-                  <Text style={{ fontWeight: "normal", fontSize: "9pt" }}>
-                    {`\u00A0-\u00A0${normalizedLink}`}
-                  </Text>
-                </ResumePDFText>
-              </ResumePDFLink>
-            ) : (
-              <ResumePDFText bold={true}>{project}</ResumePDFText>
+          <View key={idx} style={idx !== 0 ? { marginTop: spacing["2"] } : {}}>
+            <View style={{ ...styles.flexRowBetween }}>
+              {normalizedLink ? (
+                isPDF ? (
+                  <Link src={normalizedLink} style={{ textDecoration: "none" }}>
+                    <ResumePDFText bold={true} disableSoftWrap={true}>
+                      {project}
+                    </ResumePDFText>
+                  </Link>
+                ) : (
+                  <ResumePDFLink src={normalizedLink} isPDF={false}>
+                    <ResumePDFText bold={true} disableSoftWrap={true}>
+                      {project}
+                    </ResumePDFText>
+                  </ResumePDFLink>
+                )
+              ) : (
+                <ResumePDFText bold={true}>{project}</ResumePDFText>
+              )}
+              <ResumePDFText>{dateText}</ResumePDFText>
+            </View>
+            {normalizedLink && (
+              <View style={{ marginTop: spacing["0.5"] }}>
+                <ResumePDFLink src={normalizedLink} isPDF={isPDF}>
+                  <ResumePDFText disableSoftWrap={true}>
+                    {normalizedLink}
+                  </ResumePDFText>
+                </ResumePDFLink>
+              </View>
             )}
-            <ResumePDFText>{dateText}</ResumePDFText>
+            <View style={{ ...styles.flexCol, marginTop: spacing["0.5"] }}>
+              <ResumePDFBulletList items={descriptions} />
+            </View>
           </View>
-          <View style={{ ...styles.flexCol, marginTop: spacing["0.5"] }}>
-            <ResumePDFBulletList items={descriptions} />
-          </View>
-        </View>
         );
       })}
     </ResumePDFSection>

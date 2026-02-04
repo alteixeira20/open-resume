@@ -9,7 +9,6 @@ import {
 import { useAppSelector } from "lib/redux/hooks";
 import { selectResume } from "lib/redux/resumeSlice";
 import { selectSettings } from "lib/redux/settingsSlice";
-import { DEBUG_RESUME_PDF_FLAG } from "lib/constants";
 import {
   useRegisterReactPDFFont,
   useRegisterReactPDFHyphenationCallback,
@@ -26,6 +25,7 @@ export const Resume = () => {
   );
   useRegisterReactPDFFont();
   useRegisterReactPDFHyphenationCallback(settings.fontFamily);
+  const usePdfViewer = true;
 
   const handleDownloadJson = () => {
     if (typeof window === "undefined") return;
@@ -56,13 +56,13 @@ export const Resume = () => {
             <ResumeIframeCSR
               documentSize={settings.documentSize}
               scale={scale}
-              enablePDFViewer={DEBUG_RESUME_PDF_FLAG}
+              enablePDFViewer={usePdfViewer}
               allowOverflow
             >
               <ResumePDF
                 resume={resume}
                 settings={settings}
-                isPDF={DEBUG_RESUME_PDF_FLAG}
+                isPDF={usePdfViewer}
               />
             </ResumeIframeCSR>
           </section>

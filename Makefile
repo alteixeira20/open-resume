@@ -1,4 +1,4 @@
-.PHONY: help install build run lint test ats-score verify clean fclean docker-build docker-up docker-down docker-logs
+.PHONY: help install build run lint test ats-score verify clean fclean docker-build docker-up docker-down docker-logs update
 
 help:
 	@printf "OpenResume Makefile targets:\n"
@@ -10,6 +10,7 @@ help:
 	@printf "  make ats-score Run ATS score CLI (pass ARGS=...)\n"
 	@printf "  make verify    Run lint + test:ci + build\n"
 	@printf "  make fclean    Remove node_modules and build artifacts\n"
+	@printf "  make update    Update and redeploy (host)\n"
 	@printf "\nExamples:\n"
 	@printf "  make run\n"
 	@printf "  make ats-score ARGS=\"--file resume.pdf --json\"\n"
@@ -49,6 +50,9 @@ docker-down:
 
 docker-logs:
 	docker compose logs -f open-resume
+
+update:
+	./scripts/update-host.sh
 
 clean:
 	rm -rf .next dist

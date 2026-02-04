@@ -1,4 +1,4 @@
-.PHONY: help install build run lint test ats-score verify clean fclean docker-build docker-up docker-down docker-logs update
+.PHONY: help install build run lint test ats-score verify clean fclean docker-build docker-up docker-down docker-logs update docker-prod-local docker-prod-local-logs
 
 help:
 	@printf "OpenResume Makefile targets:\n"
@@ -11,6 +11,8 @@ help:
 	@printf "  make verify    Run lint + test:ci + build\n"
 	@printf "  make fclean    Remove node_modules and build artifacts\n"
 	@printf "  make update    Update and redeploy (host)\n"
+	@printf "  make docker-prod-local Run production container locally\n"
+	@printf "  make docker-prod-local-logs Tail local production container logs\n"
 	@printf "\nExamples:\n"
 	@printf "  make run\n"
 	@printf "  make ats-score ARGS=\"--file resume.pdf --json\"\n"
@@ -50,6 +52,12 @@ docker-down:
 
 docker-logs:
 	docker compose logs -f open-resume
+
+docker-prod-local:
+	./scripts/run-prod-local.sh
+
+docker-prod-local-logs:
+	docker compose -f docker-compose.local.yml logs -f open-resume
 
 update:
 	./scripts/update-host.sh

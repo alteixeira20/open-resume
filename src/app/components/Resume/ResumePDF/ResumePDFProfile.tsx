@@ -27,6 +27,7 @@ export const ResumePDFProfile = ({
   const iconProps = { email, phone, location, url, github };
   const { nameFontSize } = useResumePDFStyle();
   const iconRowLineHeight = 1.1;
+  const iconRowTextOffsetPt = 4;
   const rowHeight = `${iconRowLineHeight * bodyFontSize}pt`;
 
   return (
@@ -38,120 +39,142 @@ export const ResumePDFProfile = ({
       >
         {name}
       </ResumePDFText>
-      <View
-        style={{
-          ...styles.flexRowBetween,
-          flexWrap: "wrap",
-          marginTop: spacing["0.5"],
-        }}
-      >
-        {Object.entries(iconProps).map(([key, value]) => {
-          if (!value) return null;
+      <View style={{ marginTop: spacing["4"] }}>
+        {(() => {
+          const items = Object.entries(iconProps)
+            .map(([key, value]) => ({ key, value }))
+            .filter((item) => item.value);
+          const firstRow = items.slice(0, 3);
+          const secondRow = items.slice(3, 5);
 
-          let iconType: IconType;
-          switch (key) {
-            case "email":
-              iconType = "email";
-              break;
-            case "phone":
-              iconType = "phone";
-              break;
-            case "location":
-              iconType = "location";
-              break;
-            case "github":
-              iconType = "url_github";
-              break;
-            case "url":
-            default:
-              if (value.includes("github")) {
-                iconType = "url_github";
-              } else if (value.includes("linkedin")) {
-                iconType = "url_linkedin";
-              } else {
-                iconType = "url";
-              }
-              break;
-          }
-
-          const shouldUseLinkWrapper = ["email", "url", "phone", "github"].includes(key);
-          let src = "";
-          if (shouldUseLinkWrapper) {
+          const renderItem = (key: string, value: string) => {
+            let iconType: IconType;
             switch (key) {
-              case "email": {
-                src = `mailto:${value}`;
+              case "email":
+                iconType = "email";
                 break;
-              }
-              case "phone": {
-                src = `tel:${value.replace(/[^\d+]/g, "")}`; // Keep only + and digits
+              case "phone":
+                iconType = "phone";
                 break;
-              }
-              default: {
-                src = value.startsWith("http") ? value : `https://${value}`;
+              case "location":
+                iconType = "location";
+                break;
+              case "github":
+                iconType = "url_github";
+                break;
+              case "url":
+              default:
+                if (value.includes("github")) {
+                  iconType = "url_github";
+                } else if (value.includes("linkedin")) {
+                  iconType = "url_linkedin";
+                } else {
+                  iconType = "url";
+                }
+                break;
+            }
+
+            const shouldUseLinkWrapper = ["email", "url", "phone", "github"].includes(
+              key
+            );
+            let src = "";
+            if (shouldUseLinkWrapper) {
+              switch (key) {
+                case "email": {
+                  src = `mailto:${value}`;
+                  break;
+                }
+                case "phone": {
+                  src = `tel:${value.replace(/[^\d+]/g, "")}`; // Keep only + and digits
+                  break;
+                }
+                default: {
+                  src = value.startsWith("http") ? value : `https://${value}`;
+                }
               }
             }
-          }
 
-          return (
-            <View
-              key={key}
-              style={{
-                ...styles.flexRow,
-                alignItems: "center",
-                marginTop: spacing["0.5"],
-              }}
-            >
+            return (
               <View
+                key={key}
                 style={{
+                  ...styles.flexRow,
                   alignItems: "center",
-                  justifyContent: "center",
-                  marginRight: spacing["1"],
                 }}
               >
                 <View
                   style={{
-                    width: spacing["4"],
-                    height: rowHeight,
                     alignItems: "center",
                     justifyContent: "center",
+                    marginRight: spacing["1"],
                   }}
                 >
-                  <ResumePDFIcon type={iconType} isPDF={isPDF} />
+                  <View
+                    style={{
+                      width: spacing["4"],
+                      height: rowHeight,
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <ResumePDFIcon type={iconType} isPDF={isPDF} />
+                  </View>
                 </View>
-              </View>
-              {shouldUseLinkWrapper ? (
-                <View
-                  style={{
-                    minHeight: rowHeight,
-                    justifyContent: "center",
-                    paddingTop: "8pt",
-                  }}
-                >
-                  <ResumePDFLink src={src} isPDF={isPDF}>
+                {shouldUseLinkWrapper ? (
+                  <View
+                    style={{
+                      minHeight: rowHeight,
+                      justifyContent: "center",
+                    }}
+                  >
+                    <ResumePDFLink src={src} isPDF={isPDF}>
+                      <ResumePDFText
+                        disableSoftWrap={true}
+                        style={{
+                          lineHeight: iconRowLineHeight,
+                          position: "relative",
+                          top: iconRowTextOffsetPt,
+                        }}
+                      >
+                        {value}
+                      </ResumePDFText>
+                    </ResumePDFLink>
+                  </View>
+                ) : (
+                  <View
+                    style={{
+                      minHeight: rowHeight,
+                      justifyContent: "center",
+                    }}
+                  >
                     <ResumePDFText
-                      disableSoftWrap={true}
-                      style={{ lineHeight: iconRowLineHeight }}
+                      style={{
+                        lineHeight: iconRowLineHeight,
+                        position: "relative",
+                        top: iconRowTextOffsetPt,
+                      }}
                     >
                       {value}
                     </ResumePDFText>
-                  </ResumePDFLink>
-                </View>
-              ) : (
-                <View
-                  style={{
-                    minHeight: rowHeight,
-                    justifyContent: "center",
-                    paddingTop: "8pt",
-                  }}
-                >
-                  <ResumePDFText style={{ lineHeight: iconRowLineHeight }}>
-                    {value}
-                  </ResumePDFText>
+                  </View>
+                )}
+              </View>
+            );
+          };
+
+          return (
+            <>
+              <View style={{ ...styles.flexRowBetween }}>
+                {firstRow.map((item) => renderItem(item.key, item.value))}
+              </View>
+              {secondRow.length > 0 && (
+                <View style={{ ...styles.flexRowBetween }}>
+                  {secondRow.map((item) => renderItem(item.key, item.value))}
                 </View>
               )}
-            </View>
+            </>
           );
-        })}
+        })()}
       </View>
       {summary && <ResumePDFText style={{ marginTop: spacing["1"] }}>{summary}</ResumePDFText>}
     </ResumePDFSection>

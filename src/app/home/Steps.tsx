@@ -1,7 +1,15 @@
 const STEPS = [
-  { title: "Add a resume pdf", text: "or create from scratch" },
-  { title: "Preview design", text: "and make edits" },
-  { title: "Download and Analyze", text: "get instant ATS feedback" },
+  {
+    title: "Add a resume pdf",
+    text: "or create from scratch",
+    href: "/resume-import",
+  },
+  { title: "Preview design", text: "and make edits", href: "/resume-builder" },
+  {
+    title: "Download and Analyze",
+    text: "get instant ATS feedback",
+    href: "/resume-parser",
+  },
 ];
 
 export const Steps = () => {
@@ -12,10 +20,14 @@ export const Steps = () => {
       </h1>
       <div className="mt-8 flex justify-center">
         <dl className="flex flex-col gap-y-10 lg:flex-row lg:justify-center lg:gap-x-20">
-          {STEPS.map(({ title, text }, idx) => (
-            <div className="relative self-start pl-14" key={idx}>
+          {STEPS.map(({ title, text, href }, idx) => (
+            <a
+              key={idx}
+              href={href}
+              className="group relative self-start rounded-xl px-3 py-2 pl-16 transition-transform duration-200 ease-out hover:-translate-y-0.5 hover:shadow-[0_0_0_2px_rgba(14,165,233,0.35),0_10px_30px_-18px_rgba(14,116,144,0.45)]"
+            >
               <dt className="text-lg font-bold">
-                <div className="bg-primary absolute left-0 top-1 flex h-10 w-10 select-none items-center justify-center rounded-full p-[3.5px] opacity-80">
+                <div className="bg-primary absolute left-4 top-3 flex h-10 w-10 select-none items-center justify-center rounded-full p-[3.5px] opacity-80 transition-transform duration-200 ease-out group-hover:scale-105">
                   <div className="flex h-full w-full items-center justify-center rounded-full bg-white">
                     <div className="text-primary -mt-0.5 text-2xl">
                       {idx + 1}
@@ -24,8 +36,8 @@ export const Steps = () => {
                 </div>
                 {title}
               </dt>
-              <dd>{text}</dd>
-            </div>
+              <dd className="mt-1 text-gray-700">{text}</dd>
+            </a>
           ))}
         </dl>
       </div>

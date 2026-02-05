@@ -26,7 +26,7 @@ export default function Home() {
   const sectionDivider = <div className="my-8 h-px bg-gray-200/70" />;
 
   return (
-    <main className="mx-auto max-w-screen-2xl bg-dot px-8 pb-32 text-gray-900 lg:px-12">
+    <main className="mx-auto max-w-screen-2xl bg-dot px-8 pb-4 text-gray-900 lg:px-12">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
@@ -41,7 +41,6 @@ export default function Home() {
       <ForkHighlights />
       {sectionDivider}
       <Features />
-      {sectionDivider}
       <QuestionsAndAnswers />
       <Footer />
     </main>

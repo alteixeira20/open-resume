@@ -7,18 +7,15 @@ import { cx } from "lib/cx";
 
 export const TopNavBar = () => {
   const pathName = usePathname();
-  const isHomePage = pathName === "/";
 
   return (
     <header
       aria-label="Site Header"
       className={cx(
-        "relative flex h-[var(--top-nav-bar-height)] items-center px-3 py-0 lg:px-12",
-        isHomePage && "bg-dot"
+        "sticky top-0 z-40 flex h-[var(--top-nav-bar-height)] w-full items-center border-b border-gray-200/80 bg-white/80 px-3 py-0 backdrop-blur lg:px-12"
       )}
     >
-      <div className="pointer-events-none absolute bottom-1 left-1/2 h-[3px] w-[min(100%-2rem,1200px)] -translate-x-1/2 bg-gradient-to-r from-transparent via-gray-200/90 to-transparent" />
-      <div className="mx-auto flex w-full max-w-5xl items-center justify-between">
+      <div className="mx-auto flex w-full max-w-6xl items-center justify-between">
         <Link href="/" className="flex items-center">
           <span className="sr-only">OpenResume</span>
           <Image
@@ -30,7 +27,7 @@ export const TopNavBar = () => {
         </Link>
         <nav
           aria-label="Site Nav Bar"
-          className="flex items-center gap-3 text-sm font-semibold"
+          className="flex items-center gap-4 text-sm font-semibold"
         >
           {[
             ["/resume-builder", "Builder"],
@@ -38,7 +35,12 @@ export const TopNavBar = () => {
           ].map(([href, text]) => (
             <Link
               key={text}
-              className="inline-flex items-center justify-center rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-800 shadow-sm transition hover:border-gray-300 hover:bg-gray-50 focus-visible:border-gray-300 focus-visible:bg-gray-50 lg:px-5"
+              className={cx(
+                "inline-flex items-center justify-center rounded-full px-3 py-1.5 text-sm font-semibold transition lg:px-4",
+                pathName === href
+                  ? "bg-gray-900 text-white"
+                  : "text-gray-700 hover:text-gray-900"
+              )}
               href={href}
             >
               {text}

@@ -135,7 +135,7 @@ export const QuestionsAndAnswers = () => {
   return (
     <section className="mx-auto max-w-6xl divide-y divide-gray-300 py-6 lg:px-2">
       <div className="text-center">
-        <Heading className="!mt-0 !mb-3">Resume Builder FAQ</Heading>
+        <Heading className="!mt-0 !mb-3">FAQ</Heading>
       </div>
       <div className="mt-6 divide-y divide-gray-300">
         {QAS.map(({ question, answer }) => (

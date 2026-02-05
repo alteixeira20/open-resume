@@ -40,7 +40,7 @@ export const ForkHighlights = () => {
         </p>
         <div className="mt-6 grid gap-4 md:grid-cols-2">
           {HIGHLIGHTS.map((item) => (
-            <div key={item.title} className="rounded-md border border-gray-200 bg-white p-4 shadow-sm">
+            <div key={item.title} className="rounded-md border border-gray-200 bg-white/90 p-4 shadow-sm backdrop-blur">
               <h3 className="text-sm font-semibold text-gray-900">{item.title}</h3>
               <p className="mt-1 text-sm text-gray-600">{item.text}</p>
             </div>

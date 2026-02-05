@@ -38,15 +38,20 @@ const FEATURES = [
 
 export const Features = () => {
   return (
-    <section className="py-6">
-      <div className="mx-auto lg:max-w-4xl">
+    <section className="mx-auto max-w-6xl py-6">
+      <div className="w-full">
         <div className="text-center">
-          <Heading className="!mt-0 !mb-3">Resume Builder Features</Heading>
+          <Heading className="!mt-0 !mb-3">What’s kept from the original?</Heading>
         </div>
+        <p className="mt-3 text-center text-sm text-gray-600">
+          This fork honors Xitang Zhao’s original vision: a free, open‑source,
+          privacy‑first resume builder that keeps the experience simple and
+          accessible.
+        </p>
         <dl className="mt-6 grid grid-cols-1 justify-items-center gap-y-8 lg:grid-cols-2 lg:gap-x-6 lg:gap-y-16">
           {FEATURES.map(({ src, title, text }) => (
             <div className="px-2" key={title}>
-              <div className="relative w-96 self-center pl-16">
+              <div className="relative w-96 self-center rounded-2xl border border-gray-200 bg-white/90 p-4 pl-16 shadow-sm backdrop-blur">
                 <dt className="text-2xl font-bold">
                   <Image
                     src={src}

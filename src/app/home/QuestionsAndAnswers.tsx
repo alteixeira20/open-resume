@@ -133,7 +133,7 @@ const QAS = [
 
 export const QuestionsAndAnswers = () => {
   return (
-    <section className="mx-auto max-w-3xl divide-y divide-gray-300 py-6 lg:px-2">
+    <section className="mx-auto max-w-6xl divide-y divide-gray-300 py-6 lg:px-2">
       <div className="text-center">
         <Heading className="!mt-0 !mb-3">Resume Builder FAQ</Heading>
       </div>

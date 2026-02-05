@@ -15,6 +15,7 @@ import { LanguagesForm } from "components/ResumeForm/LanguagesForm";
 import { ThemeForm } from "components/ResumeForm/ThemeForm";
 import { CustomForm } from "components/ResumeForm/CustomForm";
 import { cx } from "lib/cx";
+import { Heading, Paragraph } from "components/documentation";
 import type { ReactElement } from "react";
 
 const formTypeToComponent: { [type in ShowForm]: () => ReactElement } = {
@@ -129,6 +130,15 @@ export const ResumeForm = ({ preview }: { preview?: React.ReactNode }) => {
           <div className="sticky top-0 z-10 -mb-8 bg-gray-50">
             <div className="h-6 bg-gray-50 md:-mx-2" />
           </div>
+          <section className="space-y-2">
+            <Heading className="text-primary !mt-0">
+              Resume Builder Workbench
+            </Heading>
+            <Paragraph>
+              Build your resume section by section, fine-tune typography and
+              theme settings, and export a polished PDF or JSON backup anytime.
+            </Paragraph>
+          </section>
           <ProfileForm />
           {formsOrder.map((form) => {
             const Component = formTypeToComponent[form];

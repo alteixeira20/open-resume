@@ -158,8 +158,8 @@ export default function ResumeParser() {
 
   return (
     <main className="h-[calc(100vh-var(--top-nav-bar-height))] w-full overflow-hidden bg-gray-50">
-      <div className="mx-auto grid h-full w-full max-w-screen-2xl gap-6 px-[var(--resume-padding)] py-4 md:grid-cols-6">
-        <div className="col-span-3 space-y-6 overflow-y-auto pr-1">
+      <div className="mx-auto grid h-full w-full max-w-screen-2xl gap-6 px-[var(--resume-padding)] py-0 md:grid-cols-6">
+        <div className="col-span-3 space-y-8 overflow-y-auto pr-1 pt-[24px]">
           <section id="overview" className="space-y-2">
             <Heading className="text-primary !mt-0">
               Resume Parsing Workbench

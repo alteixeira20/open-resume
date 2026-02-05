@@ -5,7 +5,7 @@ import { InlineInput } from "components/ResumeForm/ThemeForm/InlineInput";
 import { FontFamilySelectionsCSR } from "components/ResumeForm/ThemeForm/Selection";
 import { ResumeLocaleToggle } from "components/ResumeForm/ResumeLocaleToggle";
 import { parseResumeFromPdf } from "lib/parse-resume-from-pdf";
-import { getHasUsedAppBefore } from "lib/redux/local-storage";
+import { clearStateFromLocalStorage, getHasUsedAppBefore } from "lib/redux/local-storage";
 import type { ShowForm } from "lib/redux/settingsSlice";
 import {
   changeSettings,
@@ -50,6 +50,16 @@ export const ThemeForm = () => {
   ) => {
     const file = event.target.files?.[0];
     if (!file) return;
+    if (getHasUsedAppBefore()) {
+      const confirmed = window.confirm(
+        "This will overwrite your current resume and settings. Do you want to continue?"
+      );
+      if (!confirmed) {
+        event.target.value = "";
+        return;
+      }
+      clearStateFromLocalStorage();
+    }
     try {
       const text = await file.text();
       const parsed = JSON.parse(text) as {
@@ -78,14 +88,23 @@ export const ThemeForm = () => {
   ) => {
     const file = event.target.files?.[0];
     if (!file) return;
+    if (getHasUsedAppBefore()) {
+      const confirmed = window.confirm(
+        "This will overwrite your current resume and settings. Do you want to continue?"
+      );
+      if (!confirmed) {
+        event.target.value = "";
+        return;
+      }
+      clearStateFromLocalStorage();
+    }
     try {
       if (!file.name.toLowerCase().endsWith(".pdf")) {
         alert("Please select a PDF file.");
         return;
       }
-      const fileUrl = URL.createObjectURL(file);
-      const parsedResume = await parseResumeFromPdf(fileUrl);
-      URL.revokeObjectURL(fileUrl);
+      const pdfData = await file.arrayBuffer();
+      const parsedResume = await parseResumeFromPdf(pdfData);
 
       const newSettings = { ...settings };
       if (getHasUsedAppBefore()) {
@@ -113,7 +132,8 @@ export const ThemeForm = () => {
         resume: parsedResume,
         settings: newSettings,
       } as any);
-    } catch {
+    } catch (error) {
+      console.error("PDF import failed", error);
       alert("Could not import PDF. Please try another file.");
     } finally {
       event.target.value = "";

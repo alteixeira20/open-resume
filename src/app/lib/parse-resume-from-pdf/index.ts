@@ -1,4 +1,4 @@
-import { readPdf } from "lib/parse-resume-from-pdf/read-pdf";
+import { readPdf, type PdfSource } from "lib/parse-resume-from-pdf/read-pdf";
 import { groupTextItemsIntoLines } from "lib/parse-resume-from-pdf/group-text-items-into-lines";
 import { groupLinesIntoSections } from "lib/parse-resume-from-pdf/group-lines-into-sections";
 import { extractResumeFromSections } from "lib/parse-resume-from-pdf/extract-resume-from-sections";
@@ -8,9 +8,9 @@ import { extractResumeFromSections } from "lib/parse-resume-from-pdf/extract-res
  *
  * Note: The parser algorithm only works for single column resume in English language
  */
-export const parseResumeFromPdf = async (fileUrl: string) => {
+export const parseResumeFromPdf = async (fileSource: PdfSource) => {
   // Step 1. Read a pdf resume file into text items to prepare for processing
-  const textItems = await readPdf(fileUrl);
+  const textItems = await readPdf(fileSource);
 
   // Step 2. Group text items into lines
   const lines = groupTextItemsIntoLines(textItems);

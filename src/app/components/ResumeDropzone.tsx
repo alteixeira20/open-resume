@@ -3,6 +3,7 @@ import { LockClosedIcon } from "@heroicons/react/24/solid";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { parseResumeFromPdf } from "lib/parse-resume-from-pdf";
 import {
+  clearStateFromLocalStorage,
   getHasUsedAppBefore,
   saveStateToLocalStorage,
 } from "lib/redux/local-storage";
@@ -63,24 +64,44 @@ export const ResumeDropzone = ({
 
   const onInputChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
-    if (!files) return;
+    if (!files) {
+      return;
+    }
 
     const newFile = files[0];
     if (!newFile.name.toLowerCase().endsWith(".pdf")) {
       setHasNonPdfFile(true);
+      if (inputRef.current) {
+        inputRef.current.value = "";
+      }
       return;
     }
     setHasNonPdfFile(false);
     setNewFile(newFile);
+    if (inputRef.current) {
+      inputRef.current.value = "";
+    }
   };
 
   const onRemove = () => {
     setFile(defaultFileState);
     setHasNonPdfFile(false);
     onFileUrlChange("");
+    if (inputRef.current) {
+      inputRef.current.value = "";
+    }
   };
 
   const onImportClick = async () => {
+    if (getHasUsedAppBefore()) {
+      const confirmed = window.confirm(
+        "This will overwrite your current resume and settings. Do you want to continue?"
+      );
+      if (!confirmed) {
+        return;
+      }
+      clearStateFromLocalStorage();
+    }
     const resume = await parseResumeFromPdf(file.fileUrl);
     const settings = deepClone(initialSettings);
 

@@ -20,11 +20,24 @@ export const ProfileForm = () => {
 
   return (
     <BaseForm id="section-profile">
-      <div className="flex items-center gap-2">
-        <UserCircleIcon className="h-6 w-6 text-gray-600" aria-hidden="true" />
-        <h1 className="text-lg font-semibold tracking-wide text-gray-900">
-          Personal Information
-        </h1>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-2">
+          <UserCircleIcon className="h-6 w-6 text-gray-600" aria-hidden="true" />
+          <h1 className="text-lg font-semibold tracking-wide text-gray-900">
+            Personal Information
+          </h1>
+        </div>
+        <button
+          type="button"
+          className="rounded-md border border-gray-300 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-gray-700 hover:bg-gray-50"
+          onClick={() =>
+            document
+              .getElementById("section-settings")
+              ?.scrollIntoView({ behavior: "smooth", block: "start" })
+          }
+        >
+          Resume Settings
+        </button>
       </div>
       <div className="grid grid-cols-6 gap-3">
         <Input

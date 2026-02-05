@@ -41,21 +41,10 @@ const RESUME_EXAMPLES = [
 const defaultFileUrl = RESUME_EXAMPLES[0]["fileUrl"];
 const PARSER_REGION_STORAGE_KEY = "open-resume-parser-region";
 const BUILDER_STATE_STORAGE_KEY = "open-resume-state";
-const SECTION_ORDER = [
-  { id: "region", title: "Parser Region", description: "Set EU/US expectations" },
-  { id: "examples", title: "Resume examples", description: "Curated samples" },
-  { id: "upload", title: "Upload your resume", description: "Drop a PDF" },
-  { id: "results", title: "Parsing results", description: "Scores + tables" },
-  { id: "about", title: "About", description: "Origins & credits" },
-] as const;
-
 export default function ResumeParser() {
   const [fileUrl, setFileUrl] = useState(defaultFileUrl);
   const [textItems, setTextItems] = useState<TextItems>([]);
   const [parserRegion, setParserRegion] = useState<ResumeLocale>("eu");
-  const [activeSection, setActiveSection] = useState<typeof SECTION_ORDER[number]["id"]>(
-    SECTION_ORDER[0].id
-  );
   const [isSmallViewport, setIsSmallViewport] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
   const previewContainerRef = useRef<HTMLDivElement | null>(null);
@@ -168,75 +157,9 @@ export default function ResumeParser() {
     localStorage.setItem(PARSER_REGION_STORAGE_KEY, parserRegion);
   }, [parserRegion]);
 
-  const navigateToSection = (id: typeof SECTION_ORDER[number]["id"]) => {
-    document
-      .getElementById(id)
-      ?.scrollIntoView({ behavior: "smooth", block: "start" });
-    setActiveSection(id);
-  };
-
-  const contentRef = useRef<HTMLDivElement | null>(null);
-  useEffect(() => {
-    const root = contentRef.current;
-    if (!root) return;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visible = entries
-          .filter((entry) => entry.isIntersecting)
-          .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
-        if (visible[0]?.target?.id) {
-          setActiveSection(visible[0].target.id as typeof SECTION_ORDER[number]["id"]);
-        }
-      },
-      { root, rootMargin: "-40% 0px -55% 0px", threshold: [0.25, 0.5, 0.75] }
-    );
-    SECTION_ORDER.forEach((section) => {
-      const element = document.getElementById(section.id);
-      if (element) observer.observe(element);
-    });
-    return () => observer.disconnect();
-  }, []);
-
-  const [isNavOpen, setIsNavOpen] = useState(false);
-
-  const navItems = SECTION_ORDER;
-
   return (
     <main className="h-[calc(100vh-var(--top-nav-bar-height))] w-full overflow-hidden bg-gray-50">
-      <div className="mx-auto grid h-full w-full max-w-screen-2xl gap-6 px-4 py-6 md:grid-cols-[auto_minmax(0,520px)_minmax(0,1fr)] md:px-6">
-        <div className="hidden flex-col items-center md:flex">
-          <button
-            type="button"
-            onClick={() => setIsNavOpen((open) => !open)}
-            className="mb-3 flex h-12 w-12 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-500 shadow-sm hover:border-gray-400"
-            aria-label="Toggle parser navigation"
-            aria-expanded={isNavOpen}
-          >
-            <span className="flex flex-col items-center gap-1">
-              <span className="h-0.5 w-3 rounded-full bg-current" />
-              <span className="h-0.5 w-3 rounded-full bg-current" />
-              <span className="h-0.5 w-3 rounded-full bg-current" />
-            </span>
-          </button>
-          {isNavOpen && (
-            <div className="w-32 space-y-2 rounded-md border border-gray-200 bg-white p-3 shadow-sm">
-              {navItems.map((section) => (
-                <button
-                  key={section.id}
-                  onClick={() => navigateToSection(section.id)}
-                  className={cx(
-                    "w-full rounded-md px-2 py-1 text-xs font-semibold uppercase tracking-wide",
-                    activeSection === section.id
-                      ? "bg-gray-200 text-gray-900"
-                      : "text-gray-600 hover:text-gray-900"
-                  )}
-                >
-                  {section.title}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
+      <div className="mx-auto grid h-full w-full max-w-screen-2xl gap-6 px-4 py-6 md:grid-cols-[minmax(0,520px)_minmax(0,1fr)] md:px-6">
         <div className="space-y-6 overflow-y-auto pr-1">
           <section id="overview" className="space-y-2">
             <Heading className="text-primary !mt-0">Resume Parsing Workbench</Heading>

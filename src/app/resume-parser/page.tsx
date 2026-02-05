@@ -158,7 +158,7 @@ export default function ResumeParser() {
 
   return (
     <main className="h-[calc(100vh-var(--top-nav-bar-height))] w-full overflow-hidden bg-gray-50">
-      <div className="mx-auto grid h-full w-full max-w-screen-2xl gap-6 px-[var(--resume-padding)] py-6 md:grid-cols-6">
+      <div className="mx-auto grid h-full w-full max-w-screen-2xl gap-6 px-[var(--resume-padding)] py-4 md:grid-cols-6">
         <div className="col-span-3 space-y-6 overflow-y-auto pr-1">
           <section id="overview" className="space-y-2">
             <Heading className="text-primary !mt-0">
@@ -289,7 +289,7 @@ export default function ResumeParser() {
         </div>
 
         <div className="col-span-3 hidden md:block">
-          <div className="sticky top-[calc(var(--top-nav-bar-height)+0.5rem)] h-[calc(100vh-var(--top-nav-bar-height)-1rem)] w-full pb-4">
+          <div className="sticky top-[calc(var(--top-nav-bar-height)+0.5rem)] h-[calc(100vh-var(--top-nav-bar-height)-1rem)] w-full pb-2">
             <div
               ref={previewContainerRef}
               className="flex h-full w-full justify-center overflow-hidden"

@@ -92,44 +92,13 @@ export const ResumeForm = ({ preview }: { preview?: React.ReactNode }) => {
                 {preview}
               </div>
             )}
-            {!showPreview && (
-              <div className="mt-4">
-                <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
-                  Download
-                </p>
-                <div className="mt-2 flex flex-wrap gap-2">
-                  <button
-                    type="button"
-                    className="rounded-md border border-gray-300 px-3 py-1 text-sm font-medium text-gray-700 hover:bg-gray-50"
-                    onClick={() =>
-                      window.dispatchEvent(
-                        new CustomEvent("resume:download-json")
-                      )
-                    }
-                  >
-                    JSON
-                  </button>
-                  <button
-                    type="button"
-                    className="rounded-md border border-gray-300 px-3 py-1 text-sm font-medium text-gray-700 hover:bg-gray-50"
-                    onClick={() =>
-                      window.dispatchEvent(
-                        new CustomEvent("resume:download-pdf")
-                      )
-                    }
-                  >
-                    PDF
-                  </button>
-                </div>
-              </div>
-            )}
           </div>
         )}
         <div id="resume-form-top-sentinel" className="h-px w-full" />
         <div className="flex w-full flex-col gap-8">
-          <div className="sticky top-0 z-10 -mb-8 bg-gray-50">
-            <div className="h-6 bg-gray-50 md:-mx-2" />
-          </div>
+            <div className="sticky top-0 z-10 -mb-6 bg-gray-50">
+              <div className="h-4 bg-gray-50 md:-mx-2" />
+            </div>
           <section className="space-y-2">
             <Heading className="text-primary !mt-0">
               Resume Builder Workbench
@@ -138,6 +107,26 @@ export const ResumeForm = ({ preview }: { preview?: React.ReactNode }) => {
               Build your resume section by section, fine-tune typography and
               theme settings, and export a polished PDF or JSON backup anytime.
             </Paragraph>
+            <div className="flex flex-wrap gap-2 pt-2">
+              <button
+                type="button"
+                className="rounded-full border border-emerald-200 bg-emerald-600 px-4 py-1.5 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-500"
+                onClick={() =>
+                  window.dispatchEvent(new CustomEvent("resume:download-pdf"))
+                }
+              >
+                Download PDF
+              </button>
+              <button
+                type="button"
+                className="rounded-full border border-gray-200 bg-white px-4 py-1.5 text-sm font-semibold text-gray-700 shadow-sm transition hover:border-gray-300 hover:bg-gray-50"
+                onClick={() =>
+                  window.dispatchEvent(new CustomEvent("resume:download-json"))
+                }
+              >
+                Download JSON
+              </button>
+            </div>
           </section>
           <ProfileForm />
           {formsOrder.map((form) => {

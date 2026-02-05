@@ -71,7 +71,7 @@ export const ResumeForm = ({ preview }: { preview?: React.ReactNode }) => {
       onMouseLeave={() => setIsHover(false)}
       ref={scrollContainerRef}
     >
-      <section className="flex w-full flex-col gap-0 px-[var(--resume-padding)] pb-[var(--resume-padding)] pt-0">
+      <section className="flex w-full flex-col gap-0 px-0 pb-[var(--resume-padding)] pt-0">
         {preview && isSmallViewport && (
           <div className="mb-4 rounded-md border border-gray-200 bg-white p-4 shadow-sm">
             <div className="flex items-center justify-between gap-3">

@@ -38,7 +38,7 @@ const RESUME_EXAMPLES = [
   },
 ];
 
-const defaultFileUrl = RESUME_EXAMPLES[0]["fileUrl"];
+const defaultFileUrl = RESUME_EXAMPLES[1]["fileUrl"];
 const PARSER_REGION_STORAGE_KEY = "open-resume-parser-region";
 const BUILDER_STATE_STORAGE_KEY = "open-resume-state";
 export default function ResumeParser() {
@@ -122,9 +122,8 @@ export default function ResumeParser() {
       const width = container.clientWidth;
       const height = container.clientHeight;
       if (!width || !height) return;
-      const widthScale = width / pageWidth;
       const heightScale = height / pageHeight;
-      setPreviewScale(Math.min(widthScale, heightScale, 1));
+      setPreviewScale(Math.min(heightScale, 1));
     };
 
     updateScale();
@@ -159,12 +158,15 @@ export default function ResumeParser() {
 
   return (
     <main className="h-[calc(100vh-var(--top-nav-bar-height))] w-full overflow-hidden bg-gray-50">
-      <div className="mx-auto grid h-full w-full max-w-screen-2xl gap-6 px-4 py-6 md:grid-cols-[minmax(0,520px)_minmax(0,1fr)] md:px-6">
-        <div className="space-y-6 overflow-y-auto pr-1">
+      <div className="mx-auto grid h-full w-full max-w-screen-2xl gap-6 px-[var(--resume-padding)] py-6 md:grid-cols-6">
+        <div className="col-span-3 space-y-6 overflow-y-auto pr-1">
           <section id="overview" className="space-y-2">
-            <Heading className="text-primary !mt-0">Resume Parsing Workbench</Heading>
+            <Heading className="text-primary !mt-0">
+              Resume Parsing Workbench
+            </Heading>
             <Paragraph>
-              Select a parser region, try curated resumes, and upload your PDF to see which fields ATS systems can pick up.
+              Select a parser region, try curated resumes, and upload your PDF to
+              see which fields ATS systems can pick up.
             </Paragraph>
           </section>
           {isSmallViewport && (
@@ -182,7 +184,7 @@ export default function ResumeParser() {
               </div>
               {showPreview && (
                 <div
-                  className="mt-3 flex max-h-[70vh] justify-center overflow-auto"
+                  className="mt-3 flex max-h-[70vh] justify-center overflow-hidden"
                   ref={previewContainerRef}
                 >
                   <div
@@ -286,11 +288,11 @@ export default function ResumeParser() {
           </section>
         </div>
 
-        <div className="hidden md:block">
-          <div className="sticky top-[calc(var(--top-nav-bar-height)+0.5rem)] h-[calc(100vh-var(--top-nav-bar-height)-1rem)] w-full">
+        <div className="col-span-3 hidden md:block">
+          <div className="sticky top-[calc(var(--top-nav-bar-height)+0.5rem)] h-[calc(100vh-var(--top-nav-bar-height)-1rem)] w-full pb-4">
             <div
               ref={previewContainerRef}
-              className="flex h-full w-full justify-center overflow-auto rounded-md border border-gray-200 bg-white shadow-lg"
+              className="flex h-full w-full justify-center overflow-hidden"
             >
               <div
                 style={{

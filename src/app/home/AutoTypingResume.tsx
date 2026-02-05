@@ -6,8 +6,8 @@ import { initialSettings } from "lib/redux/settingsSlice";
 import { ResumeIframeCSR } from "components/Resume/ResumeIFrame";
 import { START_HOME_RESUME, END_HOME_RESUME } from "home/constants";
 import { makeObjectCharIterator } from "lib/make-object-char-iterator";
-import { useTailwindBreakpoints } from "lib/hooks/useTailwindBreakpoints";
 import { deepClone } from "lib/deep-clone";
+import { LETTER_HEIGHT_PX, LETTER_WIDTH_PX } from "lib/constants";
 
 // countObjectChar(END_HOME_RESUME) -> ~1800 chars
 const INTERVAL_MS = 50; // 20 Intervals Per Second
@@ -25,7 +25,8 @@ export const AutoTypingResume = () => {
     makeObjectCharIterator(START_HOME_RESUME, END_HOME_RESUME)
   );
   const hasSetEndResume = useRef(false);
-  const { isLg } = useTailwindBreakpoints();
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const [scale, setScale] = useState(0.5);
 
   useEffect(() => {
     const intervalId = setInterval(() => {
@@ -58,11 +59,35 @@ export const AutoTypingResume = () => {
     return () => clearInterval(intervalId);
   }, []);
 
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const heightPadding = 16;
+    const updateScale = () => {
+      const width = container.clientWidth;
+      const height = container.clientHeight;
+      if (!width || !height) return;
+      const widthScale = width / LETTER_WIDTH_PX;
+      const heightScale = height / (LETTER_HEIGHT_PX + heightPadding);
+      setScale(Math.min(widthScale, heightScale));
+    };
+
+    updateScale();
+    const observer = new ResizeObserver(updateScale);
+    observer.observe(container);
+    window.addEventListener("resize", updateScale);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("resize", updateScale);
+    };
+  }, []);
+
   return (
-    <>
+    <div ref={containerRef} className="h-full w-full">
       <ResumeIframeCSR
         documentSize="Letter"
-        scale={isLg ? 0.54 : 0.4}
+        scale={scale}
         frameClassName="bg-white"
         heightPadding={16}
       >
@@ -84,6 +109,6 @@ export const AutoTypingResume = () => {
           }}
         />
       </ResumeIframeCSR>
-    </>
+    </div>
   );
 };

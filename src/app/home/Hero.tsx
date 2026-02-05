@@ -6,8 +6,8 @@ export const Hero = () => {
   return (
     <section className="mx-auto py-6">
       <div className="mx-auto max-w-6xl">
-        <div className="mt-4 grid gap-10 md:mx-auto md:w-fit md:grid-cols-[minmax(0,750px)_minmax(0,750px)] md:items-start md:gap-8">
-        <div className="text-center md:text-left">
+        <div className="mt-4 grid w-full gap-10 md:mx-auto md:max-w-6xl md:grid-cols-2 md:items-stretch md:gap-8">
+        <div className="flex h-full flex-col text-center md:text-left">
           <h1 className="mt-3 text-primary text-lg font-bold lg:text-xl">
             Build a professional resume or EU CV online
           </h1>
@@ -55,9 +55,11 @@ export const Hero = () => {
             </div>
           </div>
         </div>
-          <div className="hidden md:flex md:justify-center">
-            <div className="flex w-full max-w-[750px] items-center justify-center rounded-2xl bg-white/90 px-6 py-7 shadow-sm backdrop-blur">
-              <AutoTypingResume />
+          <div className="hidden h-full md:flex">
+            <div className="relative h-full w-full overflow-hidden px-6 py-7">
+              <div className="absolute inset-0 flex items-start justify-center pt-3">
+                <AutoTypingResume />
+              </div>
             </div>
           </div>
         </div>

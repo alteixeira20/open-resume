@@ -43,3 +43,7 @@
   --resume-control-bar-height: 3rem;
   --resume-padding: 1.5rem;
 }
+
+body {
+  background-image: url("/assets/dots.svg");
+}

@@ -1,12 +1,12 @@
 const STEPS = [
   { title: "Add a resume pdf", text: "or create from scratch" },
   { title: "Preview design", text: "and make edits" },
-  { title: "Download new resume", text: "and apply with confidence" },
+  { title: "Download and Analyze", text: "get instant ATS feedback" },
 ];
 
 export const Steps = () => {
   return (
-    <section className="mx-auto rounded-2xl bg-sky-50 bg-dot px-8 py-8">
+    <section className="mx-auto max-w-6xl rounded-2xl border border-sky-100/80 bg-gradient-to-br from-white/90 via-sky-50/80 to-sky-100/70 px-8 py-10 shadow-[0_18px_45px_-30px_rgba(14,116,144,0.55)] backdrop-blur">
       <h1 className="text-primary text-center text-3xl font-bold">
         Build a Resume in 3 Steps
       </h1>

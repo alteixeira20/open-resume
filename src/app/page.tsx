@@ -31,13 +31,14 @@ export default function Home() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
+      <div className="pt-6">
+        <Steps />
+      </div>
       <Hero />
       {sectionDivider}
       <EvaluatorShowcase />
       {sectionDivider}
       <ForkHighlights />
-      {sectionDivider}
-      <Steps />
       {sectionDivider}
       <Features />
       {sectionDivider}

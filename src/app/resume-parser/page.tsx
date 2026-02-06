@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useMemo, useRef } from "react";
+import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { readPdf } from "lib/parse-resume-from-pdf/read-pdf";
 import type { TextItems } from "lib/parse-resume-from-pdf/types";
 import { groupTextItemsIntoLines } from "lib/parse-resume-from-pdf/group-text-items-into-lines";
@@ -14,6 +14,8 @@ import { calculateAtsScore } from "lib/ats-score";
 import { AtsScoreCard } from "resume-parser/AtsScoreCard";
 import type { ResumeLocale } from "lib/redux/settingsSlice";
 import { A4_HEIGHT_PX, A4_WIDTH_PX, LETTER_HEIGHT_PX, LETTER_WIDTH_PX } from "lib/constants";
+import { CSS_VARIABLES } from "globals-css";
+import { getPxPerRem } from "lib/get-px-per-rem";
 
 const RESUME_EXAMPLES = [
   {
@@ -46,6 +48,7 @@ export default function ResumeParser() {
   const [textItems, setTextItems] = useState<TextItems>([]);
   const [parserRegion, setParserRegion] = useState<ResumeLocale>("eu");
   const [isSmallViewport, setIsSmallViewport] = useState(false);
+  const [shouldCollapsePreview, setShouldCollapsePreview] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
   const previewContainerRef = useRef<HTMLDivElement | null>(null);
   const [previewScale, setPreviewScale] = useState(1);
@@ -90,51 +93,71 @@ export default function ResumeParser() {
   }, []);
 
   useEffect(() => {
-    const mediaQuery = window.matchMedia("(max-width: 767px)");
-    const handleChange = (event: MediaQueryListEvent | MediaQueryList) => {
-      setIsSmallViewport(event.matches);
-      if (!event.matches) {
+    const computeCollapse = () => {
+      const screenHeightPx = window.innerHeight - 20;
+      const screenWidthPx = window.innerWidth;
+      const PX_PER_REM = getPxPerRem();
+      const screenHeightRem = screenHeightPx / PX_PER_REM;
+      const topNavBarHeightRem = parseFloat(
+        CSS_VARIABLES["--top-nav-bar-height"]
+      );
+      const resumePadding = parseFloat(CSS_VARIABLES["--resume-padding"]);
+      const topAndBottomResumePadding = resumePadding * 2;
+      const isSplitLayout = screenWidthPx >= 768;
+      const availableWidthPx =
+        (isSplitLayout ? screenWidthPx / 2 : screenWidthPx) -
+        topAndBottomResumePadding * PX_PER_REM;
+      const defaultResumeHeightRem =
+        screenHeightRem - topNavBarHeightRem - topAndBottomResumePadding;
+      const resumeHeightPx = defaultResumeHeightRem * PX_PER_REM;
+      const height = parserRegion === "eu" ? A4_HEIGHT_PX : LETTER_HEIGHT_PX;
+      const width = parserRegion === "eu" ? A4_WIDTH_PX : LETTER_WIDTH_PX;
+      const heightScale = resumeHeightPx / height;
+      const widthScale = availableWidthPx / width;
+      const defaultScale =
+        Math.round(Math.min(heightScale, widthScale, 1) * 100) / 100;
+      const collapse = defaultScale < 0.6 || screenWidthPx < 768;
+      setShouldCollapsePreview(collapse);
+      setIsSmallViewport(collapse);
+      if (!collapse) {
         setShowPreview(false);
       }
     };
-    handleChange(mediaQuery);
-    if (mediaQuery.addEventListener) {
-      mediaQuery.addEventListener("change", handleChange);
-    } else {
-      mediaQuery.addListener(handleChange);
-    }
+
+    computeCollapse();
+    window.addEventListener("resize", computeCollapse);
     return () => {
-      if (mediaQuery.removeEventListener) {
-        mediaQuery.removeEventListener("change", handleChange);
-      } else {
-        mediaQuery.removeListener(handleChange);
-      }
+      window.removeEventListener("resize", computeCollapse);
     };
-  }, []);
+  }, [parserRegion]);
+
+  const updatePreviewScale = useCallback(() => {
+    const container = previewContainerRef.current;
+    if (!container) return;
+    const pageHeight = parserRegion === "eu" ? A4_HEIGHT_PX : LETTER_HEIGHT_PX;
+    const height = container.clientHeight;
+    if (!height) return;
+    const heightScale = height / pageHeight;
+    setPreviewScale(Math.min(heightScale, 1));
+  }, [parserRegion]);
 
   useEffect(() => {
     const container = previewContainerRef.current;
     if (!container) return;
-    const pageWidth = parserRegion === "eu" ? A4_WIDTH_PX : LETTER_WIDTH_PX;
-    const pageHeight = parserRegion === "eu" ? A4_HEIGHT_PX : LETTER_HEIGHT_PX;
 
-    const updateScale = () => {
-      const width = container.clientWidth;
-      const height = container.clientHeight;
-      if (!width || !height) return;
-      const heightScale = height / pageHeight;
-      setPreviewScale(Math.min(heightScale, 1));
-    };
-
-    updateScale();
-    const observer = new ResizeObserver(updateScale);
+    updatePreviewScale();
+    const observer = new ResizeObserver(updatePreviewScale);
     observer.observe(container);
-    window.addEventListener("resize", updateScale);
+    window.addEventListener("resize", updatePreviewScale);
     return () => {
       observer.disconnect();
-      window.removeEventListener("resize", updateScale);
+      window.removeEventListener("resize", updatePreviewScale);
     };
-  }, [parserRegion]);
+  }, [updatePreviewScale]);
+
+  useEffect(() => {
+    updatePreviewScale();
+  }, [shouldCollapsePreview, updatePreviewScale]);
 
   useEffect(() => {
     try {
@@ -157,9 +180,13 @@ export default function ResumeParser() {
   }, [parserRegion]);
 
   return (
-    <main className="h-[calc(100vh-var(--top-nav-bar-height))] w-full overflow-hidden bg-gray-50">
+    <main className="h-[calc(100vh-var(--top-nav-bar-height)-20px)] w-full overflow-hidden bg-gray-50">
       <div className="mx-auto grid h-full w-full max-w-screen-2xl gap-6 px-[var(--resume-padding)] py-0 md:grid-cols-6">
-        <div className="col-span-3 space-y-8 overflow-y-auto pr-1 pt-[24px]">
+        <div
+          className={`space-y-8 overflow-y-auto pr-1 pt-[24px] ${
+            shouldCollapsePreview ? "col-span-3 md:col-span-6" : "col-span-3"
+          }`}
+        >
           <section id="overview" className="space-y-2">
             <Heading className="text-primary !mt-0">
               Resume Parsing Workbench
@@ -169,7 +196,7 @@ export default function ResumeParser() {
               see which fields ATS systems can pick up.
             </Paragraph>
           </section>
-          {isSmallViewport && (
+          {shouldCollapsePreview && (
             <section className="rounded-md border border-gray-200 bg-white p-4 shadow-sm">
               <div className="flex items-center justify-between gap-3">
                 <p className="text-sm font-semibold text-gray-900">Resume Preview</p>
@@ -288,33 +315,36 @@ export default function ResumeParser() {
           </section>
         </div>
 
-        <div className="col-span-3 hidden md:block">
-          <div className="sticky top-[calc(var(--top-nav-bar-height)+0.5rem)] h-[calc(100vh-var(--top-nav-bar-height)-1rem)] w-full pb-2">
-            <div
-              ref={previewContainerRef}
-              className="flex h-full w-full justify-center overflow-hidden"
-            >
+        {!shouldCollapsePreview && (
+          <div className="col-span-3 hidden md:block">
+            <div className="sticky top-[calc(var(--top-nav-bar-height)+0.5rem)] h-[calc(100vh-var(--top-nav-bar-height)-1rem-20px)] w-full pb-2">
               <div
-                style={{
-                  width:
-                    (parserRegion === "eu" ? A4_WIDTH_PX : LETTER_WIDTH_PX) *
-                    previewScale,
-                  height:
-                    (parserRegion === "eu" ? A4_HEIGHT_PX : LETTER_HEIGHT_PX) *
-                    previewScale,
-                }}
-                className="bg-white shadow-lg"
+                ref={previewContainerRef}
+                className="flex h-full w-full justify-center overflow-hidden"
               >
-                <iframe
-                  src={`${fileUrl}#navpanes=0&zoom=100`}
-                  className="h-full w-full"
-                  style={{ border: "none" }}
-                />
+                <div
+                  style={{
+                    width:
+                      (parserRegion === "eu" ? A4_WIDTH_PX : LETTER_WIDTH_PX) *
+                      previewScale,
+                    height:
+                      (parserRegion === "eu" ? A4_HEIGHT_PX : LETTER_HEIGHT_PX) *
+                      previewScale,
+                  }}
+                  className="bg-white shadow-lg"
+                >
+                  <iframe
+                    src={`${fileUrl}#navpanes=0&zoom=100`}
+                    className="h-full w-full"
+                    style={{ border: "none" }}
+                  />
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        )}
       </div>
+      <div className="fixed bottom-0 left-0 right-0 z-50 h-5 bg-gray-50" />
     </main>
   );
 }

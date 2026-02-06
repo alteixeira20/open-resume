@@ -82,7 +82,7 @@ const BuilderContent = () => {
         </div>
         <ResumeDownloadBridge />
       </main>
-      <div className="fixed bottom-0 left-0 right-0 z-50 h-5 bg-orange-500" />
+      <div className="fixed bottom-0 left-0 right-0 z-50 h-5 bg-gray-50" />
     </>
   );
 };

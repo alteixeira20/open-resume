@@ -123,7 +123,7 @@ export const ResumeForm = ({
               {showRefreshButton && !isSmallViewport && (
                 <button
                   type="button"
-                  className="rounded-full border border-blue-700 bg-emerald-50 px-4 py-1.5 text-sm font-semibold text-primary shadow-sm transition hover:bg-emerald-100"
+                  className="rounded-full border border-blue-700 bg-emerald-50 px-4 py-1.5 text-sm font-semibold text-primary shadow-sm transition-transform duration-150 ease-out hover:-translate-y-0.5 hover:bg-emerald-100 active:translate-y-0"
                   onClick={() =>
                     window.dispatchEvent(
                       new CustomEvent("resume:refresh-preview")
@@ -205,7 +205,6 @@ export const ResumeForm = ({
             return <Component key={form} />;
           })}
           <ThemeForm />
-          <br />
         </div>
       </section>
     </div>

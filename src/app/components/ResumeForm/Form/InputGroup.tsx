@@ -80,7 +80,7 @@ export const Input = <K extends string>({
             window.dispatchEvent(new CustomEvent("resume:refresh-preview"));
           }
         }}
-        onKeyDown={(event) => {
+        onKeyDown={(event: React.KeyboardEvent<HTMLInputElement>) => {
           if (event.key === "Enter" && typeof window !== "undefined") {
             window.dispatchEvent(new CustomEvent("resume:refresh-preview"));
           }
@@ -136,7 +136,7 @@ export const Textarea = <T extends string>({
             window.dispatchEvent(new CustomEvent("resume:refresh-preview"));
           }
         }}
-        onKeyDown={(event) => {
+        onKeyDown={(event: React.KeyboardEvent<HTMLTextAreaElement>) => {
           if (event.key === "Enter" && typeof window !== "undefined") {
             window.dispatchEvent(new CustomEvent("resume:refresh-preview"));
           }
@@ -216,7 +216,7 @@ const BulletListTextareaGeneral = <T extends string>({
             window.dispatchEvent(new CustomEvent("resume:refresh-preview"));
           }
         }}
-        onKeyDown={(event) => {
+        onKeyDown={(event: React.KeyboardEvent<HTMLElement>) => {
           if (event.key === "Enter" && typeof window !== "undefined") {
             window.dispatchEvent(new CustomEvent("resume:refresh-preview"));
           }

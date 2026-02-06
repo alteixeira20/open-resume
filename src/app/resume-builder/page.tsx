@@ -22,6 +22,12 @@ const BuilderContent = () => {
   const [shouldCollapsePreview, setShouldCollapsePreview] = useState(false);
 
   useEffect(() => {
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent("resume:refresh-preview"));
+    }
+  }, []);
+
+  useEffect(() => {
     const computeShouldCollapse = () => {
       const screenHeightPx = window.innerHeight;
       const screenWidthPx = window.innerWidth;

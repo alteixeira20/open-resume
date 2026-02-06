@@ -3,15 +3,22 @@ import {
   Input,
   BulletListTextarea,
 } from "components/ResumeForm/Form/InputGroup";
+import { BulletListIconButton } from "components/ResumeForm/Form/IconButton";
 import type { CreateHandleChangeArgsWithDescriptions } from "components/ResumeForm/types";
 import { useAppDispatch, useAppSelector } from "lib/redux/hooks";
 import { selectProjects, changeProjects } from "lib/redux/resumeSlice";
 import type { ResumeProject } from "lib/redux/types";
+import {
+  changeShowBulletPoints,
+  selectShowBulletPoints,
+} from "lib/redux/settingsSlice";
 
 export const ProjectsForm = () => {
   const projects = useAppSelector(selectProjects);
   const dispatch = useAppDispatch();
   const showDelete = projects.length > 1;
+  const form = "projects";
+  const showBulletPoints = useAppSelector(selectShowBulletPoints(form));
 
   return (
     <Form form="projects" addButtonText="Add Project">
@@ -23,6 +30,9 @@ export const ProjectsForm = () => {
           ]: CreateHandleChangeArgsWithDescriptions<ResumeProject>
         ) => {
           dispatch(changeProjects({ idx, field, value } as any));
+        };
+        const handleShowBulletPoints = (value: boolean) => {
+          dispatch(changeShowBulletPoints({ field: form, value }));
         };
         const showMoveUp = idx !== 0;
         const showMoveDown = idx !== projects.length - 1;
@@ -72,6 +82,13 @@ export const ProjectsForm = () => {
               maxLength={200}
               onChange={handleProjectChange}
               labelClassName="col-span-full"
+              showBulletPoints={showBulletPoints}
+              labelAction={
+                <BulletListIconButton
+                  showBulletPoints={showBulletPoints}
+                  onClick={handleShowBulletPoints}
+                />
+              }
             />
           </FormSection>
         );

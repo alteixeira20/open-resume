@@ -5,6 +5,7 @@ import { useAutosizeTextareaHeight } from "lib/hooks/useAutosizeTextareaHeight";
 interface InputProps<K extends string, V extends string | string[]> {
   label: string;
   labelClassName?: string;
+  labelAction?: React.ReactNode;
   // name is passed in as a const string. Therefore, we make it a generic type so its type can
   // be more restricted as a const for the first argument in onChange
   name: K;
@@ -22,14 +23,19 @@ interface InputProps<K extends string, V extends string | string[]> {
 export const InputGroupWrapper = ({
   label,
   className,
+  labelAction,
   children,
 }: {
   label: string;
   className?: string;
+  labelAction?: React.ReactNode;
   children?: React.ReactNode;
 }) => (
   <label className={`text-base font-medium text-gray-700 ${className}`}>
-    {label}
+    <div className="flex items-center gap-2">
+      <span>{label}</span>
+      {labelAction}
+    </div>
     {children}
   </label>
 );
@@ -46,11 +52,16 @@ export const Input = <K extends string>({
   onChange,
   label,
   labelClassName,
+  labelAction,
 }: InputProps<K, string>) => {
   const clampedValue =
     typeof maxLength === "number" ? value.slice(0, maxLength) : value;
   return (
-    <InputGroupWrapper label={label} className={labelClassName}>
+    <InputGroupWrapper
+      label={label}
+      className={labelClassName}
+      labelAction={labelAction}
+    >
       <input
         type="text"
         name={name}
@@ -94,13 +105,18 @@ export const Textarea = <T extends string>({
   maxLength,
   showCounter = true,
   onChange,
+  labelAction,
 }: InputProps<T, string>) => {
   const clampedValue =
     typeof maxLength === "number" ? value.slice(0, maxLength) : value;
   const textareaRef = useAutosizeTextareaHeight({ value });
 
   return (
-    <InputGroupWrapper label={label} className={wrapperClassName}>
+    <InputGroupWrapper
+      label={label}
+      className={wrapperClassName}
+      labelAction={labelAction}
+    >
       <textarea
         ref={textareaRef}
         name={name}
@@ -169,6 +185,7 @@ export const BulletListTextarea = <T extends string>(
 const BulletListTextareaGeneral = <T extends string>({
   label,
   labelClassName: wrapperClassName,
+  labelAction,
   name,
   value: bulletListStrings = [],
   placeholder,
@@ -184,7 +201,11 @@ const BulletListTextareaGeneral = <T extends string>({
   const html = getHTMLFromBulletListStrings(normalizedStrings);
   const totalLength = normalizedStrings.join("\n").length;
   return (
-    <InputGroupWrapper label={label} className={wrapperClassName}>
+    <InputGroupWrapper
+      label={label}
+      className={wrapperClassName}
+      labelAction={labelAction}
+    >
       <ContentEditable
         contentEditable={true}
         className={`${INPUT_CLASS_NAME} cursor-text [&>div]:list-item ${
@@ -271,6 +292,7 @@ const getHTMLFromBulletListStrings = (bulletListStrings: string[]) => {
 const BulletListTextareaFallback = <T extends string>({
   label,
   labelClassName,
+  labelAction,
   name,
   value: bulletListStrings = [],
   placeholder,
@@ -292,6 +314,7 @@ const BulletListTextareaFallback = <T extends string>({
     <Textarea
       label={label}
       labelClassName={labelClassName}
+      labelAction={labelAction}
       name={name}
       value={textareaValue}
       placeholder={placeholder}

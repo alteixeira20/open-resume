@@ -64,6 +64,16 @@ export const Input = <K extends string>({
               : e.target.value;
           onChange(name, nextValue);
         }}
+        onBlur={() => {
+          if (typeof window !== "undefined") {
+            window.dispatchEvent(new CustomEvent("resume:refresh-preview"));
+          }
+        }}
+        onKeyDown={(event) => {
+          if (event.key === "Enter" && typeof window !== "undefined") {
+            window.dispatchEvent(new CustomEvent("resume:refresh-preview"));
+          }
+        }}
         className={INPUT_CLASS_NAME}
       />
       {typeof maxLength === "number" && showCounter && (
@@ -104,6 +114,16 @@ export const Textarea = <T extends string>({
               ? e.target.value.slice(0, maxLength)
               : e.target.value;
           onChange(name, nextValue);
+        }}
+        onBlur={() => {
+          if (typeof window !== "undefined") {
+            window.dispatchEvent(new CustomEvent("resume:refresh-preview"));
+          }
+        }}
+        onKeyDown={(event) => {
+          if (event.key === "Enter" && typeof window !== "undefined") {
+            window.dispatchEvent(new CustomEvent("resume:refresh-preview"));
+          }
         }}
       />
       {typeof maxLength === "number" && showCounter && (
@@ -170,6 +190,16 @@ const BulletListTextareaGeneral = <T extends string>({
         className={`${INPUT_CLASS_NAME} cursor-text [&>div]:list-item ${
           showBulletPoints ? "pl-7" : "[&>div]:list-['']"
         }`}
+        onBlur={() => {
+          if (typeof window !== "undefined") {
+            window.dispatchEvent(new CustomEvent("resume:refresh-preview"));
+          }
+        }}
+        onKeyDown={(event) => {
+          if (event.key === "Enter" && typeof window !== "undefined") {
+            window.dispatchEvent(new CustomEvent("resume:refresh-preview"));
+          }
+        }}
         // Note: placeholder currently doesn't work
         onChange={(e) => {
           if (e.type === "input") {

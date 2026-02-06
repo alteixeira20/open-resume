@@ -1,6 +1,6 @@
 "use client";
 import { useSetDefaultScale } from "components/Resume/hooks";
-import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+import { ArrowPathIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import dynamic from "next/dynamic";
 
 const ResumeControlBar = ({
@@ -16,6 +16,11 @@ const ResumeControlBar = ({
     setScale,
     documentSize,
   });
+
+  const handleRefresh = () => {
+    if (typeof window === "undefined") return;
+    window.dispatchEvent(new CustomEvent("resume:refresh-preview"));
+  };
 
   return (
     <div className="sticky bottom-0 left-0 right-0 flex h-[var(--resume-control-bar-height)] items-center justify-center px-[var(--resume-padding)] text-gray-600 lg:justify-between">
@@ -43,7 +48,19 @@ const ResumeControlBar = ({
           <span className="select-none">Autoscale</span>
         </label>
       </div>
-      <div className="ml-1 flex items-center gap-2 lg:ml-8" />
+      <div className="ml-1 flex items-center gap-2 lg:ml-8">
+        <button
+          type="button"
+          className="flex items-center gap-1 rounded-md border border-gray-300 px-3 py-0.5 text-sm font-semibold text-gray-700 hover:bg-gray-100"
+          onClick={handleRefresh}
+        >
+          <ArrowPathIcon className="h-4 w-4" />
+          <span className="hidden whitespace-nowrap sm:inline">
+            Refresh Preview
+          </span>
+          <span className="whitespace-nowrap sm:hidden">Refresh</span>
+        </button>
+      </div>
     </div>
   );
 };

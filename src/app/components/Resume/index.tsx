@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ResumeIframeCSR } from "components/Resume/ResumeIFrame";
 import { ResumePDF } from "components/Resume/ResumePDF";
 import {
@@ -19,10 +19,27 @@ export const Resume = () => {
   const [scale, setScale] = useState(0.8);
   const resume = useAppSelector(selectResume);
   const settings = useAppSelector(selectSettings);
+  const [previewResume, setPreviewResume] = useState(resume);
+  const [previewSettings, setPreviewSettings] = useState(settings);
   useRegisterReactPDFFont();
   useRegisterReactPDFHyphenationCallback(settings.fontFamily);
   const usePdfViewer = true;
 
+  useEffect(() => {
+    setPreviewResume(resume);
+    setPreviewSettings(settings);
+  }, []);
+
+  useEffect(() => {
+    const handleRefresh = () => {
+      setPreviewResume(resume);
+      setPreviewSettings(settings);
+    };
+    window.addEventListener("resume:refresh-preview", handleRefresh);
+    return () => {
+      window.removeEventListener("resume:refresh-preview", handleRefresh);
+    };
+  }, [resume, settings]);
 
   return (
     <>
@@ -31,14 +48,14 @@ export const Resume = () => {
         <div className="relative">
           <section className="h-[calc(100vh-var(--top-nav-bar-height)-var(--resume-control-bar-height))] w-full min-w-0 overflow-auto md:p-[var(--resume-padding)]">
             <ResumeIframeCSR
-              documentSize={settings.documentSize}
+              documentSize={previewSettings.documentSize}
               scale={scale}
               enablePDFViewer={usePdfViewer}
               allowOverflow
             >
               <ResumePDF
-                resume={resume}
-                settings={settings}
+                resume={previewResume}
+                settings={previewSettings}
                 isPDF={usePdfViewer}
               />
             </ResumeIframeCSR>
@@ -46,7 +63,7 @@ export const Resume = () => {
           <ResumeControlBarCSR
             scale={scale}
             setScale={setScale}
-            documentSize={settings.documentSize}
+            documentSize={previewSettings.documentSize}
           />
         </div>
         <ResumeControlBarBorder />

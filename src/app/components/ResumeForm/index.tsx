@@ -156,7 +156,13 @@ export const ResumeForm = ({
             </div>
             <Paragraph>
               Build your resume section by section, fine-tune typography and
-              theme settings, and export a polished PDF or JSON backup anytime.
+              theme settings, then export a polished PDF or JSON backup anytime.
+              <br />
+              Press{" "}
+              <kbd className="rounded border border-gray-300 bg-white px-1.5 py-0.5 text-xs font-semibold text-gray-700 align-middle">
+                Enter
+              </kbd>{" "}
+              to refresh the preview.
             </Paragraph>
             {preview && isSmallViewport && showPreview && (
               <div className="mt-3 w-full">

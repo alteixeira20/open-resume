@@ -28,7 +28,7 @@ export const ResumePDFProfile = ({
   const { nameFontSize } = useResumePDFStyle();
   const iconRowLineHeight = 1.1;
   const iconRowTextOffsetPt = 4;
-  const rowHeight = `${iconRowLineHeight * bodyFontSize}pt`;
+  const rowHeight = `${bodyFontSize}pt`;
 
   return (
     <ResumePDFSection style={{ marginTop: spacing["4"] }}>
@@ -44,8 +44,12 @@ export const ResumePDFProfile = ({
           const items = Object.entries(iconProps)
             .map(([key, value]) => ({ key, value }))
             .filter((item) => item.value);
-          const firstRow = items.slice(0, 3);
-          const secondRow = items.slice(3, 5);
+          const firstRow = items.filter((item) =>
+            ["email", "phone", "location"].includes(item.key)
+          );
+          const secondRow = items.filter((item) =>
+            ["url", "github"].includes(item.key)
+          );
 
           const renderItem = (key: string, value: string) => {
             let iconType: IconType;
@@ -164,11 +168,13 @@ export const ResumePDFProfile = ({
 
           return (
             <>
-              <View style={{ ...styles.flexRowBetween }}>
-                {firstRow.map((item) => renderItem(item.key, item.value))}
-              </View>
-              {secondRow.length > 0 && (
+              {firstRow.length > 0 && (
                 <View style={{ ...styles.flexRowBetween }}>
+                  {firstRow.map((item) => renderItem(item.key, item.value))}
+                </View>
+              )}
+              {secondRow.length > 0 && (
+                <View style={{ ...styles.flexRowBetween, marginTop: "-5pt" }}>
                   {secondRow.map((item) => renderItem(item.key, item.value))}
                 </View>
               )}

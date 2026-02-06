@@ -6,9 +6,8 @@ import {
   ResumeControlBarCSR,
   ResumeControlBarBorder,
 } from "components/Resume/ResumeControlBar";
-import { useAppSelector } from "lib/redux/hooks";
-import { selectResume } from "lib/redux/resumeSlice";
-import { selectSettings } from "lib/redux/settingsSlice";
+import { useStore } from "react-redux";
+import type { RootState } from "lib/redux/store";
 import {
   useRegisterReactPDFFont,
   useRegisterReactPDFHyphenationCallback,
@@ -16,30 +15,29 @@ import {
 import { NonEnglishFontsCSSLazyLoader } from "components/fonts/NonEnglishFontsCSSLoader";
 
 export const Resume = () => {
+  const store = useStore<RootState>();
   const [scale, setScale] = useState(0.8);
-  const resume = useAppSelector(selectResume);
-  const settings = useAppSelector(selectSettings);
-  const [previewResume, setPreviewResume] = useState(resume);
-  const [previewSettings, setPreviewSettings] = useState(settings);
+  const [previewResume, setPreviewResume] = useState(
+    () => store.getState().resume
+  );
+  const [previewSettings, setPreviewSettings] = useState(
+    () => store.getState().settings
+  );
   useRegisterReactPDFFont();
-  useRegisterReactPDFHyphenationCallback(settings.fontFamily);
+  useRegisterReactPDFHyphenationCallback(previewSettings.fontFamily);
   const usePdfViewer = true;
 
   useEffect(() => {
-    setPreviewResume(resume);
-    setPreviewSettings(settings);
-  }, []);
-
-  useEffect(() => {
     const handleRefresh = () => {
-      setPreviewResume(resume);
-      setPreviewSettings(settings);
+      const state = store.getState();
+      setPreviewResume(state.resume);
+      setPreviewSettings(state.settings);
     };
     window.addEventListener("resume:refresh-preview", handleRefresh);
     return () => {
       window.removeEventListener("resume:refresh-preview", handleRefresh);
     };
-  }, [resume, settings]);
+  }, [store]);
 
   return (
     <>

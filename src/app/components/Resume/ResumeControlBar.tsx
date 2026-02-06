@@ -7,10 +7,12 @@ const ResumeControlBar = ({
   scale,
   setScale,
   documentSize,
+  maxScale,
 }: {
   scale: number;
   setScale: (scale: number) => void;
   documentSize: string;
+  maxScale: number;
 }) => {
   const { scaleOnResize, setScaleOnResize } = useSetDefaultScale({
     setScale,
@@ -23,18 +25,19 @@ const ResumeControlBar = ({
   };
 
   return (
-    <div className="sticky bottom-0 left-0 right-0 flex h-[var(--resume-control-bar-height)] items-center justify-center px-[var(--resume-padding)] text-gray-600 lg:justify-between">
+    <div className="sticky top-0 left-0 right-0 flex h-[var(--resume-control-bar-height)] items-start justify-center px-[var(--resume-padding)] pt-1 text-gray-600 lg:justify-between">
       <div className="flex items-center gap-2">
         <MagnifyingGlassIcon className="h-5 w-5" aria-hidden="true" />
         <input
           type="range"
           min={0.5}
-          max={1.5}
+          max={maxScale}
           step={0.01}
           value={scale}
           onChange={(e) => {
             setScaleOnResize(false);
-            setScale(Number(e.target.value));
+            const nextScale = Number(e.target.value);
+            setScale(Math.min(nextScale, maxScale));
           }}
         />
         <div className="w-10">{`${Math.round(scale * 100)}%`}</div>
@@ -73,8 +76,4 @@ export const ResumeControlBarCSR = dynamic(
   {
     ssr: false,
   }
-);
-
-export const ResumeControlBarBorder = () => (
-  <div className="absolute bottom-[var(--resume-control-bar-height)] w-full border-t-2 bg-gray-50" />
 );

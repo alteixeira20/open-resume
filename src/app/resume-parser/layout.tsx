@@ -1,7 +1,28 @@
-export const metadata = {
-  title: "ATS Resume Checker & Parser (EU/US)",
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Resume Parsing Workbench",
   description:
-    "Test your resume or CV with a local ATS score, parsing diagnostics, and EU/US layout expectations.",
+    "Resume parser and ATS scoring workbench. Upload a PDF to see extracted fields, parsing diagnostics, and ATS-friendly formatting issues.",
+  keywords: [
+    "resume parser",
+    "ats resume parser",
+    "ats resume checker",
+    "ats resume scoring",
+    "resume grader",
+    "cv grader",
+    "resume evaluator",
+    "cv evaluator",
+    "resume scoring tool",
+    "cv scoring tool",
+    "resume analysis",
+    "cv analysis",
+    "resume audit",
+    "cv audit",
+    "ats friendly resume",
+    "pdf resume parser",
+    "resume parsing tool",
+  ],
 };
 
 export default function ResumeParserLayout({

@@ -14,7 +14,15 @@ const structuredData = {
   operatingSystem: "Web",
   url: "https://open-resume.alexandreteixeira.dev",
   description:
-    "Free, open-source resume builder and CV builder with EU A4 + US Letter presets, ATS resume scoring system, resume parser, and local-first privacy.",
+    "Open-source resume builder and CV evaluator with EU A4 + US Letter presets, ATS resume scoring, resume parser, and local-first privacy.",
+  keywords:
+    "resume builder, cv builder, ats resume checker, ats resume scoring, resume grader, cv grader, resume evaluator, cv evaluator, resume parser, ats resume parser, open source resume builder, open source cv builder, resume builder pdf export, resume import json, resume import pdf",
+  featureList: [
+    "ATS-ready resume builder with EU A4 + US Letter presets",
+    "Local ATS scoring and parsing diagnostics",
+    "PDF export and JSON backup",
+    "Local-first privacy with no sign-up",
+  ],
   offers: {
     "@type": "Offer",
     price: "0",

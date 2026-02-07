@@ -205,7 +205,8 @@ export default function ResumeParser() {
             </div>
             <Paragraph>
               Select a parser region, try curated resumes, and upload your PDF to
-              see which fields ATS systems can pick up.
+              see which fields ATS systems can pick up. Use it as a resume
+              grader or CV evaluator to spot parsing gaps before you apply.
             </Paragraph>
           </section>
           {shouldCollapsePreview && showPreview && (

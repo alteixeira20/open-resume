@@ -12,8 +12,9 @@ export const Hero = () => {
             Build a professional resume or EU CV online
           </h1>
             <p className="mt-4 text-lg text-gray-700 lg:text-xl">
-              Free, open-source resume builder with EU A4 + US Letter presets, ATS-friendly
-              resume templates, and privacy-first local storage.
+              Open-source resume and CV builder with EU A4 + US Letter presets,
+              ATS-friendly templates, and a built-in ATS resume checker to grade
+              and evaluate your CV locally.
             </p>
           <div className="mt-6 flex flex-col items-center gap-3 sm:flex-row sm:justify-center md:justify-start">
             <Link href="/resume-import" className="btn-primary">

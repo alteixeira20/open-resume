@@ -155,8 +155,9 @@ export const ResumeForm = ({
               )}
             </div>
             <Paragraph>
-              Build your resume section by section, fine-tune typography and
-              theme settings, then export a polished PDF or JSON backup anytime.
+              Build an ATS-ready resume section by section, fine-tune typography
+              and theme settings, then export a polished PDF or JSON backup
+              anytime.
               <br />
               Press{" "}
               <kbd className="rounded border border-gray-300 bg-white px-1.5 py-0.5 text-xs font-semibold text-gray-700 align-middle">

@@ -28,6 +28,11 @@ This file documents the maintenance decisions and upgrades applied to this fork 
 ### 2026-01 — Version Bump
 - **Package version** updated to **0.2.0** to reflect the accumulated upgrades and tooling changes.
 
+### 2026-02 — UX + Workbench Alignment
+- **Builder / parser parity**: matching workbench widths and consistent preview alignment.
+- **Preview controls**: manual refresh and Enter‑to‑refresh for stable editing.
+- **Import hub**: resume import flow consolidated and clarified.
+
 ## Why Webpack in Next 16
 This project uses `pdfjs-dist`, which in Node environments optionally tries to resolve `canvas` and `encoding`. We disable those aliases for browser-only usage. Webpack handles these overrides reliably.
 

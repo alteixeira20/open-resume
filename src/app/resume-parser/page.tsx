@@ -188,51 +188,50 @@ export default function ResumeParser() {
           }`}
         >
           <section id="overview" className="space-y-2">
-            <Heading className="text-primary !mt-0">
-              Resume Parsing Workbench
-            </Heading>
-            <Paragraph>
-              Select a parser region, try curated resumes, and upload your PDF to
-              see which fields ATS systems can pick up.
-            </Paragraph>
-          </section>
-          {shouldCollapsePreview && (
-            <section className="rounded-md border border-gray-200 bg-white p-4 shadow-sm">
-              <div className="flex items-center justify-between gap-3">
-                <p className="text-sm font-semibold text-gray-900">Resume Preview</p>
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <Heading className="text-primary !mt-0">
+                Resume Parsing Workbench
+              </Heading>
+              {shouldCollapsePreview && (
                 <button
                   type="button"
-                  className="rounded-md border border-gray-300 px-3 py-1 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                  className="rounded-full border border-emerald-200 bg-emerald-600 px-4 py-1.5 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-500"
                   onClick={() => setShowPreview((prev) => !prev)}
                   aria-expanded={showPreview}
                 >
                   {showPreview ? "Hide preview" : "Show preview"}
                 </button>
-              </div>
-              {showPreview && (
-                <div
-                  className="mt-3 flex max-h-[70vh] justify-center overflow-hidden"
-                  ref={previewContainerRef}
-                >
-                  <div
-                    style={{
-                      width:
-                        (parserRegion === "eu" ? A4_WIDTH_PX : LETTER_WIDTH_PX) *
-                        previewScale,
-                      height:
-                        (parserRegion === "eu" ? A4_HEIGHT_PX : LETTER_HEIGHT_PX) *
-                        previewScale,
-                    }}
-                    className="bg-white shadow-lg"
-                  >
-                    <iframe
-                      src={`${fileUrl}#navpanes=0&zoom=100`}
-                      className="h-full w-full"
-                      style={{ border: "none" }}
-                    />
-                  </div>
-                </div>
               )}
+            </div>
+            <Paragraph>
+              Select a parser region, try curated resumes, and upload your PDF to
+              see which fields ATS systems can pick up.
+            </Paragraph>
+          </section>
+          {shouldCollapsePreview && showPreview && (
+            <section className="mt-3">
+              <div
+                className="flex max-h-[70vh] justify-center overflow-auto"
+                ref={previewContainerRef}
+              >
+                <div
+                  style={{
+                    width:
+                      (parserRegion === "eu" ? A4_WIDTH_PX : LETTER_WIDTH_PX) *
+                      previewScale,
+                    height:
+                      (parserRegion === "eu" ? A4_HEIGHT_PX : LETTER_HEIGHT_PX) *
+                      previewScale,
+                  }}
+                  className="bg-white shadow-lg"
+                >
+                  <iframe
+                    src={`${fileUrl}#navpanes=0&zoom=100`}
+                    className="h-full w-full"
+                    style={{ border: "none" }}
+                  />
+                </div>
+              </div>
             </section>
           )}
 

@@ -10,13 +10,12 @@ import { deepClone } from "lib/deep-clone";
 export const END_HOME_RESUME: Resume = {
   profile: {
     name: "John Doe",
-    summary:
-      "Software engineer obsessed with building exceptional products that people love",
-    email: "hello@openresume.com",
+    email: "hello@cvforge.app",
     phone: "123-456-7890",
     location: "NYC, NY",
-    url: "linkedin.com/in/john-doe",
-    github: "github.com/johndoe",
+    url: "linkedin.com/in/jdoe",
+    github: "github.com/jdoe",
+    summary: "Software engineer building products people actually love",
   },
   workExperiences: [
     {
@@ -64,7 +63,7 @@ export const END_HOME_RESUME: Resume = {
   ],
   projects: [
     {
-      project: "OpenResume",
+      project: "CVForge",
       link: "",
       date: "Spring 2023",
       descriptions: [

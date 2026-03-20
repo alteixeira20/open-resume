@@ -1,55 +1,68 @@
 import { Hero } from "home/Hero";
 import { Steps } from "home/Steps";
-import { Features } from "home/Features";
 import { QuestionsAndAnswers } from "home/QuestionsAndAnswers";
 import { ForkHighlights } from "home/ForkHighlights";
 import { EvaluatorShowcase } from "home/EvaluatorShowcase";
 import { Footer } from "home/Footer";
+import { SITE } from "content/site";
+import { SectionDivider } from "components/layout/SectionDivider";
 
 const structuredData = {
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
-  name: "OpenResume",
+  name: "CVForge",
   applicationCategory: "BusinessApplication",
   operatingSystem: "Web",
-  url: "https://open-resume.alexandreteixeira.dev",
-  description:
-    "Open-source resume builder and CV evaluator with EU A4 + US Letter presets, ATS resume scoring, resume parser, and local-first privacy.",
-  keywords:
-    "resume builder, cv builder, ats resume checker, ats resume scoring, resume grader, cv grader, resume evaluator, cv evaluator, resume parser, ats resume parser, open source resume builder, open source cv builder, resume builder pdf export, resume import json, resume import pdf",
+  url: SITE.liveUrl,
+  description: SITE.description,
   featureList: [
-    "ATS-ready resume builder with EU A4 + US Letter presets",
-    "Local ATS scoring and parsing diagnostics",
+    "Local ATS scoring — grade your CV offline",
+    "EU A4 and US Letter presets",
+    "ATS-friendly single-column resume templates",
+    "Privacy-first — no sign-up, no data uploads",
     "PDF export and JSON backup",
-    "Local-first privacy with no sign-up",
+    "Resume parser with field extraction transparency",
+    "Typography controls: body size, name size, spacing, line height",
+    "GitHub, project links, and languages fields",
   ],
   offers: {
     "@type": "Offer",
     price: "0",
     priceCurrency: "EUR",
   },
+  author: {
+    "@type": "Person",
+    name: "Alexandre Teixeira",
+    url: SITE.author.github,
+  },
+  isBasedOn: {
+    "@type": "SoftwareApplication",
+    name: "OpenResume",
+    author: {
+      "@type": "Person",
+      name: "Xitang Zhao",
+      url: SITE.original.github,
+    },
+  },
 };
 
 export default function Home() {
-  const sectionDivider = <div className="my-8 h-px bg-gray-200/70" />;
-
   return (
-    <main className="mx-auto max-w-screen-2xl bg-dot px-8 pb-4 text-gray-900 lg:px-12">
+    <main className="mx-auto max-w-screen-xl px-8 pb-4 text-gray-900 lg:px-12">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
-      <div className="pt-6">
-        <Steps />
-      </div>
       <Hero />
-      {sectionDivider}
+      <SectionDivider />
+      <Steps />
+      <SectionDivider />
       <EvaluatorShowcase />
-      {sectionDivider}
+      <SectionDivider />
       <ForkHighlights />
-      {sectionDivider}
-      <Features />
+      <SectionDivider />
       <QuestionsAndAnswers />
+      <SectionDivider />
       <Footer />
     </main>
   );

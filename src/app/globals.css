@@ -3,47 +3,109 @@
 
 @layer components {
   .btn-primary {
-    @apply bg-gradient-to-r from-[color:var(--theme-purple)] to-[color:var(--theme-blue)] text-white inline-block rounded-full px-6 py-2 font-semibold shadow-sm hover:opacity-80 hover:outline-[color:var(--theme-purple)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--theme-purple)];
+    @apply inline-block rounded-full font-semibold shadow-sm transition hover:opacity-90 hover:shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--color-brand-primary)];
+    background: linear-gradient(
+      135deg,
+      var(--color-brand-primary),
+      var(--color-brand-secondary)
+    );
+    color: #ffffff;
+    padding: 0.5rem 1.5rem;
   }
   .text-primary {
-    @apply bg-gradient-to-r from-[color:var(--theme-purple)] to-[color:var(--theme-blue)] bg-clip-text text-transparent;
+    background: linear-gradient(
+      90deg,
+      var(--color-brand-primary),
+      var(--color-brand-accent)
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
   }
   .bg-primary {
-    @apply bg-gradient-to-r from-[color:var(--theme-purple)] to-[color:var(--theme-blue)] text-white;
+    background: linear-gradient(
+      135deg,
+      var(--color-brand-primary),
+      var(--color-brand-secondary)
+    );
+    color: #ffffff;
   }
-  .outline-theme-purple {
-    @apply hover:opacity-80 hover:outline-[color:var(--theme-purple)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--theme-purple)];
+  .forge-glow {
+    box-shadow: 0 4px 24px var(--color-brand-glow);
   }
-  .outline-theme-blue {
-    @apply hover:opacity-80 hover:outline-[color:var(--theme-blue)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--theme-blue)];
+  .keyword {
+    color: var(--color-brand-primary);
+    font-weight: 600;
   }
-  .within-outline-theme-purple {
-    @apply focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-[color:var(--theme-purple)] hover:opacity-80 hover:outline-[color:var(--theme-purple)];
+  .outline-brand-primary {
+    @apply hover:opacity-80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--color-brand-primary)];
+  }
+  .outline-brand-secondary {
+    @apply hover:opacity-80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--color-brand-secondary)];
+  }
+  .within-outline-brand-primary {
+    @apply focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-[color:var(--color-brand-primary)] hover:opacity-80 hover:outline-[color:var(--color-brand-primary)];
   }
   .heading-text-primary {
-    background-image: linear-gradient(
+    background: linear-gradient(
       90deg,
-      var(--theme-purple),
-      var(--theme-blue)
+      var(--color-brand-primary),
+      var(--color-brand-accent)
     );
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
   }
   .heading-plain {
-    color: #111827;
+    color: var(--color-text-primary);
   }
 }
 
 :root {
-  --theme-purple: #5d52d9;
-  --theme-blue: #4fc5eb;
+  /* Brand */
+  --color-brand-primary: #c44a0a;
+  --color-brand-secondary: #8f5a1f;
+  --color-brand-accent: #d8891e;
+  --color-brand-glow: rgba(196, 74, 10, 0.2);
+
+  /* Forge neutrals */
+  --color-forge-950: #120d0a;
+  --color-forge-900: #1c1310;
+  --color-forge-800: #2c1f19;
+  --color-forge-700: #3d2b22;
+  --color-forge-600: #5c3d2e;
+  --color-forge-500: #7a5240;
+  --color-forge-200: #e8d5c4;
+  --color-forge-100: #f5ede6;
+  --color-forge-50: #fdf8f5;
+
+  /* Surfaces */
+  --color-surface-base: var(--color-forge-50);
+  --color-surface-raised: var(--color-forge-100);
+  --color-surface-border: var(--color-forge-200);
+
+  /* Text */
+  --color-text-primary: var(--color-forge-900);
+  --color-text-secondary: var(--color-forge-600);
+  --color-text-muted: var(--color-forge-500);
+
+  /* Feedback */
+  --color-success: #22c55e;
+  --color-warning: #f59e0b;
+  --color-error: #ef4444;
+
+  /* Legacy aliases */
+  --theme-purple: #c44a0a;
+  --theme-blue: #8f5a1f;
+
+  /* Layout */
   /* Keep the below variable names in sync with CSS_VARIABLES in globals-css.ts */
-  --top-nav-bar-height: 3.5rem;
+  --top-nav-bar-height: 4.5rem;
   --resume-control-bar-height: 3rem;
   --resume-padding: 1.5rem;
+  --workbench-panel-px: clamp(1.5rem, 4vw, 3rem);
 }
 
 body {
-  background-image: url("/assets/dots.svg");
+  background-color: var(--color-forge-100);
 }

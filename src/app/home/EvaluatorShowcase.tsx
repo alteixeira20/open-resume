@@ -1,12 +1,13 @@
 "use client";
 import { useState } from "react";
-import { AtsScoreCard } from "resume-parser/AtsScoreCard";
-import { ResumeTable } from "resume-parser/ResumeTable";
+import { AtsScoreCard } from "parser/AtsScoreCard";
+import { ResumeTable } from "parser/ResumeTable";
 import type { AtsScoreResult } from "lib/ats-score";
 import type { Resume } from "lib/redux/types";
-import { Heading, Paragraph } from "components/documentation";
-import Link from "next/link";
 import { END_HOME_RESUME } from "home/constants";
+import { HOME_EVALUATOR } from "content/home";
+import { Section } from "components/layout/Section";
+import { Button, SectionHeading } from "components/ui";
 
 const demoScore: AtsScoreResult = {
   score: 97,
@@ -25,27 +26,27 @@ export const EvaluatorShowcase = () => {
   const [showParsedResume, setShowParsedResume] = useState(false);
 
   return (
-    <section className="mx-auto max-w-6xl rounded-2xl bg-white/55 p-6 shadow-sm backdrop-blur">
+    <Section>
       <div className="text-center">
-        <Heading className="!mt-0 !mb-3">
-          ATS Resume Scoring System
-        </Heading>
-        <Paragraph>
-          This is a sample ATS scoring preview using the same demo resume shown
-          in the builder example above.
-        </Paragraph>
+        <SectionHeading
+          align="center"
+          title={HOME_EVALUATOR.title}
+          subtitle={HOME_EVALUATOR.description}
+        />
         <div className="mt-4 flex flex-wrap justify-center gap-3">
-          <Link href="/resume-parser" className="btn-primary">
-            Try ATS Scoring
-          </Link>
-          <button
-            type="button"
-            className="rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm transition hover:border-gray-300 hover:bg-gray-50"
+          <Button href={HOME_EVALUATOR.primaryCta.href}>
+            {HOME_EVALUATOR.primaryCta.label}
+          </Button>
+          <Button
+            variant="secondary"
+            size="sm"
             onClick={() => setShowParsedResume((prev) => !prev)}
             aria-expanded={showParsedResume}
           >
-            {showParsedResume ? "Hide parsed CV" : "Show parsed CV"}
-          </button>
+            {showParsedResume
+              ? HOME_EVALUATOR.toggle.hide
+              : HOME_EVALUATOR.toggle.show}
+          </Button>
         </div>
       </div>
       <div className="mt-6">
@@ -56,6 +57,6 @@ export const EvaluatorShowcase = () => {
           <ResumeTable resume={demoResume} />
         </div>
       )}
-    </section>
+    </Section>
   );
 };

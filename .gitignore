@@ -39,6 +39,17 @@ next-env.d.ts
 summary.txt
 template_context_report.md
 project_details.txt
+/docs/internal/
+/docs/**/*.private.*
+/docs/**/*.internal.*
 
 # pdfjs runtime assets (copied on install)
 /public/pdfjs/
+
+# Example/dev artifacts
+/examples/
+*.notes.md
+*.report.md
+*.local.txt
+TODO.md
+session-codex.txt

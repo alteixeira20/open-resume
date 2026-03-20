@@ -7,76 +7,108 @@
   <img src="https://img.shields.io/badge/Docker-Ready-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Docker badge">
 </p>
 
-<h1 align="center">OpenResume</h1>
-<p align="center">Open-source CV builder + ATS resume evaluator with EU A4 / US Letter presets.</p>
-
-<p align="center"><sub><em>Original project by <a href="https://github.com/xitanggg">Xitang Zhao</a>. Fork maintained by <a href="https://github.com/alteixeira20">Alexandre Teixeira</a>.</em></sub></p>
+<h1 align="center">CVForge</h1>
+<p align="center">
+  <strong>Forge your career. ATS-ready, EU-native.</strong>
+</p>
+<p align="center">
+  Free, open-source CV builder · Local ATS scoring · EU A4 + US Letter · Privacy-first
+</p>
+<p align="center">
+  <sub>Built on <a href="https://github.com/xitanggg/open-resume">OpenResume</a> by Xitang Zhao
+  · Extended and maintained by <a href="https://github.com/alteixeira20">Alexandre Teixeira</a></sub>
+</p>
 
 <p align="center">
-  <a href="https://open-resume.alexandreteixeira.dev/">Live demo</a>
+  <a href="https://cvforge.alexandreteixeira.dev/">Live demo</a>
 </p>
 
 <p align="center">
   <img src="public/assets/ATS_scoring.png" alt="ATS scoring preview" width="85%" />
   <br />
-  <em>ATS scoring breakdown with local diagnostics.</em>
+  <em>Local ATS scoring breakdown inside the Parser Workbench.</em>
 </p>
 
 ## Table of Contents
 1. [At a Glance](#at-a-glance)
 2. [About](#about)
-3. [What This Fork Adds](#what-this-fork-adds)
-4. [ATS Scoring](#ats-scoring)
-5. [EU vs US Presets](#eu-vs-us-presets)
-6. [Docs](#docs)
-7. [Self-Hosting](#self-hosting)
-8. [Deploy with Docker (Behind Reverse Proxy)](#deploy-with-docker-behind-reverse-proxy)
-9. [Testing](#testing)
-10. [Project Layout](#project-layout)
-11. [Maintenance & Upgrades](#maintenance--upgrades)
-12. [Credits](#credits)
+3. [Routes](#routes)
+4. [How the App Is Built](#how-the-app-is-built)
+5. [What This Fork Adds](#what-this-fork-adds)
+6. [ATS Scoring](#ats-scoring)
+7. [Docs](#docs)
+8. [Self-Hosting](#self-hosting)
+9. [Deploy with Docker (Behind Reverse Proxy)](#deploy-with-docker-behind-reverse-proxy)
+10. [Testing](#testing)
+11. [Project Layout](#project-layout)
+12. [Maintenance & Upgrades](#maintenance--upgrades)
+13. [Credits](#credits)
 
 ## At a Glance
-> **Highlights:** ATS-ready resume builder, local ATS scoring, and a built-in resume grader.
+> **Highlights:** CV builder, parser workbench, local ATS scoring, and no server-side CV processing.
 
-- EU A4 and US Letter presets for layout, spacing, and headings.
-- ATS scoring and diagnostics run entirely offline (no third-party APIs).
-- CV/resume evaluator view with transparent parsing evidence.
-- Parser transparency: see extracted fields, token evidence, and issue details.
-- Builder includes GitHub profiles, project links, languages, and optional GPA (US).
-- Typography controls: body size, name size, section spacing, line height.
-- Docker and Makefile workflows for easy self-hosting.
+- `/builder` is the editing workbench: build a CV, preview it live, and export PDF or JSON.
+- `/parser` is the parser workbench: upload any PDF and inspect parsing results plus ATS scoring.
+- `/resume-import` is the import hub: continue the last session, start fresh, or import PDF/JSON.
+- EU A4 and US Letter presets are supported in both building and parsing flows.
+- ATS scoring runs locally in the browser UI, and the same scoring core is available through API and CLI entry points.
+- Builder state is persisted to local storage so the workbench can restore the last session.
 
 ## About
-OpenResume is an open-source resume/CV builder and ATS evaluator you can run locally. It generates professional, ATS-friendly PDFs and lets you grade, score, and inspect how a machine would read your resume before you apply.
+CVForge is a Next.js 16 / React 19 fork of the OpenResume project. It keeps the original local-first CV builder model, then adds a parser workbench, local ATS scoring, EU A4 support, and a more explicit workbench UX around editing and diagnostics.
+
+The app is still built around one printable PDF template rendered with `@react-pdf/renderer`. The builder and parser are separate workbenches that share layout primitives, but they solve different problems:
+
+- The builder workbench edits Redux-backed CV state and renders the live PDF preview.
+- The parser workbench reads a PDF with pdf.js, reconstructs text lines and sections, extracts a resume model, and scores it heuristically.
+- The import hub bridges those flows by taking JSON exports or PDFs and moving the user back into the builder.
+
+## Routes
+- `/` marketing and product overview
+- `/builder` Builder Workbench
+- `/parser` Parser Workbench
+- `/resume-import` import hub
+
+Legacy URLs are still redirected in `next.config.js`:
+- `/resume-builder` -> `/builder`
+- `/resume-parser` -> `/parser`
+- `/ats-checker` -> `/parser`
+
+## How the App Is Built
+- **App framework:** Next.js App Router under `src/app`
+- **UI:** React 19 + TypeScript + Tailwind 4
+- **State:** Redux Toolkit store in `src/app/lib/redux`
+- **PDF rendering:** `@react-pdf/renderer` via `src/app/components/Resume/ResumePDF`
+- **PDF parsing:** `pdfjs-dist`, copied into `public/pdfjs` by `scripts/copy-pdfjs.mjs`
+- **Scoring:** local heuristics in `src/app/lib/ats-score`
+- **Shared workbench shell:** `WorkbenchLayout`, `WorkbenchPreview`, and `WorkbenchHeader` under `src/app/components/layout`
+
+The two workbenches intentionally differ only where needed:
+- `/builder` uses `ResumeForm` on the left and the React PDF preview on the right.
+- `/parser` uses parser controls/results on the left and an iframe-based PDF preview on the right.
 
 ## What This Fork Adds
-> **Highlights:** ATS readiness + EU-focused CV workflow with a feedback loop.
+> **Highlights:** a stronger local feedback loop around CV building and PDF parsing.
 
-- **Local ATS scoring** with UI + API + CLI parity.
-- **EU vs US presets** (A4 vs Letter) in both builder and parser.
-- **ATS issue details** to show *exact* detections and missing fields.
-- **Extra builder fields**: GitHub, project links, languages, optional GPA.
-- **Typography controls** for fine-tuned readability.
-- **Resume import hub** to continue, start fresh, or import PDF/JSON.
-- **Workbench UX**: consistent builder/parser layout, clearer previews.
-- **Manual preview refresh** with Enter-to-refresh for stability.
+- **Parser Workbench** at `/parser` for field extraction, diagnostics, and ATS scoring
+- **Local ATS scoring** with the same scoring core available in UI, API, and CLI contexts
+- **EU A4 + US Letter support** in both generation and parser expectations
+- **Import hub** for continuing, starting fresh, or importing PDF/JSON
+- **Workbench parity** between the builder and parser shells
+- **Theme and typography controls** without changing the underlying PDF engine
+- **Extra data fields** like GitHub, project links, and languages
 
 ## ATS Scoring
-The ATS engine grades resumes on parsing reliability, structure, readability, and optional job-description keywords. It returns a score plus a list of actionable issues with diagnostic details.
+The ATS engine grades a parsed PDF across parsing reliability, structure, readability, and optional job-description keywords. It returns a score plus issues with diagnostic details.
 
 - Full breakdown: `docs/ATS_SCORING.md`
 - Issue list: `docs/ATS_ISSUES.md`
 
 ## Docs
+- Architecture overview: `docs/ARCHITECTURE.md`
 - Fork overview and changes: `docs/FORK_OVERVIEW.md`
 - Maintenance and upgrades: `docs/MAINTENANCE.md`
 - Self-hosting guide: `docs/SELF_HOSTING.md`
-
-## EU vs US Presets
-- **EU (A4)** uses A4 sizing and EU-friendly headings.
-- **US (Letter)** uses Letter sizing and US-oriented headings.
-- Parser expectations match your selected region.
 
 ## Self-Hosting
 **Prerequisites:**
@@ -99,8 +131,8 @@ make run
 
 ## Deploy with Docker (Behind Reverse Proxy)
 ```sh
-git clone https://github.com/alteixeira20/open-resume.git
-cd open-resume
+git clone https://github.com/alteixeira20/cvforge.git
+cd cvforge
 
 docker network create edge   # if it doesn't exist
 
@@ -109,11 +141,11 @@ docker compose up -d --build
 
 Verify from your proxy container:
 ```sh
-docker exec nginx wget -qO- http://open-resume:3000 | head
+docker exec nginx wget -qO- http://cvforge:3000 | head
 ```
 
 ## Testing
-> **Highlights:** Parser heuristics, ATS scoring, and UI safeguards are covered by unit and component tests.
+> **Highlights:** parser heuristics, ATS scoring, and key UI flows have test coverage.
 
 ```sh
 npm run lint
@@ -121,23 +153,29 @@ npm run test:ci
 npm run build
 ```
 
-- Parser coverage: section grouping, bullet extraction, subsection splitting, feature scoring.
-- ATS coverage: scoring breakdowns, JD keyword impact, EU vs US formats, issue reporting.
-- UI coverage: locale toggle, import dropzone validation.
-- Core utils: deep clone/merge helpers, object iterators, class name combinator.
+- Parser coverage: section grouping, bullet extraction, subsection splitting, feature scoring
+- ATS coverage: scoring breakdowns, JD keyword impact, EU vs US formats, issue reporting
+- UI coverage: locale toggle, import dropzone validation
+- Core utils: deep clone/merge helpers, object iterators, class name combinator
 
 ## Project Layout
-- `src/app` — Next.js app routes and UI components
-- `src/app/lib` — parsing, ATS scoring, and shared utilities
-- `public` — assets, fonts, and example resumes
-- `docs` — scoring details, issues reference, and hosting notes
-- `scripts` — CLI tooling
+- `src/app` — routes, content files, and UI components
+- `src/app/builder` — Builder Workbench route
+- `src/app/parser` — Parser Workbench route
+- `src/app/resume-import` — import hub route
+- `src/app/components/Resume` — live PDF preview and download bridge
+- `src/app/components/ResumeForm` — builder controls and editable sections
+- `src/app/components/layout` — shared workbench shell primitives
+- `src/app/lib` — parsing, ATS scoring, Redux state, and utilities
+- `public` — fonts, images, example PDFs, and pdf.js runtime assets
+- `docs` — public documentation
+- `scripts` — helper scripts such as `copy-pdfjs.mjs`
 
 ## Maintenance & Upgrades
 This fork is actively maintained with explicit upgrades and compatibility notes:
 
 - **Node 20 LTS** pinned via `.nvmrc`
-- **Next 16** migration with Webpack build flags for stability
+- **Next 16** with explicit Webpack usage for pdf.js / React PDF compatibility
 - **ESLint 9** flat config (`eslint.config.mjs`)
 - **Sitemap + robots** via Next route handlers
 

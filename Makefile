@@ -1,7 +1,7 @@
 .PHONY: help install build run lint test ats-score verify clean fclean docker-build docker-up docker-down docker-logs update docker-prod-local docker-prod-local-logs
 
 help:
-	@printf "OpenResume Makefile targets:\n"
+	@printf "CVForge Makefile targets:\n"
 	@printf "  make install   Install dependencies\n"
 	@printf "  make build     Build production bundle\n"
 	@printf "  make run       Start dev server\n"
@@ -51,13 +51,13 @@ docker-down:
 	docker compose down
 
 docker-logs:
-	docker compose logs -f open-resume
+	docker compose logs -f cvforge
 
 docker-prod-local:
 	./scripts/run-prod-local.sh
 
 docker-prod-local-logs:
-	docker compose -f docker-compose.local.yml logs -f open-resume
+	docker compose -f docker-compose.local.yml logs -f cvforge
 
 update:
 	./scripts/update-host.sh

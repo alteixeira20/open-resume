@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { SITE } from "content/site";
 
 export default function robots(): MetadataRoute.Robots {
   return {
@@ -8,6 +9,6 @@ export default function robots(): MetadataRoute.Robots {
         allow: "/",
       },
     ],
-    sitemap: "https://open-resume.alexandreteixeira.dev/sitemap.xml",
+    sitemap: `${SITE.liveUrl}/sitemap.xml`,
   };
 }

@@ -34,6 +34,6 @@ if [[ -z "$selected_port" ]]; then
   exit 1
 fi
 
-export OPEN_RESUME_PORT="$selected_port"
-echo "Using port ${OPEN_RESUME_PORT} for local production container."
-OPEN_RESUME_PORT="$selected_port" docker compose -f docker-compose.local.yml up -d --build
+export CVFORGE_PORT="$selected_port"
+echo "Using port ${CVFORGE_PORT} for local production container."
+CVFORGE_PORT="$selected_port" docker compose -f docker-compose.local.yml up -d --build

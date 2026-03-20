@@ -10,6 +10,40 @@ const nextConfig = {
   output: "standalone",
   outputFileTracingRoot: path.join(__dirname),
   transpilePackages: ["@react-pdf/renderer"],
+  async redirects() {
+    return [
+      {
+        source: "/resume-builder",
+        destination: "/builder",
+        permanent: true,
+      },
+      {
+        source: "/resume-builder/:path*",
+        destination: "/builder/:path*",
+        permanent: true,
+      },
+      {
+        source: "/resume-parser",
+        destination: "/parser",
+        permanent: true,
+      },
+      {
+        source: "/resume-parser/:path*",
+        destination: "/parser/:path*",
+        permanent: true,
+      },
+      {
+        source: "/ats-checker",
+        destination: "/parser",
+        permanent: true,
+      },
+      {
+        source: "/ats-checker/:path*",
+        destination: "/parser/:path*",
+        permanent: true,
+      },
+    ];
+  },
   webpack: (config) => {
     // Setting resolve.alias to false tells webpack to ignore a module
     // https://webpack.js.org/configuration/resolve/#resolvealias

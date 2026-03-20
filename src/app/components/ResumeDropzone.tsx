@@ -14,6 +14,7 @@ import Image from "next/image";
 import { cx } from "lib/cx";
 import { deepClone } from "lib/deep-clone";
 import type { RootState } from "lib/redux/store";
+import { Button } from "components/ui";
 
 const defaultFileState = {
   name: "",
@@ -118,14 +119,14 @@ export const ResumeDropzone = ({
         const text = await file.file.text();
         const parsed = JSON.parse(text) as Partial<RootState>;
         if (!parsed?.resume || !parsed?.settings) {
-          alert("Invalid JSON format. Please use an OpenResume export file.");
+          alert("Invalid JSON format. Please use a CVForge export file.");
           return;
         }
         saveStateToLocalStorage({
           resume: parsed.resume,
           settings: parsed.settings,
         } as RootState);
-        router.push("/resume-builder");
+        router.push("/builder");
       } catch {
         alert("Could not read JSON file. Please check the file and try again.");
       }
@@ -158,7 +159,7 @@ export const ResumeDropzone = ({
     }
 
     saveStateToLocalStorage({ resume, settings });
-    router.push("/resume-builder");
+    router.push("/builder");
   };
 
   useEffect(() => {
@@ -170,8 +171,8 @@ export const ResumeDropzone = ({
   return (
     <div
       className={cx(
-        "flex justify-center rounded-md border-2 border-dashed border-gray-300 px-6 ",
-        isHoveredOnDropzone && "border-sky-400",
+        "flex justify-center rounded-md border-2 border-dashed border-[color:var(--color-surface-border)] px-6 ",
+        isHoveredOnDropzone && "border-[color:var(--color-brand-primary)]",
         playgroundView ? "pb-6 pt-4" : "py-12",
         className
       )}
@@ -201,25 +202,25 @@ export const ResumeDropzone = ({
           <>
             <p
               className={cx(
-                "pt-3 text-gray-700",
+                "pt-3 text-[color:var(--color-text-secondary)]",
                 !playgroundView && "text-lg font-semibold"
               )}
             >
               Browse a PDF{allowJsonImport ? " or JSON" : ""} file or drop it here
             </p>
-            <p className="flex text-sm text-gray-500">
-              <LockClosedIcon className="mr-1 mt-1 h-3 w-3 text-gray-400" />
+            <p className="flex text-sm text-[color:var(--color-text-muted)]">
+              <LockClosedIcon className="mr-1 mt-1 h-3 w-3 text-[color:var(--color-text-muted)]" />
               File data is used locally and never leaves your browser
             </p>
           </>
         ) : (
           <div className="flex items-center justify-center gap-3 pt-3">
-            <div className="pl-7 font-semibold text-gray-900">
+            <div className="pl-7 font-semibold text-[color:var(--color-text-primary)]">
               {file.name} - {getFileSizeString(file.size)}
             </div>
             <button
               type="button"
-              className="outline-theme-blue rounded-md p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-500"
+              className="outline-brand-secondary rounded-md p-1 text-[color:var(--color-text-muted)] hover:bg-[color:var(--color-surface-raised)] hover:text-[color:var(--color-text-secondary)]"
               title="Remove file"
               onClick={onRemove}
             >
@@ -232,7 +233,7 @@ export const ResumeDropzone = ({
             <>
               <label
                 className={cx(
-                  "within-outline-theme-purple cursor-pointer rounded-full px-6 pb-2.5 pt-2 font-semibold shadow-sm",
+                  "within-outline-brand-primary cursor-pointer rounded-full px-6 pb-2.5 pt-2 font-semibold shadow-sm",
                   playgroundView ? "border" : "bg-primary"
                 )}
               >
@@ -254,18 +255,14 @@ export const ResumeDropzone = ({
           ) : (
             <>
               {!playgroundView && (
-                <button
-                  type="button"
-                  className="btn-primary"
-                  onClick={onImportClick}
-                >
+                <Button onClick={onImportClick}>
                   {file.type === "json" ? "Import JSON" : "Import"} and Continue{" "}
                   <span aria-hidden="true">→</span>
-                </button>
+                </Button>
               )}
-              <p className={cx(" text-gray-500", !playgroundView && "mt-6")}>
+              <p className={cx(" text-[color:var(--color-text-muted)]", !playgroundView && "mt-6")}>
                 Note: {!playgroundView ? "Import" : "Parser"} works best on
-                single column resume
+                single-column CVs
               </p>
             </>
           )}

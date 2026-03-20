@@ -107,10 +107,10 @@ export const ResumeParserAlgorithmArticle = ({
         Resume Parser Algorithm Deep Dive
       </Heading>
       <Paragraph smallMarginTop={true}>
-        For the technical curious, this section will dive into the OpenResume
-        parser algorithm and walks through the 4 steps on how it works. (Note
-        that the algorithm is designed to parse single column resume in English
-        language)
+        For the technical curious, this section will dive into the CVForge
+        parser algorithm and walk through the 4 steps behind it. (Note that the
+        algorithm is designed to parse single column resume in English
+        language.)
       </Paragraph>
       {/* Step 1. Read the text items from a PDF file */}
       <Heading level={2}>Step 1. Read the text items from a PDF file</Heading>
@@ -140,7 +140,7 @@ export const ResumeParserAlgorithmArticle = ({
         (Note that x,y position is relative to the bottom left corner of the
         page, which is the origin 0,0)
       </Paragraph>
-      <div className="mt-4 max-h-72 overflow-y-scroll border scrollbar scrollbar-track-gray-100 scrollbar-thumb-gray-200 scrollbar-w-3">
+      <div className="mt-4 max-h-72 overflow-y-scroll border scrollbar scrollbar-track-transparent scrollbar-thumb-gray-200 scrollbar-w-3">
         <Table
           table={step1TextItemsTable}
           className="!border-none"
@@ -211,7 +211,7 @@ export const ResumeParserAlgorithmArticle = ({
         </span>
         )
       </Paragraph>
-      <div className="mt-4 max-h-96 overflow-y-scroll border scrollbar scrollbar-track-gray-100 scrollbar-thumb-gray-200 scrollbar-w-3">
+      <div className="mt-4 max-h-96 overflow-y-scroll border scrollbar scrollbar-track-transparent scrollbar-thumb-gray-200 scrollbar-w-3">
         <Table table={step2LinesTable} className="!border-none" />
       </div>
       {/* Step 3. Group lines into sections */}
@@ -346,7 +346,7 @@ export const ResumeParserAlgorithmArticle = ({
         the main heuristic doesn't apply to check if the text item is bolded.
       </Paragraph>
       <Paragraph>
-        And that is everything about the OpenResume parser algorithm :)
+        And that is everything about the CVForge parser algorithm.
       </Paragraph>
       <Paragraph>
         Written by <Link href="https://github.com/xitanggg">Xitang</Link>
@@ -463,7 +463,7 @@ const Step3SectionsTable = ({
   }
 
   return (
-    <div className="mt-4 max-h-96 overflow-y-scroll border scrollbar scrollbar-track-gray-100 scrollbar-thumb-gray-200 scrollbar-w-3">
+    <div className="mt-4 max-h-96 overflow-y-scroll border scrollbar scrollbar-track-transparent scrollbar-thumb-gray-200 scrollbar-w-3">
       <Table
         table={table}
         className="!border-none"

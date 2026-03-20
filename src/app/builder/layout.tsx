@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Resume Builder Workbench",
+  title: "CV Builder — CVForge",
   description:
-    "Build an ATS-friendly resume or EU CV online. Local-first resume builder with EU A4 + US Letter presets, typography controls, and PDF/JSON export.",
+    "Build an ATS-friendly CV or resume online. EU A4 and US Letter presets, typography controls, and one-click PDF export. Free and private.",
   keywords: [
     "resume builder",
     "cv builder",
@@ -27,5 +27,5 @@ export default function ResumeBuilderLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return children;
+  return <div className="h-[calc(100dvh-var(--top-nav-bar-height))] overflow-hidden">{children}</div>;
 }

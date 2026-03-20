@@ -1,5 +1,5 @@
 import { render, screen } from "@testing-library/react";
-import { AtsScoreCard } from "resume-parser/AtsScoreCard";
+import { AtsScoreCard } from "parser/AtsScoreCard";
 import type { AtsScoreResult } from "lib/ats-score";
 
 describe("AtsScoreCard", () => {
@@ -18,7 +18,7 @@ describe("AtsScoreCard", () => {
     render(<AtsScoreCard result={null} />);
     expect(screen.getByText("ATS Score")).toBeInTheDocument();
     expect(
-      screen.getByText("Upload a resume to generate a local ATS readiness score.")
+      screen.getByText("Upload a CV to generate a local ATS readiness score.")
     ).toBeInTheDocument();
   });
 

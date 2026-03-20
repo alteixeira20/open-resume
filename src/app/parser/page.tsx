@@ -6,16 +6,19 @@ import { groupTextItemsIntoLines } from "lib/parse-resume-from-pdf/group-text-it
 import { groupLinesIntoSections } from "lib/parse-resume-from-pdf/group-lines-into-sections";
 import { extractResumeFromSections } from "lib/parse-resume-from-pdf/extract-resume-from-sections";
 import { ResumeDropzone } from "components/ResumeDropzone";
+import { WorkbenchHeader } from "components/layout/WorkbenchHeader";
 import { cx } from "lib/cx";
 import { Heading, Link, Paragraph } from "components/documentation";
-import { ResumeTable } from "resume-parser/ResumeTable";
-import { ResumeParserAlgorithmArticle } from "resume-parser/ResumeParserAlgorithmArticle";
+import { Button } from "components/ui";
+import { WorkbenchLayout } from "components/layout/WorkbenchLayout";
+import { ResumeTable } from "parser/ResumeTable";
+import { ResumeParserAlgorithmArticle } from "parser/ResumeParserAlgorithmArticle";
 import { calculateAtsScore } from "lib/ats-score";
-import { AtsScoreCard } from "resume-parser/AtsScoreCard";
+import { AtsScoreCard } from "parser/AtsScoreCard";
 import type { ResumeLocale } from "lib/redux/settingsSlice";
 import { A4_HEIGHT_PX, A4_WIDTH_PX, LETTER_HEIGHT_PX, LETTER_WIDTH_PX } from "lib/constants";
-import { CSS_VARIABLES } from "globals-css";
-import { getPxPerRem } from "lib/get-px-per-rem";
+import { useWorkbenchCollapse } from "lib/hooks/useWorkbenchCollapse";
+import { WORKBENCH_UI } from "components/layout/workbench-ui";
 
 const RESUME_EXAMPLES = [
   {
@@ -33,23 +36,22 @@ const RESUME_EXAMPLES = [
     fileUrl: "/resume-example/openresume-resume.pdf",
     description: (
       <span>
-        Created with OpenResume resume builder -{" "}
-        <Link href="/resume-builder">Link</Link>
+        Created with CVForge builder - <Link href="/builder">Link</Link>
       </span>
     ),
   },
 ];
 
 const defaultFileUrl = RESUME_EXAMPLES[1]["fileUrl"];
-const PARSER_REGION_STORAGE_KEY = "open-resume-parser-region";
-const BUILDER_STATE_STORAGE_KEY = "open-resume-state";
+const PARSER_REGION_STORAGE_KEY = "cvforge-parser-region";
+const LEGACY_PARSER_REGION_STORAGE_KEY = "open-resume-parser-region";
+const BUILDER_STATE_STORAGE_KEY = "cvforge-state";
+const LEGACY_BUILDER_STATE_STORAGE_KEY = "open-resume-state";
 export default function ResumeParser() {
   const [fileUrl, setFileUrl] = useState(defaultFileUrl);
   const [textItems, setTextItems] = useState<TextItems>([]);
   const [parserRegion, setParserRegion] = useState<ResumeLocale>("eu");
-  const [isSmallViewport, setIsSmallViewport] = useState(false);
-  const [shouldCollapsePreview, setShouldCollapsePreview] = useState(false);
-  const [showPreview, setShowPreview] = useState(false);
+  const { isCollapsed, showPreview, togglePreview } = useWorkbenchCollapse();
   const previewContainerRef = useRef<HTMLDivElement | null>(null);
   const [previewScale, setPreviewScale] = useState(1);
 
@@ -86,50 +88,13 @@ export default function ResumeParser() {
   }, [fileUrl]);
 
   useEffect(() => {
-    const stored = localStorage.getItem(PARSER_REGION_STORAGE_KEY);
+    const stored =
+      localStorage.getItem(PARSER_REGION_STORAGE_KEY) ??
+      localStorage.getItem(LEGACY_PARSER_REGION_STORAGE_KEY);
     if (stored === "us" || stored === "eu") {
       setParserRegion(stored);
     }
   }, []);
-
-  useEffect(() => {
-    const computeCollapse = () => {
-      const screenHeightPx = window.innerHeight - 20;
-      const screenWidthPx = window.innerWidth;
-      const PX_PER_REM = getPxPerRem();
-      const screenHeightRem = screenHeightPx / PX_PER_REM;
-      const topNavBarHeightRem = parseFloat(
-        CSS_VARIABLES["--top-nav-bar-height"]
-      );
-      const resumePadding = parseFloat(CSS_VARIABLES["--resume-padding"]);
-      const topAndBottomResumePadding = resumePadding * 2;
-      const isSplitLayout = screenWidthPx >= 768;
-      const availableWidthPx =
-        (isSplitLayout ? screenWidthPx / 2 : screenWidthPx) -
-        topAndBottomResumePadding * PX_PER_REM;
-      const defaultResumeHeightRem =
-        screenHeightRem - topNavBarHeightRem - topAndBottomResumePadding;
-      const resumeHeightPx = defaultResumeHeightRem * PX_PER_REM;
-      const height = parserRegion === "eu" ? A4_HEIGHT_PX : LETTER_HEIGHT_PX;
-      const width = parserRegion === "eu" ? A4_WIDTH_PX : LETTER_WIDTH_PX;
-      const heightScale = resumeHeightPx / height;
-      const widthScale = availableWidthPx / width;
-      const defaultScale =
-        Math.round(Math.min(heightScale, widthScale, 1) * 100) / 100;
-      const collapse = defaultScale < 0.6 || screenWidthPx < 768;
-      setShouldCollapsePreview(collapse);
-      setIsSmallViewport(collapse);
-      if (!collapse) {
-        setShowPreview(false);
-      }
-    };
-
-    computeCollapse();
-    window.addEventListener("resize", computeCollapse);
-    return () => {
-      window.removeEventListener("resize", computeCollapse);
-    };
-  }, [parserRegion]);
 
   const updatePreviewScale = useCallback(() => {
     const container = previewContainerRef.current;
@@ -157,11 +122,13 @@ export default function ResumeParser() {
 
   useEffect(() => {
     updatePreviewScale();
-  }, [shouldCollapsePreview, updatePreviewScale]);
+  }, [isCollapsed, updatePreviewScale]);
 
   useEffect(() => {
     try {
-      const storedState = localStorage.getItem(BUILDER_STATE_STORAGE_KEY);
+      const storedState =
+        localStorage.getItem(BUILDER_STATE_STORAGE_KEY) ??
+        localStorage.getItem(LEGACY_BUILDER_STATE_STORAGE_KEY);
       if (!storedState) return;
       const parsed = JSON.parse(storedState) as {
         settings?: { resumeLocale?: ResumeLocale };
@@ -177,39 +144,28 @@ export default function ResumeParser() {
 
   useEffect(() => {
     localStorage.setItem(PARSER_REGION_STORAGE_KEY, parserRegion);
+    localStorage.removeItem(LEGACY_PARSER_REGION_STORAGE_KEY);
   }, [parserRegion]);
 
-  return (
-    <main className="h-[calc(100vh-var(--top-nav-bar-height)-20px)] w-full overflow-hidden bg-gray-50">
-      <div className="mx-auto grid h-full w-full max-w-screen-2xl gap-6 px-[var(--resume-padding)] py-0 md:grid-cols-6">
-        <div
-          className={`space-y-8 overflow-y-auto pr-1 pt-[24px] ${
-            shouldCollapsePreview ? "col-span-3 md:col-span-6" : "col-span-3"
-          }`}
-        >
-          <section id="overview" className="space-y-2">
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <Heading className="text-primary !mt-0">
-                Resume Parsing Workbench
-              </Heading>
-              {shouldCollapsePreview && (
-                <button
-                  type="button"
-                  className="rounded-full border border-emerald-200 bg-emerald-600 px-4 py-1.5 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-500"
-                  onClick={() => setShowPreview((prev) => !prev)}
-                  aria-expanded={showPreview}
-                >
-                  {showPreview ? "Hide preview" : "Show preview"}
-                </button>
-              )}
-            </div>
-            <Paragraph>
-              Select a parser region, try curated resumes, and upload your PDF to
-              see which fields ATS systems can pick up. Use it as a resume
-              grader or CV evaluator to spot parsing gaps before you apply.
-            </Paragraph>
-          </section>
-          {shouldCollapsePreview && showPreview && (
+  const workbenchContent = (
+    <div className={WORKBENCH_UI.contentStackClass}>
+      <WorkbenchHeader
+        title="Parser Workbench"
+        description="Upload a PDF to see what a text parser extracts from it. Check field detection, layout flags, and parsing diagnostics."
+        actions={
+          isCollapsed ? (
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={togglePreview}
+              aria-expanded={showPreview}
+            >
+              {showPreview ? "Hide preview" : "Show preview"}
+            </Button>
+          ) : undefined
+        }
+      />
+          {isCollapsed && showPreview && (
             <section className="mt-3">
               <div
                 className="flex max-h-[70vh] justify-center overflow-auto"
@@ -236,18 +192,25 @@ export default function ResumeParser() {
             </section>
           )}
 
-          <section id="region" className="rounded-md border border-gray-200 bg-white p-4">
-            <p className="text-sm font-semibold text-gray-900">Parser Region</p>
-            <p className="text-xs text-gray-500">EU (A4) vs US (Letter) alters parsing expectations.</p>
+          <section
+            id="region"
+            className="rounded-xl border border-[color:var(--color-surface-border)] bg-[color:var(--color-surface-base)] p-4"
+          >
+            <p className="text-sm font-semibold text-[color:var(--color-text-primary)]">
+              Parser Region
+            </p>
+            <p className="text-xs text-[color:var(--color-text-muted)]">
+              EU (A4) vs US (Letter) alters parsing expectations.
+            </p>
             <div className="mt-3 flex flex-wrap gap-2">
               {(["eu", "us"] as ResumeLocale[]).map((region) => (
                 <button
                   key={region}
                   type="button"
-                  className={`rounded-md border px-3 py-1.5 text-sm font-medium ${
+                  className={`rounded-xl border px-3 py-1.5 text-sm font-medium transition-colors ${
                     parserRegion === region
-                      ? "border-black bg-black text-white"
-                      : "border-gray-300 text-gray-700 hover:border-gray-400"
+                      ? "border-[color:var(--color-brand-primary)] bg-[color:var(--color-brand-primary)] text-white"
+                      : "border-[color:var(--color-surface-border)] text-[color:var(--color-text-secondary)] hover:border-[color:var(--color-brand-primary)]"
                   }`}
                   onClick={() => setParserRegion(region)}
                 >
@@ -258,16 +221,18 @@ export default function ResumeParser() {
           </section>
 
           <section id="examples" className="space-y-3">
-            <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Resume Examples</p>
+            <p className="text-xs font-semibold uppercase tracking-wide text-[color:var(--color-text-muted)]">
+              CV Examples
+            </p>
             <div className="flex flex-col gap-3">
               {RESUME_EXAMPLES.map((example, idx) => (
                 <article
                   key={idx}
                   className={cx(
-                    "rounded-md border px-4 py-3 shadow-sm outline-none",
+                    "rounded-xl border px-4 py-3 shadow-sm outline-none transition-colors",
                     example.fileUrl === fileUrl
-                      ? "border-blue-400 bg-blue-50"
-                      : "border-gray-300 bg-white"
+                      ? "border-[color:var(--color-brand-primary)] bg-[color:var(--color-forge-100)]"
+                      : "border-[color:var(--color-surface-border)] bg-[color:var(--color-surface-base)]"
                   )}
                   onClick={() => setFileUrl(example.fileUrl)}
                   onKeyDown={(e) => {
@@ -275,15 +240,24 @@ export default function ResumeParser() {
                   }}
                   tabIndex={0}
                 >
-                  <p className="font-semibold">Resume Example {idx + 1}</p>
-                  <p className="mt-1 text-sm text-gray-500">{example.description}</p>
+                  <p className="font-semibold text-[color:var(--color-text-primary)]">
+                    CV Example {idx + 1}
+                  </p>
+                  <p className="mt-1 text-sm text-[color:var(--color-text-muted)]">
+                    {example.description}
+                  </p>
                 </article>
               ))}
             </div>
           </section>
 
-          <section id="upload" className="rounded-md border border-gray-200 bg-white p-4">
-            <p className="text-sm font-semibold text-gray-900">Upload your resume</p>
+          <section
+            id="upload"
+            className="rounded-xl border border-[color:var(--color-surface-border)] bg-[color:var(--color-surface-base)] p-4"
+          >
+            <p className="text-sm font-semibold text-[color:var(--color-text-primary)]">
+              Upload your CV
+            </p>
             <Paragraph smallMarginTop={true}>
               Drop a PDF to see how the parser interprets its structure. Everything happens locally in your browser.
             </Paragraph>
@@ -297,7 +271,7 @@ export default function ResumeParser() {
 
           <section id="results" className="space-y-4">
             <Heading level={2} className="!mt-0">
-              Resume Parsing Results
+              CV Parsing Results
             </Heading>
             <AtsScoreCard result={atsScore} />
             <ResumeTable resume={resume} />
@@ -308,16 +282,30 @@ export default function ResumeParser() {
             />
           </section>
 
-          <section id="about" className="rounded-md border border-dashed border-gray-200 bg-white p-3 text-sm text-gray-600">
+          <section className="rounded-xl border border-dashed border-[color:var(--color-surface-border)] bg-[color:var(--color-surface-base)] p-3 text-sm text-[color:var(--color-text-muted)]">
             <p>
-              OpenResume builds on the original project by Xitang Zhao and is currently maintained by Alexandre Teixeira. All parsing runs inside your browser for privacy.
+              CVForge is built on{" "}
+              <a
+                href="https://github.com/xitanggg/open-resume"
+                className="underline underline-offset-2 transition-colors hover:text-[color:var(--color-brand-primary)]"
+              >
+                OpenResume
+              </a>{" "}
+              by Xitang Zhao and maintained by{" "}
+              <a
+                href="https://github.com/alteixeira20"
+                className="underline underline-offset-2 transition-colors hover:text-[color:var(--color-brand-primary)]"
+              >
+                Alexandre Teixeira
+              </a>
+              . All parsing and ATS scoring run locally in your browser.
             </p>
           </section>
-        </div>
+    </div>
+  );
 
-        {!shouldCollapsePreview && (
-          <div className="col-span-3 hidden md:block">
-            <div className="sticky top-[calc(var(--top-nav-bar-height)+0.5rem)] h-[calc(100vh-var(--top-nav-bar-height)-1rem-20px)] w-full pb-2">
+  const previewContent = (
+    <div className="sticky top-0 h-full w-full pb-2">
               <div
                 ref={previewContainerRef}
                 className="flex h-full w-full justify-center overflow-hidden"
@@ -340,11 +328,14 @@ export default function ResumeParser() {
                   />
                 </div>
               </div>
-            </div>
-          </div>
-        )}
-      </div>
-      <div className="fixed bottom-0 left-0 right-0 z-50 h-5 bg-gray-50" />
-    </main>
+    </div>
+  );
+
+  return (
+    <WorkbenchLayout
+      workbench={workbenchContent}
+      preview={previewContent}
+      isCollapsed={isCollapsed}
+    />
   );
 }

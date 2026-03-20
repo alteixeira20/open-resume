@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Resume Parsing Workbench",
+  title: "Parser Workbench — CVForge",
   description:
-    "Resume parser and ATS scoring workbench. Upload a PDF to see extracted fields, parsing diagnostics, and ATS-friendly formatting issues.",
+    "Check your CV or resume ATS score for free. Local ATS scoring across parsing, structure, readability, and keyword alignment. No uploads.",
   keywords: [
     "resume parser",
     "ats resume parser",
@@ -30,5 +30,5 @@ export default function ResumeParserLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return children;
+  return <div className="h-[calc(100dvh-var(--top-nav-bar-height))] overflow-hidden">{children}</div>;
 }

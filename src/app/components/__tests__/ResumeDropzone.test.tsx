@@ -42,9 +42,7 @@ describe("ResumeDropzone", () => {
     const file = new File(["hello"], "resume.txt", { type: "text/plain" });
     fireEvent.change(input, { target: { files: [file] } });
 
-    expect(
-      screen.getByText("Only pdf file is supported")
-    ).toBeInTheDocument();
+    expect(screen.getByText(/Only PDF file is supported/i)).toBeInTheDocument();
   });
 
   it("accepts pdf input and shows file name", () => {

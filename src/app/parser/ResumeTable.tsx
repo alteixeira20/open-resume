@@ -5,8 +5,12 @@ import { deepClone } from "lib/deep-clone";
 import { cx } from "lib/cx";
 
 const TableRowHeader = ({ children }: { children: React.ReactNode }) => (
-  <tr className="divide-x bg-gray-50">
-    <th className="px-3 py-2 font-semibold" scope="colgroup" colSpan={2}>
+  <tr className="divide-x border-[color:var(--color-surface-border)] bg-[color:var(--color-forge-100)]">
+    <th
+      className="px-3 py-2 font-semibold text-[color:var(--color-text-primary)]"
+      scope="colgroup"
+      colSpan={2}
+    >
       {children}
     </th>
   </tr>
@@ -22,10 +26,13 @@ const TableRow = ({
   className?: string | false;
 }) => (
   <tr className={cx("divide-x", className)}>
-    <th className="px-3 py-2 font-medium" scope="row">
+    <th
+      className="px-3 py-2 font-medium text-[color:var(--color-text-primary)]"
+      scope="row"
+    >
       {label}
     </th>
-    <td className="w-full px-3 py-2">
+    <td className="w-full px-3 py-2 text-[color:var(--color-text-secondary)]">
       {typeof value === "string"
         ? value
         : value.map((x, idx) => (
@@ -57,8 +64,8 @@ export const ResumeTable = ({ resume }: { resume: Resume }) => {
     skills.unshift(featuredSkills);
   }
   return (
-    <table className="mt-2 w-full border text-sm text-gray-900">
-      <tbody className="divide-y text-left align-top">
+    <table className="mt-2 w-full border border-[color:var(--color-surface-border)] text-sm">
+      <tbody className="divide-y divide-[color:var(--color-surface-border)] text-left align-top">
         <TableRowHeader>Profile</TableRowHeader>
         <TableRow label="Name" value={resume.profile.name} />
         <TableRow label="Email" value={resume.profile.email} />

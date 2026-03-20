@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-cd /opt/src/open-resume
+cd /opt/src/cvforge
 git pull --ff-only
 
-cd /opt/stacks/apps/open-resume
+cd /opt/stacks/apps/cvforge
 
-if [[ -z "${OPEN_RESUME_PORT:-}" ]]; then
+if [[ -z "${CVFORGE_PORT:-}" ]]; then
   start_port=3000
   end_port=3010
   selected_port=""
@@ -27,9 +27,9 @@ if [[ -z "${OPEN_RESUME_PORT:-}" ]]; then
     exit 1
   fi
 
-  export OPEN_RESUME_PORT="$selected_port"
+  export CVFORGE_PORT="$selected_port"
 fi
 
-OPEN_RESUME_PORT="${OPEN_RESUME_PORT}" docker compose up -d --build
+CVFORGE_PORT="${CVFORGE_PORT}" docker compose up -d --build
 
 docker image prune -f >/dev/null 2>&1 || true

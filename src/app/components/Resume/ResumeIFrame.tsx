@@ -80,8 +80,8 @@ const ResumeIframe = ({
   const paddedHeight = height + heightPadding;
 
   const outerStyle = enablePDFViewer
-    ? { maxWidth: `${width * scale}px`, maxHeight: `${paddedHeight * scale}px` }
-    : { maxWidth: `${width * scale}px`, maxHeight: `${paddedHeight * scale}px` };
+    ? { width: `${width * scale}px`, height: `${paddedHeight * scale}px` }
+    : { width: `${width * scale}px`, height: `${paddedHeight * scale}px` };
   const innerStyle = enablePDFViewer
     ? { width: `${width * scale}px`, height: `${paddedHeight * scale}px` }
     : { width: `${width}px`, height: `${paddedHeight}px`, transform: `scale(${scale})` };

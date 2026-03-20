@@ -36,7 +36,7 @@ export const ProfileForm = () => {
               ?.scrollIntoView({ behavior: "smooth", block: "start" })
           }
         >
-          Resume Settings
+          Settings
         </button>
       </div>
       <div className="grid grid-cols-6 gap-3">

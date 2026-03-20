@@ -3,7 +3,8 @@ import {
   ResumePDFSection,
   ResumePDFText,
 } from "components/Resume/ResumePDF/common";
-import { styles, spacing } from "components/Resume/ResumePDF/styles";
+import { styles } from "components/Resume/ResumePDF/styles";
+import { useResumePDFStyle } from "components/Resume/ResumePDF/common/ResumePDFStyleContext";
 import type { ResumeLanguage } from "lib/redux/types";
 
 export const ResumePDFLanguages = ({
@@ -15,6 +16,8 @@ export const ResumePDFLanguages = ({
   languages: ResumeLanguage[];
   themeColor: string;
 }) => {
+  const { languagesSpacing } = useResumePDFStyle();
+  const rowGapPt = languagesSpacing - 6;
   const normalizeLanguage = (value: string) =>
     value.replace(/[\s\u2012\u2013\u2014\u2015\u2212\u2010\u00ad\-:]+$/g, "").trim();
   const normalizeProficiency = (value: string) =>
@@ -31,14 +34,16 @@ export const ResumePDFLanguages = ({
     <ResumePDFSection themeColor={themeColor} heading={heading}>
       <View style={{ ...styles.flexCol }}>
         {filtered.map(({ language, proficiency }, idx) => (
-          <ResumePDFText
+          <View
             key={idx}
-            style={idx !== 0 ? { marginTop: spacing["1"] } : {}}
+            style={idx !== 0 ? { marginTop: `${rowGapPt}pt` } : {}}
           >
-            {language}
-            {language && proficiency ? " — " : ""}
-            {proficiency}
-          </ResumePDFText>
+            <ResumePDFText style={{ lineHeight: 1 }}>
+              {language}
+              {language && proficiency ? " — " : ""}
+              {proficiency}
+            </ResumePDFText>
+          </View>
         ))}
       </View>
     </ResumePDFSection>

@@ -5,6 +5,7 @@ import {
   ResumePDFText,
   ResumePDFLink,
 } from "components/Resume/ResumePDF/common";
+import { useResumePDFStyle } from "components/Resume/ResumePDF/common/ResumePDFStyleContext";
 import { styles, spacing } from "components/Resume/ResumePDF/styles";
 import type { ResumeProject } from "lib/redux/types";
 
@@ -19,6 +20,7 @@ export const ResumePDFProject = ({
   themeColor: string;
   isPDF: boolean;
 }) => {
+  const { projectItemSpacing } = useResumePDFStyle();
   return (
     <ResumePDFSection themeColor={themeColor} heading={heading}>
       {projects.map(({ project, link, date, descriptions }, idx) => {
@@ -26,7 +28,10 @@ export const ResumePDFProject = ({
           link && (link.startsWith("http") ? link : `https://${link}`);
         const dateText = date ? `\u00A0${date}` : "";
         return (
-          <View key={idx} style={idx !== 0 ? { marginTop: spacing["2"] } : {}}>
+          <View
+            key={idx}
+            style={idx !== 0 ? { marginTop: `${projectItemSpacing}pt` } : {}}
+          >
             <View style={{ ...styles.flexRowBetween }}>
               {normalizedLink ? (
                 isPDF ? (

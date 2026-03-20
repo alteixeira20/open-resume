@@ -4,7 +4,12 @@ import { ResumeIframeCSR } from "components/Resume/ResumeIFrame";
 import { ResumePDF } from "components/Resume/ResumePDF";
 import { useStore } from "react-redux";
 import type { RootState } from "lib/redux/store";
-import { A4_HEIGHT_PX, LETTER_HEIGHT_PX } from "lib/constants";
+import {
+  A4_HEIGHT_PX,
+  A4_WIDTH_PX,
+  LETTER_HEIGHT_PX,
+  LETTER_WIDTH_PX,
+} from "lib/constants";
 import {
   useRegisterReactPDFFont,
   useRegisterReactPDFHyphenationCallback,
@@ -20,7 +25,7 @@ export const Resume = () => {
   const [previewSettings, setPreviewSettings] = useState(
     () => store.getState().settings
   );
-  const scrollContainerRef = useRef<HTMLDivElement | null>(null);
+  const viewportRef = useRef<HTMLDivElement | null>(null);
   useRegisterReactPDFFont();
   useRegisterReactPDFHyphenationCallback(previewSettings.fontFamily);
   const usePdfViewer = true;
@@ -38,64 +43,71 @@ export const Resume = () => {
   }, [store]);
 
   useEffect(() => {
-    const element = scrollContainerRef.current;
+    const element = viewportRef.current;
     if (!element || typeof window === "undefined") return;
 
+    const getDocWidth = () =>
+      previewSettings.documentSize === "A4" ? A4_WIDTH_PX : LETTER_WIDTH_PX;
     const getDocHeight = () =>
       previewSettings.documentSize === "A4" ? A4_HEIGHT_PX : LETTER_HEIGHT_PX;
 
-    const computeMaxScale = () => {
-      const styles = window.getComputedStyle(element);
-      const paddingTop = parseFloat(styles.paddingTop || "0");
-      const paddingBottom = parseFloat(styles.paddingBottom || "0");
-      const availableHeight =
-        element.clientHeight - paddingTop - paddingBottom - 1;
+    const computeScale = () => {
+      const availableWidth = element.clientWidth;
+      const availableHeight = element.clientHeight;
+      const docWidth = getDocWidth();
       const docHeight = getDocHeight();
-      if (availableHeight <= 0 || docHeight <= 0) return;
+      if (
+        availableWidth <= 0 ||
+        availableHeight <= 0 ||
+        docWidth <= 0 ||
+        docHeight <= 0
+      ) {
+        return;
+      }
+
+      const widthScale = availableWidth / docWidth;
+      const heightScale = availableHeight / docHeight;
       const nextScale = Math.max(
-        0.5,
-        Math.min(1, Math.round((availableHeight / docHeight) * 100) / 100)
+        0.35,
+        Math.min(1, Math.round(Math.min(widthScale, heightScale) * 100) / 100)
       );
-      setScale(nextScale);
+      setScale((prevScale) =>
+        Math.abs(prevScale - nextScale) < 0.01 ? prevScale : nextScale
+      );
     };
 
-    computeMaxScale();
-    const observer = new ResizeObserver(computeMaxScale);
+    computeScale();
+    const observer = new ResizeObserver(computeScale);
     observer.observe(element);
-    window.addEventListener("resize", computeMaxScale);
+    window.addEventListener("resize", computeScale);
 
     return () => {
       observer.disconnect();
-      window.removeEventListener("resize", computeMaxScale);
+      window.removeEventListener("resize", computeScale);
     };
   }, [previewSettings.documentSize]);
 
   return (
     <>
       <NonEnglishFontsCSSLazyLoader />
-      <div className="relative flex justify-center md:justify-start">
-        <div className="relative">
-          <section className="h-[calc(100vh-var(--top-nav-bar-height)-20px)] w-full min-w-0 overflow-hidden pt-[24px]">
-            <div
-              ref={scrollContainerRef}
-              className="flex h-full w-full justify-center overflow-hidden"
-            >
-              <ResumeIframeCSR
-                documentSize={previewSettings.documentSize}
-                scale={scale}
-                enablePDFViewer={usePdfViewer}
-                allowOverflow
-              >
-                <ResumePDF
-                  resume={previewResume}
-                  settings={previewSettings}
-                  isPDF={usePdfViewer}
-                />
-              </ResumeIframeCSR>
-            </div>
-          </section>
+      <section
+        ref={viewportRef}
+        className="h-full w-full min-w-0 overflow-hidden"
+      >
+        <div className="flex h-full w-full items-start justify-center overflow-hidden">
+        <ResumeIframeCSR
+          documentSize={previewSettings.documentSize}
+          scale={scale}
+          enablePDFViewer={usePdfViewer}
+        >
+          <ResumePDF
+            resume={previewResume}
+              settings={previewSettings}
+              isPDF={usePdfViewer}
+            />
+          </ResumeIframeCSR>
         </div>
-      </div>
+      </section>
     </>
   );
 };

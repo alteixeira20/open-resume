@@ -8,6 +8,13 @@ export interface Settings {
   fontSize: string;
   lineHeight: string;
   sectionSpacing: string;
+  linksSummarySpacing: string;
+  languagesSpacing: string;
+  companyRoleSpacing: string;
+  companyItemSpacing: string;
+  schoolDegreeSpacing: string;
+  projectItemSpacing: string;
+  topBarHeight: string;
   nameFontSize: string;
   sectionHeadingSize: string;
   documentSize: string;
@@ -45,7 +52,7 @@ export type GeneralSetting = Exclude<
 >;
 export type ResumeLocale = "us" | "eu";
 
-export const DEFAULT_THEME_COLOR = "#38bdf8"; // sky-400
+export const DEFAULT_THEME_COLOR = "#2c1f19"; // forge-800
 export const DEFAULT_FONT_FAMILY = "Roboto";
 export const DEFAULT_FONT_SIZE = "11"; // text-base https://tailwindcss.com/docs/font-size
 export const DEFAULT_FONT_COLOR = "#171717"; // text-neutral-800
@@ -55,9 +62,16 @@ export const initialSettings: Settings = {
   themeColor: DEFAULT_THEME_COLOR,
   fontFamily: DEFAULT_FONT_FAMILY,
   fontSize: DEFAULT_FONT_SIZE,
-  lineHeight: "1.3",
-  sectionSpacing: "1.0",
-  nameFontSize: "20",
+  lineHeight: "1",
+  sectionSpacing: "0.4",
+  linksSummarySpacing: "5",
+  languagesSpacing: "4",
+  companyRoleSpacing: "4",
+  companyItemSpacing: "6",
+  schoolDegreeSpacing: "4",
+  projectItemSpacing: "6",
+  topBarHeight: "10.5",
+  nameFontSize: "18",
   sectionHeadingSize: "11",
   documentSize: "A4",
   formToShow: {

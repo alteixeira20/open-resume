@@ -35,7 +35,7 @@ export const ResumeDownloadBridgeClient = () => {
       const link = window.document.createElement("a");
       const dateStamp = new Date().toISOString().slice(0, 10);
       link.href = url;
-      link.download = `open-resume-${dateStamp}.json`;
+      link.download = `cvforge-${dateStamp}.json`;
       link.click();
       URL.revokeObjectURL(url);
     };

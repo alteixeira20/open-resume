@@ -4,6 +4,7 @@ import {
   ResumePDFSection,
   ResumePDFText,
 } from "components/Resume/ResumePDF/common";
+import { useResumePDFStyle } from "components/Resume/ResumePDF/common/ResumePDFStyleContext";
 import { styles, spacing } from "components/Resume/ResumePDF/styles";
 import type { ResumeEducation } from "lib/redux/types";
 
@@ -20,6 +21,8 @@ export const ResumePDFEducation = ({
   showBulletPoints: boolean;
   showGpa: boolean;
 }) => {
+  const { schoolDegreeSpacing } = useResumePDFStyle();
+  const schoolDegreeOffsetPt = schoolDegreeSpacing - 4.5;
   return (
     <ResumePDFSection themeColor={themeColor} heading={heading}>
       {educations.map(({ school, degree, gpa, date, descriptions = [] }, idx) => {
@@ -34,7 +37,7 @@ export const ResumePDFEducation = ({
           return (
             <View key={idx}>
               {!hideSchoolName && (
-                <ResumePDFText bold={true}>
+                <ResumePDFText bold={true} style={{ lineHeight: 1 }}>
                   {school.replace(/(\d)\s+(?=[\p{L}])/gu, "$1\u00A0")}
                 </ResumePDFText>
               )}
@@ -43,18 +46,18 @@ export const ResumePDFEducation = ({
                   ...styles.flexRowBetween,
                   marginTop: hideSchoolName
                     ? "-" + spacing["1"]
-                    : spacing["1.5"],
+                    : `${schoolDegreeOffsetPt}pt`,
                 }}
               >
                 <View style={{ ...styles.flexRow, flexGrow: 1, flexBasis: 0 }}>
-                  <ResumePDFText>{degree}</ResumePDFText>
+                  <ResumePDFText style={{ lineHeight: 1 }}>{degree}</ResumePDFText>
                   {gpaText && (
-                    <ResumePDFText style={{ fontSize: "9pt" }}>
+                    <ResumePDFText style={{ fontSize: "9pt", lineHeight: 1 }}>
                       {gpaText}
                     </ResumePDFText>
                   )}
                 </View>
-                <ResumePDFText>{dateText}</ResumePDFText>
+                <ResumePDFText style={{ lineHeight: 1 }}>{dateText}</ResumePDFText>
               </View>
               {showDescriptions && (
                 <View style={{ ...styles.flexCol, marginTop: spacing["1.5"] }}>

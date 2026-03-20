@@ -50,7 +50,7 @@ export const ProjectsForm = () => {
             <Input
               name="project"
               label="Project Name"
-              placeholder="OpenResume"
+              placeholder="CVForge"
               value={project}
               maxLength={120}
               onChange={handleProjectChange}

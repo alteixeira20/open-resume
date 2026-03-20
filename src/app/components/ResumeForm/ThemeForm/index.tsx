@@ -4,199 +4,169 @@ import { THEME_COLORS } from "components/ResumeForm/ThemeForm/constants";
 import { InlineInput } from "components/ResumeForm/ThemeForm/InlineInput";
 import { FontFamilySelectionsCSR } from "components/ResumeForm/ThemeForm/Selection";
 import { ResumeLocaleToggle } from "components/ResumeForm/ResumeLocaleToggle";
-import { parseResumeFromPdf } from "lib/parse-resume-from-pdf";
-import { clearStateFromLocalStorage, getHasUsedAppBefore } from "lib/redux/local-storage";
-import type { ShowForm } from "lib/redux/settingsSlice";
 import {
   changeSettings,
   DEFAULT_THEME_COLOR,
+  initialSettings,
   selectSettings,
   setSettings,
   type GeneralSetting,
 } from "lib/redux/settingsSlice";
 import { useAppDispatch, useAppSelector } from "lib/redux/hooks";
 import { Cog6ToothIcon } from "@heroicons/react/24/outline";
-import { selectResume, setResume } from "lib/redux/resumeSlice";
+import { selectResume } from "lib/redux/resumeSlice";
 import { saveStateToLocalStorage } from "lib/redux/local-storage";
-import { useRef } from "react";
+import { Button, Card } from "components/ui";
+import { useEffect, useState } from "react";
 
 export const ThemeForm = () => {
   const sectionTitleClassName = "text-base font-semibold text-gray-900";
   const settings = useAppSelector(selectSettings);
   const resume = useAppSelector(selectResume);
-  const { fontSize, fontFamily, lineHeight, sectionSpacing } = settings;
+  const {
+    fontSize,
+    fontFamily,
+    lineHeight,
+    sectionSpacing,
+    linksSummarySpacing,
+    languagesSpacing,
+    companyRoleSpacing,
+    companyItemSpacing,
+    schoolDegreeSpacing,
+    projectItemSpacing,
+    topBarHeight,
+  } = settings;
   const themeColor = settings.themeColor || DEFAULT_THEME_COLOR;
   const dispatch = useAppDispatch();
-  const importInputRef = useRef<HTMLInputElement>(null);
-  const importPdfInputRef = useRef<HTMLInputElement>(null);
-  const sectionSpacingValue = Number.isFinite(Number(sectionSpacing))
-    ? sectionSpacing
-    : "";
+  const [draftSettings, setDraftSettings] = useState({
+    themeColor: settings.themeColor ?? "",
+    sectionSpacing: sectionSpacing ?? "",
+    linksSummarySpacing: linksSummarySpacing ?? "",
+    languagesSpacing: languagesSpacing ?? "",
+    companyRoleSpacing: companyRoleSpacing ?? "",
+    companyItemSpacing: companyItemSpacing ?? "",
+    schoolDegreeSpacing: schoolDegreeSpacing ?? "",
+    projectItemSpacing: projectItemSpacing ?? "",
+    topBarHeight: topBarHeight ?? "",
+    lineHeight: lineHeight ?? "",
+    fontSize: fontSize ?? "",
+    nameFontSize: settings.nameFontSize ?? "",
+    sectionHeadingSize: settings.sectionHeadingSize ?? "",
+  });
 
-  const handleSettingsChange = (field: GeneralSetting, value: string) => {
+  useEffect(() => {
+    setDraftSettings({
+      themeColor: settings.themeColor ?? "",
+      sectionSpacing: settings.sectionSpacing ?? "",
+      linksSummarySpacing: settings.linksSummarySpacing ?? "",
+      languagesSpacing: settings.languagesSpacing ?? "",
+      companyRoleSpacing: settings.companyRoleSpacing ?? "",
+      companyItemSpacing: settings.companyItemSpacing ?? "",
+      schoolDegreeSpacing: settings.schoolDegreeSpacing ?? "",
+      projectItemSpacing: settings.projectItemSpacing ?? "",
+      topBarHeight: settings.topBarHeight ?? "",
+      lineHeight: settings.lineHeight ?? "",
+      fontSize: settings.fontSize ?? "",
+      nameFontSize: settings.nameFontSize ?? "",
+      sectionHeadingSize: settings.sectionHeadingSize ?? "",
+    });
+  }, [settings]);
+
+  const refreshPreview = () => {
+    window.dispatchEvent(new CustomEvent("resume:refresh-preview"));
+  };
+
+  const handleSettingsChange = (
+    field: GeneralSetting,
+    value: string,
+    refresh = false
+  ) => {
     dispatch(changeSettings({ field, value }));
+    if (refresh) refreshPreview();
   };
 
-  const handleImportClick = () => {
-    importInputRef.current?.click();
+  const handleDraftChange = (field: keyof typeof draftSettings, value: string) => {
+    setDraftSettings((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleImportPdfClick = () => {
-    importPdfInputRef.current?.click();
-  };
-
-  const handleImportJson = async (
-    event: React.ChangeEvent<HTMLInputElement>
+  const commitDraftSetting = (
+    field: keyof typeof draftSettings,
+    nextValue: string
   ) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-    if (getHasUsedAppBefore()) {
-      const confirmed = window.confirm(
-        "This will overwrite your current resume and settings. Do you want to continue?"
-      );
-      if (!confirmed) {
-        event.target.value = "";
-        return;
-      }
-      clearStateFromLocalStorage();
-    }
-    try {
-      const text = await file.text();
-      const parsed = JSON.parse(text) as {
-        resume?: typeof resume;
-        settings?: typeof settings;
-      };
-      if (!parsed.resume || !parsed.settings) {
-        alert("Invalid JSON format. Please use an OpenResume export file.");
-        return;
-      }
-      dispatch(setResume(parsed.resume));
-      dispatch(setSettings(parsed.settings));
-      saveStateToLocalStorage({
-        resume: parsed.resume,
-        settings: parsed.settings,
-      } as any);
-    } catch {
-      alert("Could not read JSON file. Please check the file and try again.");
-    } finally {
-      event.target.value = "";
-    }
+    setDraftSettings((prev) => ({ ...prev, [field]: nextValue }));
+    const currentValue = settings[field as keyof typeof settings];
+    if (nextValue === currentValue) return;
+    handleSettingsChange(field as GeneralSetting, nextValue, true);
   };
 
-  const handleImportPdf = async (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-    if (getHasUsedAppBefore()) {
-      const confirmed = window.confirm(
-        "This will overwrite your current resume and settings. Do you want to continue?"
-      );
-      if (!confirmed) {
-        event.target.value = "";
-        return;
+  const handleSettingsInputKeyDown =
+    (field: keyof typeof draftSettings): React.KeyboardEventHandler<HTMLInputElement> =>
+    (event) => {
+      if (event.key === "Enter") {
+        commitDraftSetting(field, event.currentTarget.value);
+        event.currentTarget.blur();
       }
-      clearStateFromLocalStorage();
-    }
-    try {
-      if (!file.name.toLowerCase().endsWith(".pdf")) {
-        alert("Please select a PDF file.");
-        return;
-      }
-      const pdfData = await file.arrayBuffer();
-      const parsedResume = await parseResumeFromPdf(pdfData);
+    };
 
-      const newSettings = { ...settings };
-      if (getHasUsedAppBefore()) {
-        const sections = Object.keys(newSettings.formToShow) as ShowForm[];
-        const hasFeaturedSkills =
-          parsedResume.skills.featuredSkills?.some((skill) => skill.skill.trim()) ??
-          false;
-        const sectionToFormToShow: Record<ShowForm, boolean> = {
-          workExperiences: parsedResume.workExperiences.length > 0,
-          educations: parsedResume.educations.length > 0,
-          projects: parsedResume.projects.length > 0,
-          skills:
-            parsedResume.skills.descriptions.length > 0 || hasFeaturedSkills,
-          languages: parsedResume.languages.length > 0,
-          custom: parsedResume.custom.descriptions.length > 0,
-        };
-        for (const section of sections) {
-          newSettings.formToShow[section] = sectionToFormToShow[section];
-        }
-      }
+  const handleSettingsInputBlur =
+    (field: keyof typeof draftSettings): React.FocusEventHandler<HTMLInputElement> =>
+    (event) => {
+      commitDraftSetting(field, event.currentTarget.value);
+    };
 
-      dispatch(setResume(parsedResume));
-      dispatch(setSettings(newSettings));
-      saveStateToLocalStorage({
-        resume: parsedResume,
-        settings: newSettings,
-      } as any);
-    } catch (error) {
-      console.error("PDF import failed", error);
-      alert("Could not import PDF. Please try another file.");
-    } finally {
-      event.target.value = "";
-    }
+  const handleSettingsNumberMouseUp =
+    (field: keyof typeof draftSettings): React.MouseEventHandler<HTMLInputElement> =>
+    (event) => {
+      commitDraftSetting(field, event.currentTarget.value);
+    };
+
+  const handleSettingsNumberKeyUp =
+    (field: keyof typeof draftSettings): React.KeyboardEventHandler<HTMLInputElement> =>
+    (event) => {
+      if (!["ArrowUp", "ArrowDown"].includes(event.key)) return;
+      commitDraftSetting(field, event.currentTarget.value);
+    };
+
+  const handleResetSettings = () => {
+    const confirmed = window.confirm(
+      "Reset all settings to their default values?"
+    );
+    if (!confirmed) return;
+    dispatch(setSettings(initialSettings));
+    saveStateToLocalStorage({
+      resume,
+      settings: initialSettings,
+    } as any);
+    window.dispatchEvent(new CustomEvent("resume:refresh-preview"));
   };
 
   return (
-    <BaseForm id="section-settings">
+    <BaseForm id="section-settings" className="scroll-mt-40">
       <div className="flex flex-col gap-6">
-        <div className="flex items-center gap-2">
-          <Cog6ToothIcon className="h-6 w-6 text-gray-600" aria-hidden="true" />
-          <h1 className="text-xl font-semibold tracking-wide text-gray-900 ">
-            Resume Settings
-          </h1>
-        </div>
-        <div className="rounded-xl border border-gray-200 bg-white p-4">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div>
-              <h2 className={sectionTitleClassName}>Import Resume</h2>
-              <p className="mt-1 text-xs text-gray-600">
-                Import a JSON backup for an exact resume, or parse a PDF to start
-                from an existing resume.
-              </p>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              <button
-                type="button"
-                className="rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm hover:border-gray-300 hover:bg-gray-50"
-                onClick={handleImportClick}
-              >
-                Import JSON
-              </button>
-              <button
-                type="button"
-                className="rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm hover:border-gray-300 hover:bg-gray-50"
-                onClick={handleImportPdfClick}
-              >
-                Import PDF
-              </button>
-            </div>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <Cog6ToothIcon className="h-6 w-6 text-gray-600" aria-hidden="true" />
+            <h1 className="text-xl font-semibold tracking-wide text-gray-900 ">
+              Settings
+            </h1>
           </div>
-          <input
-            ref={importInputRef}
-            type="file"
-            accept="application/json"
-            className="hidden"
-            onChange={handleImportJson}
-          />
-          <input
-            ref={importPdfInputRef}
-            type="file"
-            accept=".pdf"
-            className="hidden"
-            onChange={handleImportPdf}
-          />
+          <Button variant="secondary" size="sm" onClick={handleResetSettings}>
+            Reset to defaults
+          </Button>
         </div>
         <div>
           <InlineInput
             label="Theme Color"
             name="themeColor"
-            value={settings.themeColor}
+            value={draftSettings.themeColor}
             placeholder={DEFAULT_THEME_COLOR}
-            onChange={handleSettingsChange}
+            onChange={(field, value) =>
+              handleDraftChange(field as keyof typeof draftSettings, value)
+            }
+            onBlur={(event) =>
+              commitDraftSetting("themeColor", event.currentTarget.value)
+            }
+            onKeyDown={handleSettingsInputKeyDown("themeColor")}
             inputStyle={{ color: themeColor }}
             labelClassName={sectionTitleClassName}
           />
@@ -206,10 +176,10 @@ export const ThemeForm = () => {
                 className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-md text-sm text-white"
                 style={{ backgroundColor: color }}
                 key={idx}
-                onClick={() => handleSettingsChange("themeColor", color)}
+                onClick={() => handleSettingsChange("themeColor", color, true)}
                 onKeyDown={(e) => {
                   if (["Enter", " "].includes(e.key))
-                    handleSettingsChange("themeColor", color);
+                    handleSettingsChange("themeColor", color, true);
                 }}
                 tabIndex={0}
               >
@@ -228,39 +198,165 @@ export const ThemeForm = () => {
         </div>
         <div>
           <h2 className={sectionTitleClassName}>Typography</h2>
-          <div className="mt-4 flex flex-col gap-4">
+          <div className="mt-4 grid gap-4 md:grid-cols-2">
             <div>
               <label className="flex items-center gap-2 text-base font-medium text-gray-700">
-                <span className="flex w-36 items-center gap-2">
-                  Section Spacing
-                </span>
+                <span className="flex w-36 items-center gap-2">Section Spacing</span>
                 <input
                   type="number"
                   min="0.1"
                   max="3"
                   step="0.05"
                   className="w-[5rem] border-b border-gray-300 text-center font-semibold leading-3 outline-none"
-                  value={sectionSpacingValue}
+                  value={draftSettings.sectionSpacing}
                   onChange={(event) =>
-                    handleSettingsChange("sectionSpacing", event.target.value)
+                    handleDraftChange("sectionSpacing", event.target.value)
                   }
+                  onBlur={handleSettingsInputBlur("sectionSpacing")}
+                  onKeyDown={handleSettingsInputKeyDown("sectionSpacing")}
+                  onKeyUp={handleSettingsNumberKeyUp("sectionSpacing")}
+                  onMouseUp={handleSettingsNumberMouseUp("sectionSpacing")}
                 />
-                <span className="group relative flex items-center">
-                  <button
-                    type="button"
-                    className="flex h-5 w-5 items-center justify-center rounded-full border border-gray-300 text-[10px] font-semibold text-gray-500 transition-colors group-hover:border-gray-400 group-hover:text-gray-700"
-                  >
-                    i
-                  </button>
-                  <span className="pointer-events-none absolute left-full top-1/2 ml-2 w-56 -translate-y-1/2 rounded-md border border-gray-200 bg-white px-2 py-1 text-[11px] text-gray-600 opacity-0 shadow-sm transition-opacity duration-150 group-hover:opacity-100">
-                    <span className="font-semibold text-gray-800">
-                      Recommended:
-                    </span>
-                    <span className="mt-1 block">• 0.9–1.0 tight</span>
-                    <span className="block">• 1.1–1.2 normal</span>
-                    <span className="block">• 1.3–1.4 relaxed</span>
-                  </span>
-                </span>
+              </label>
+            </div>
+            <div>
+              <label className="flex items-center gap-2 text-base font-medium text-gray-700">
+                <span className="flex w-36 items-center gap-2">Language Gap (pt)</span>
+                <input
+                  type="number"
+                  min="0"
+                  max="20"
+                  step="1"
+                  className="w-[5rem] border-b border-gray-300 text-center font-semibold leading-3 outline-none"
+                  value={draftSettings.languagesSpacing}
+                  onChange={(event) =>
+                    handleDraftChange("languagesSpacing", event.target.value)
+                  }
+                  onBlur={handleSettingsInputBlur("languagesSpacing")}
+                  onKeyDown={handleSettingsInputKeyDown("languagesSpacing")}
+                  onKeyUp={handleSettingsNumberKeyUp("languagesSpacing")}
+                  onMouseUp={handleSettingsNumberMouseUp("languagesSpacing")}
+                />
+              </label>
+            </div>
+            <div>
+              <label className="flex items-center gap-2 text-base font-medium text-gray-700">
+                <span className="flex w-36 items-center gap-2">Role Gap (pt)</span>
+                <input
+                  type="number"
+                  min="0"
+                  max="20"
+                  step="0.5"
+                  className="w-[5rem] border-b border-gray-300 text-center font-semibold leading-3 outline-none"
+                  value={draftSettings.companyRoleSpacing}
+                  onChange={(event) =>
+                    handleDraftChange("companyRoleSpacing", event.target.value)
+                  }
+                  onBlur={handleSettingsInputBlur("companyRoleSpacing")}
+                  onKeyDown={handleSettingsInputKeyDown("companyRoleSpacing")}
+                  onKeyUp={handleSettingsNumberKeyUp("companyRoleSpacing")}
+                  onMouseUp={handleSettingsNumberMouseUp("companyRoleSpacing")}
+                />
+              </label>
+            </div>
+            <div>
+              <label className="flex items-center gap-2 text-base font-medium text-gray-700">
+                <span className="flex w-36 items-center gap-2">Companies Gap (pt)</span>
+                <input
+                  type="number"
+                  min="0"
+                  max="30"
+                  step="0.5"
+                  className="w-[5rem] border-b border-gray-300 text-center font-semibold leading-3 outline-none"
+                  value={draftSettings.companyItemSpacing}
+                  onChange={(event) =>
+                    handleDraftChange("companyItemSpacing", event.target.value)
+                  }
+                  onBlur={handleSettingsInputBlur("companyItemSpacing")}
+                  onKeyDown={handleSettingsInputKeyDown("companyItemSpacing")}
+                  onKeyUp={handleSettingsNumberKeyUp("companyItemSpacing")}
+                  onMouseUp={handleSettingsNumberMouseUp("companyItemSpacing")}
+                />
+              </label>
+            </div>
+            <div>
+              <label className="flex items-center gap-2 text-base font-medium text-gray-700">
+                <span className="flex w-36 items-center gap-2">School Gap (pt)</span>
+                <input
+                  type="number"
+                  min="0"
+                  max="20"
+                  step="0.5"
+                  className="w-[5rem] border-b border-gray-300 text-center font-semibold leading-3 outline-none"
+                  value={draftSettings.schoolDegreeSpacing}
+                  onChange={(event) =>
+                    handleDraftChange("schoolDegreeSpacing", event.target.value)
+                  }
+                  onBlur={handleSettingsInputBlur("schoolDegreeSpacing")}
+                  onKeyDown={handleSettingsInputKeyDown("schoolDegreeSpacing")}
+                  onKeyUp={handleSettingsNumberKeyUp("schoolDegreeSpacing")}
+                  onMouseUp={handleSettingsNumberMouseUp("schoolDegreeSpacing")}
+                />
+              </label>
+            </div>
+            <div>
+              <label className="flex items-center gap-2 text-base font-medium text-gray-700">
+                <span className="flex w-36 items-center gap-2">Projects Gap (pt)</span>
+                <input
+                  type="number"
+                  min="0"
+                  max="30"
+                  step="0.5"
+                  className="w-[5rem] border-b border-gray-300 text-center font-semibold leading-3 outline-none"
+                  value={draftSettings.projectItemSpacing}
+                  onChange={(event) =>
+                    handleDraftChange("projectItemSpacing", event.target.value)
+                  }
+                  onBlur={handleSettingsInputBlur("projectItemSpacing")}
+                  onKeyDown={handleSettingsInputKeyDown("projectItemSpacing")}
+                  onKeyUp={handleSettingsNumberKeyUp("projectItemSpacing")}
+                  onMouseUp={handleSettingsNumberMouseUp("projectItemSpacing")}
+                />
+              </label>
+            </div>
+            <div>
+              <label className="flex items-center gap-2 text-base font-medium text-gray-700">
+                <span className="flex w-36 items-center gap-2">Top Bar Height (pt)</span>
+                <input
+                  type="number"
+                  min="0"
+                  max="30"
+                  step="0.5"
+                  className="w-[5rem] border-b border-gray-300 text-center font-semibold leading-3 outline-none"
+                  value={draftSettings.topBarHeight}
+                  onChange={(event) =>
+                    handleDraftChange("topBarHeight", event.target.value)
+                  }
+                  onBlur={handleSettingsInputBlur("topBarHeight")}
+                  onKeyDown={handleSettingsInputKeyDown("topBarHeight")}
+                  onKeyUp={handleSettingsNumberKeyUp("topBarHeight")}
+                  onMouseUp={handleSettingsNumberMouseUp("topBarHeight")}
+                />
+              </label>
+            </div>
+            <div>
+              <label className="flex items-center gap-2 text-base font-medium text-gray-700">
+                <span className="flex w-36 items-center gap-2">Summary Gap (pt)</span>
+                <input
+                  type="number"
+                  min="0"
+                  max="40"
+                  step="1"
+                  className="w-[5rem] border-b border-gray-300 text-center font-semibold leading-3 outline-none"
+                  value={draftSettings.linksSummarySpacing}
+                  onChange={(event) =>
+                    handleDraftChange("linksSummarySpacing", event.target.value)
+                  }
+                  onBlur={handleSettingsInputBlur("linksSummarySpacing")}
+                  onKeyDown={handleSettingsInputKeyDown("linksSummarySpacing")}
+                  onKeyUp={handleSettingsNumberKeyUp("linksSummarySpacing")}
+                  onMouseUp={handleSettingsNumberMouseUp("linksSummarySpacing")}
+                />
               </label>
             </div>
             <div>
@@ -272,131 +368,77 @@ export const ThemeForm = () => {
                   max="2.5"
                   step="0.05"
                   className="w-[5rem] border-b border-gray-300 text-center font-semibold leading-3 outline-none"
-                  value={lineHeight}
+                  value={draftSettings.lineHeight}
                   onChange={(event) =>
-                    handleSettingsChange("lineHeight", event.target.value)
+                    handleDraftChange("lineHeight", event.target.value)
                   }
+                  onBlur={handleSettingsInputBlur("lineHeight")}
+                  onKeyDown={handleSettingsInputKeyDown("lineHeight")}
+                  onKeyUp={handleSettingsNumberKeyUp("lineHeight")}
+                  onMouseUp={handleSettingsNumberMouseUp("lineHeight")}
                 />
-                <span className="group relative flex items-center">
-                  <button
-                    type="button"
-                    className="flex h-5 w-5 items-center justify-center rounded-full border border-gray-300 text-[10px] font-semibold text-gray-500 transition-colors group-hover:border-gray-400 group-hover:text-gray-700"
-                  >
-                    i
-                  </button>
-                  <span className="pointer-events-none absolute left-full top-1/2 ml-2 w-48 -translate-y-1/2 rounded-md border border-gray-200 bg-white px-2 py-1 text-[11px] text-gray-600 opacity-0 shadow-sm transition-opacity duration-150 group-hover:opacity-100">
-                    <span className="font-semibold text-gray-800">
-                      Recommended:
-                    </span>
-                    <span className="mt-1 block">• 1.15 tight</span>
-                    <span className="block">• 1.25 normal</span>
-                    <span className="block">• 1.35 relaxed</span>
-                  </span>
-                </span>
               </label>
             </div>
             <div>
               <label className="flex items-center gap-2 text-base font-medium text-gray-700">
-                <span className="flex w-36 items-center gap-2">
-                  Font Size (pt)
-                </span>
+                <span className="flex w-36 items-center gap-2">Body Size (pt)</span>
                 <input
                   type="number"
                   min="6"
                   max="20"
                   step="0.5"
                   name="fontSize"
-                  value={fontSize}
+                  value={draftSettings.fontSize}
                   placeholder="11"
                   onChange={(event) =>
-                    handleSettingsChange("fontSize", event.target.value)
+                    handleDraftChange("fontSize", event.target.value)
                   }
+                  onBlur={handleSettingsInputBlur("fontSize")}
+                  onKeyDown={handleSettingsInputKeyDown("fontSize")}
+                  onKeyUp={handleSettingsNumberKeyUp("fontSize")}
+                  onMouseUp={handleSettingsNumberMouseUp("fontSize")}
                   className="w-[5rem] border-b border-gray-300 text-center font-semibold leading-3 outline-none"
                 />
-                <span className="group relative flex items-center">
-                  <button
-                    type="button"
-                    className="flex h-5 w-5 items-center justify-center rounded-full border border-gray-300 text-[10px] font-semibold text-gray-500 transition-colors group-hover:border-gray-400 group-hover:text-gray-700"
-                  >
-                    i
-                  </button>
-                  <span className="pointer-events-none absolute left-full top-1/2 ml-2 w-52 -translate-y-1/2 rounded-md border border-gray-200 bg-white px-2 py-1 text-[11px] text-gray-600 opacity-0 shadow-sm transition-opacity duration-150 group-hover:opacity-100">
-                    <span className="font-semibold text-gray-800">
-                      Recommended:
-                    </span>
-                    <span className="mt-1 block">• 10–11 compact</span>
-                    <span className="block">• 11–12 normal</span>
-                    <span className="block">• 12–13 relaxed</span>
-                  </span>
-                </span>
               </label>
             </div>
-            <div className="flex flex-wrap gap-6">
+            <div>
               <label className="flex items-center gap-2 text-base font-medium text-gray-700">
-                <span className="flex w-36 items-center gap-2">
-                  Name Size (pt)
-                </span>
+                <span className="flex w-36 items-center gap-2">Name Size (pt)</span>
                 <input
                   type="number"
                   min="16"
                   max="48"
                   step="0.5"
-                  value={settings.nameFontSize}
+                  value={draftSettings.nameFontSize}
                   onChange={(event) =>
-                    handleSettingsChange("nameFontSize", event.target.value)
+                    handleDraftChange("nameFontSize", event.target.value)
                   }
+                  onBlur={handleSettingsInputBlur("nameFontSize")}
+                  onKeyDown={handleSettingsInputKeyDown("nameFontSize")}
+                  onKeyUp={handleSettingsNumberKeyUp("nameFontSize")}
+                  onMouseUp={handleSettingsNumberMouseUp("nameFontSize")}
                   className="w-[5rem] border-b border-gray-300 text-center font-semibold leading-3 outline-none"
                 />
-                <span className="group relative flex items-center">
-                  <button
-                    type="button"
-                    className="flex h-5 w-5 items-center justify-center rounded-full border border-gray-300 text-[10px] font-semibold text-gray-500 transition-colors group-hover:border-gray-400 group-hover:text-gray-700"
-                  >
-                    i
-                  </button>
-                  <span className="pointer-events-none absolute left-full top-1/2 ml-2 w-48 -translate-y-1/2 rounded-md border border-gray-200 bg-white px-2 py-1 text-[11px] text-gray-600 opacity-0 shadow-sm transition-opacity duration-150 group-hover:opacity-100">
-                    <span className="font-semibold text-gray-800">
-                      Recommended:
-                    </span>
-                    <span className="mt-1 block">• 22–24 compact</span>
-                    <span className="block">• 24–28 normal</span>
-                    <span className="block">• 28–32 relaxed</span>
-                  </span>
-                </span>
               </label>
             </div>
             <div>
               <label className="flex items-center gap-2 text-base font-medium text-gray-700">
-                <span className="flex w-36 items-center gap-2">
-                  Section Header (pt)
-                </span>
+                <span className="flex w-36 items-center gap-2">Heading Size (pt)</span>
                 <input
                   type="number"
                   min="8"
                   max="20"
                   step="0.5"
-                  value={settings.sectionHeadingSize}
+                  value={draftSettings.sectionHeadingSize}
                   onChange={(event) =>
-                    handleSettingsChange("sectionHeadingSize", event.target.value)
+                    handleDraftChange("sectionHeadingSize", event.target.value)
                   }
+                  onBlur={handleSettingsInputBlur("sectionHeadingSize")}
+                  onKeyDown={handleSettingsInputKeyDown("sectionHeadingSize")}
+                  onKeyUp={handleSettingsNumberKeyUp("sectionHeadingSize")}
+                  onMouseUp={handleSettingsNumberMouseUp("sectionHeadingSize")}
                   className="w-[5rem] border-b border-gray-300 text-center font-semibold leading-3 outline-none"
                 />
-                <span className="group relative flex items-center">
-                  <button
-                    type="button"
-                    className="flex h-5 w-5 items-center justify-center rounded-full border border-gray-300 text-[10px] font-semibold text-gray-500 transition-colors group-hover:border-gray-400 group-hover:text-gray-700"
-                  >
-                    i
-                  </button>
-                  <span className="pointer-events-none absolute left-full top-1/2 ml-2 w-52 -translate-y-1/2 rounded-md border border-gray-200 bg-white px-2 py-1 text-[11px] text-gray-600 opacity-0 shadow-sm transition-opacity duration-150 group-hover:opacity-100">
-                    <span className="font-semibold text-gray-800">
-                      Recommended:
-                    </span>
-                    <span className="mt-1 block">• 10–11 compact</span>
-                    <span className="block">• 11–12 normal</span>
-                    <span className="block">• 12–14 relaxed</span>
-                  </span>
-                </span>
               </label>
             </div>
           </div>

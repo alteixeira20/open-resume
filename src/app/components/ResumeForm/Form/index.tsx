@@ -44,7 +44,7 @@ export const BaseForm = ({
 }) => (
   <section
     id={id}
-    className={`flex flex-col gap-3 rounded-md border border-gray-200 bg-white p-6 pt-4 shadow-sm transition-opacity duration-200 ${className}`}
+    className={`flex flex-col gap-3 rounded-md border border-[color:var(--color-surface-border)] bg-white/70 p-6 pt-4 shadow-sm backdrop-blur-sm transition-opacity duration-200 ${className}`}
   >
     {children}
   </section>

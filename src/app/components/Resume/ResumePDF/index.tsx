@@ -58,10 +58,22 @@ export const ResumePDF = ({
     showBulletPoints,
     lineHeight,
     sectionSpacing,
+    linksSummarySpacing,
+    languagesSpacing,
+    companyRoleSpacing,
+    companyItemSpacing,
+    schoolDegreeSpacing,
+    projectItemSpacing,
+    topBarHeight,
     nameFontSize,
     sectionHeadingSize,
   } = settings;
   const themeColor = settings.themeColor || DEFAULT_FONT_COLOR;
+  const parseNumberSetting = (value: string, fallback: number) => {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : fallback;
+  };
+  const topBarHeightPt = parseNumberSetting(topBarHeight, 10.5);
 
   const showFormsOrder = formsOrder.filter((form) => formToShow[form]);
 
@@ -119,7 +131,7 @@ export const ResumePDF = ({
 
   return (
     <>
-      <Document title={`${name} Resume`} author={name} producer={"OpenResume"}>
+      <Document title={`${name} Resume`} author={name} producer={"CVForge"}>
         <Page
           size={documentSize === "A4" ? "A4" : "LETTER"}
           style={{
@@ -129,21 +141,27 @@ export const ResumePDF = ({
             fontSize: fontSize + "pt",
           }}
         >
-          {Boolean(settings.themeColor) && (
+          {Boolean(settings.themeColor) && topBarHeightPt > 0 && (
             <View
               style={{
                 width: spacing["full"],
-                height: spacing[3.5],
+                height: `${topBarHeightPt}pt`,
                 backgroundColor: themeColor,
               }}
             />
           )}
           <ResumePDFStyleProvider
             value={{
-              lineHeight: Number(lineHeight) || 1.3,
-              sectionSpacing: Number(sectionSpacing) || 1,
-              nameFontSize: Number(nameFontSize) || 20,
-              sectionHeadingSize: Number(sectionHeadingSize) || 11,
+              lineHeight: parseNumberSetting(lineHeight, 1),
+              sectionSpacing: parseNumberSetting(sectionSpacing, 1),
+              linksSummarySpacing: parseNumberSetting(linksSummarySpacing, 20),
+              languagesSpacing: parseNumberSetting(languagesSpacing, 0),
+              companyRoleSpacing: parseNumberSetting(companyRoleSpacing, 4.5),
+              companyItemSpacing: parseNumberSetting(companyItemSpacing, 6),
+              schoolDegreeSpacing: parseNumberSetting(schoolDegreeSpacing, 4.5),
+              projectItemSpacing: parseNumberSetting(projectItemSpacing, 6),
+              nameFontSize: parseNumberSetting(nameFontSize, 20),
+              sectionHeadingSize: parseNumberSetting(sectionHeadingSize, 11),
             }}
           >
             <View

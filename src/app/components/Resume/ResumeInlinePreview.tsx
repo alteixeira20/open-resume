@@ -10,7 +10,12 @@ import {
 } from "components/fonts/hooks";
 import { NonEnglishFontsCSSLazyLoader } from "components/fonts/NonEnglishFontsCSSLoader";
 import type { RootState } from "lib/redux/store";
-import { A4_WIDTH_PX, LETTER_WIDTH_PX } from "lib/constants";
+import {
+  A4_HEIGHT_PX,
+  A4_WIDTH_PX,
+  LETTER_HEIGHT_PX,
+  LETTER_WIDTH_PX,
+} from "lib/constants";
 
 export const ResumeInlinePreview = () => {
   const store = useStore<RootState>();
@@ -44,16 +49,30 @@ export const ResumeInlinePreview = () => {
 
     const getDocWidth = () =>
       previewSettings.documentSize === "A4" ? A4_WIDTH_PX : LETTER_WIDTH_PX;
+    const getDocHeight = () =>
+      previewSettings.documentSize === "A4" ? A4_HEIGHT_PX : LETTER_HEIGHT_PX;
 
     const computeScale = () => {
       const styles = window.getComputedStyle(element);
       const paddingLeft = parseFloat(styles.paddingLeft || "0");
       const paddingRight = parseFloat(styles.paddingRight || "0");
       const availableWidth = element.clientWidth - paddingLeft - paddingRight;
+      const rect = element.getBoundingClientRect();
+      const availableHeight = window.innerHeight - rect.top - 24;
       const docWidth = getDocWidth();
-      if (availableWidth <= 0 || docWidth <= 0) return;
+      const docHeight = getDocHeight();
+      if (
+        availableWidth <= 0 ||
+        availableHeight <= 0 ||
+        docWidth <= 0 ||
+        docHeight <= 0
+      ) {
+        return;
+      }
+      const widthScale = availableWidth / docWidth;
+      const heightScale = availableHeight / docHeight;
       const nextScale =
-        Math.round(Math.min(availableWidth / docWidth, 1.5) * 100) / 100;
+        Math.round(Math.min(widthScale, heightScale, 1.5) * 100) / 100;
       setScale(Math.max(0.5, nextScale));
     };
 

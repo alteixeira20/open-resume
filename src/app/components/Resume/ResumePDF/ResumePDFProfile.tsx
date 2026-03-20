@@ -25,10 +25,11 @@ export const ResumePDFProfile = ({
 }) => {
   const { name, email, phone, url, github, summary, location } = profile;
   const iconProps = { email, phone, location, url, github };
-  const { nameFontSize } = useResumePDFStyle();
-  const iconRowLineHeight = 1.1;
-  const iconRowTextOffsetPt = 4;
-  const rowHeight = `${bodyFontSize}pt`;
+  const { nameFontSize, linksSummarySpacing } = useResumePDFStyle();
+  const iconRowLineHeight = 1;
+  const iconBoxSize = "11pt";
+  const iconRowTextOffsetPt = 1;
+  const iconRowIconOffsetPt = -2.5;
 
   return (
     <ResumePDFSection style={{ marginTop: spacing["4"] }}>
@@ -39,7 +40,12 @@ export const ResumePDFProfile = ({
       >
         {name}
       </ResumePDFText>
-      <View style={{ marginTop: spacing["4"] }}>
+      <View
+        style={{
+          marginTop: spacing["4"],
+          marginBottom: `${linksSummarySpacing}pt`,
+        }}
+      >
         {(() => {
           const items = Object.entries(iconProps)
             .map(([key, value]) => ({ key, value }))
@@ -108,29 +114,20 @@ export const ResumePDFProfile = ({
               >
                 <View
                   style={{
+                    width: spacing["4"],
+                    height: iconBoxSize,
+                    marginRight: spacing["1"],
+                    display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    marginRight: spacing["1"],
+                    position: "relative",
+                    top: `${iconRowIconOffsetPt}pt`,
                   }}
                 >
-                  <View
-                    style={{
-                      width: spacing["4"],
-                      height: rowHeight,
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <ResumePDFIcon type={iconType} isPDF={isPDF} />
-                  </View>
+                  <ResumePDFIcon type={iconType} isPDF={isPDF} />
                 </View>
                 {shouldUseLinkWrapper ? (
-                  <View
-                    style={{
-                      minHeight: rowHeight,
-                      justifyContent: "center",
-                    }}
-                  >
+                  <View style={{ display: "flex", justifyContent: "center" }}>
                     <ResumePDFLink src={src} isPDF={isPDF}>
                       <ResumePDFText
                         disableSoftWrap={true}
@@ -145,12 +142,7 @@ export const ResumePDFProfile = ({
                     </ResumePDFLink>
                   </View>
                 ) : (
-                  <View
-                    style={{
-                      minHeight: rowHeight,
-                      justifyContent: "center",
-                    }}
-                  >
+                  <View style={{ display: "flex", justifyContent: "center" }}>
                     <ResumePDFText
                       style={{
                         lineHeight: iconRowLineHeight,
@@ -174,7 +166,7 @@ export const ResumePDFProfile = ({
                 </View>
               )}
               {secondRow.length > 0 && (
-                <View style={{ ...styles.flexRowBetween, marginTop: "-5pt" }}>
+                <View style={{ ...styles.flexRowBetween, marginTop: "0pt" }}>
                   {secondRow.map((item) => renderItem(item.key, item.value))}
                 </View>
               )}
@@ -182,7 +174,11 @@ export const ResumePDFProfile = ({
           );
         })()}
       </View>
-      {summary && <ResumePDFText style={{ marginTop: spacing["1"] }}>{summary}</ResumePDFText>}
+      {summary && (
+        <View>
+          <ResumePDFText>{summary}</ResumePDFText>
+        </View>
+      )}
     </ResumePDFSection>
   );
 };

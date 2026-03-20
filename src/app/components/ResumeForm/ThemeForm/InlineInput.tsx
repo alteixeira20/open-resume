@@ -6,6 +6,8 @@ interface InputProps<K extends string, V extends string> {
   placeholder: string;
   inputStyle?: React.CSSProperties;
   onChange: (name: K, value: V) => void;
+  onBlur?: React.FocusEventHandler<HTMLInputElement>;
+  onKeyDown?: React.KeyboardEventHandler<HTMLInputElement>;
 }
 
 export const InlineInput = <K extends string>({
@@ -16,6 +18,8 @@ export const InlineInput = <K extends string>({
   placeholder,
   inputStyle = {},
   onChange,
+  onBlur,
+  onKeyDown,
 }: InputProps<K, string>) => {
   return (
     <label
@@ -28,6 +32,8 @@ export const InlineInput = <K extends string>({
         value={value}
         placeholder={placeholder}
         onChange={(e) => onChange(name, e.target.value)}
+        onBlur={onBlur}
+        onKeyDown={onKeyDown}
         className="w-[5rem] border-b border-gray-300 text-center font-semibold leading-3 outline-none"
         style={inputStyle}
       />

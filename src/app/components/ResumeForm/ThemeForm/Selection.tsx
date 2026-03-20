@@ -54,7 +54,11 @@ const FontFamilySelections = ({
 }: {
   selectedFontFamily: string;
   themeColor: string;
-  handleSettingsChange: (field: GeneralSetting, value: string) => void;
+  handleSettingsChange: (
+    field: GeneralSetting,
+    value: string,
+    refresh?: boolean
+  ) => void;
 }) => {
   const allFontFamilies = getAllFontFamiliesToLoad();
   return (
@@ -71,7 +75,7 @@ const FontFamilySelections = ({
               fontFamily,
               fontSize: `${standardSizePt * PX_PER_PT}px`,
             }}
-            onClick={() => handleSettingsChange("fontFamily", fontFamily)}
+            onClick={() => handleSettingsChange("fontFamily", fontFamily, true)}
           >
             {FONT_FAMILY_TO_DISPLAY_NAME[fontFamily]}
           </Selection>
@@ -101,7 +105,11 @@ export const FontSizeSelections = ({
   fontFamily: FontFamily;
   themeColor: string;
   selectedFontSize: string;
-  handleSettingsChange: (field: GeneralSetting, value: string) => void;
+  handleSettingsChange: (
+    field: GeneralSetting,
+    value: string,
+    refresh?: boolean
+  ) => void;
 }) => {
   const standardSizePt = FONT_FAMILY_TO_STANDARD_SIZE_IN_PT[fontFamily];
   const compactSizePt = standardSizePt - 1;
@@ -120,7 +128,7 @@ export const FontSizeSelections = ({
               fontFamily,
               fontSize: `${Number(fontSizePt) * PX_PER_PT}px`,
             }}
-            onClick={() => handleSettingsChange("fontSize", fontSizePt)}
+            onClick={() => handleSettingsChange("fontSize", fontSizePt, true)}
           >
             {type}
           </Selection>
@@ -137,7 +145,11 @@ export const DocumentSizeSelections = ({
 }: {
   themeColor: string;
   selectedDocumentSize: string;
-  handleSettingsChange: (field: GeneralSetting, value: string) => void;
+  handleSettingsChange: (
+    field: GeneralSetting,
+    value: string,
+    refresh?: boolean
+  ) => void;
 }) => {
   return (
     <SelectionsWrapper>
@@ -147,7 +159,7 @@ export const DocumentSizeSelections = ({
             key={idx}
             selectedColor={themeColor}
             isSelected={type === selectedDocumentSize}
-            onClick={() => handleSettingsChange("documentSize", type)}
+            onClick={() => handleSettingsChange("documentSize", type, true)}
           >
             <div className="flex flex-col items-center">
               <div>{type}</div>

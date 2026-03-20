@@ -1,4 +1,4 @@
-import { IconButton } from "components/Button";
+import { IconButton } from "components/ui/Button";
 import {
   EyeIcon,
   EyeSlashIcon,
@@ -23,7 +23,10 @@ export const ShowIconButton = ({
 
   return (
     <IconButton onClick={onClick} tooltipText={tooltipText}>
-      <Icon className="h-6 w-6 text-gray-400" aria-hidden="true" />
+      <Icon
+        className="h-6 w-6 text-[color:var(--color-text-muted)]"
+        aria-hidden="true"
+      />
       <span className="sr-only">{tooltipText}</span>
     </IconButton>
   );
@@ -49,7 +52,10 @@ export const MoveIconButton = ({
       tooltipText={tooltipText}
       size={size}
     >
-      <Icon className={`${sizeClassName} text-gray-400`} aria-hidden="true" />
+      <Icon
+        className={`${sizeClassName} text-[color:var(--color-text-muted)]`}
+        aria-hidden="true"
+      />
       <span className="sr-only">{tooltipText}</span>
     </IconButton>
   );
@@ -64,7 +70,10 @@ export const DeleteIconButton = ({
 }) => {
   return (
     <IconButton onClick={onClick} tooltipText={tooltipText} size="small">
-      <TrashIcon className="h-4 w-4 text-gray-400" aria-hidden="true" />
+      <TrashIcon
+        className="h-4 w-4 text-[color:var(--color-text-muted)]"
+        aria-hidden="true"
+      />
       <span className="sr-only">{tooltipText}</span>
     </IconButton>
   );
@@ -86,11 +95,13 @@ export const BulletListIconButton = ({
       onClick={() => onClick(!showBulletPoints)}
       tooltipText={tooltipText}
       size="small"
-      className={showBulletPoints ? "!bg-sky-100" : ""}
+      className={showBulletPoints ? "!bg-[color:var(--color-surface-raised)]" : ""}
     >
       <ListBulletIcon
         className={`h-4 w-4 ${
-          showBulletPoints ? "text-gray-700" : "text-gray-400"
+          showBulletPoints
+            ? "text-[color:var(--color-text-secondary)]"
+            : "text-[color:var(--color-text-muted)]"
         }`}
         aria-hidden="true"
       />

@@ -55,8 +55,8 @@ export const styles = StyleSheet.create({
     flexDirection: "column",
   },
   icon: {
-    width: "13pt",
-    height: "13pt",
+    width: "10pt",
+    height: "10pt",
     fill: "#525252", // text-neutral-600
   },
 });

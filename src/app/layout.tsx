@@ -13,7 +13,7 @@ export const metadata = {
     apple: "/anvil_logo.png",
   },
   title: {
-    default: "CVForge — Free CV Builder + ATS Resume Checker | EU A4 + US Letter",
+    default: "CVForge — CV Builder + ATS Parser | EU A4 + US Letter",
     template: "%s | CVForge",
   },
   description: SITE.description,
@@ -58,10 +58,9 @@ export const metadata = {
     "cv builder portugal",
     "cv builder uk",
     "cv builder ireland",
-    "privacy first resume builder",
-    "local first cv builder",
+    "browser based resume builder",
+    "browser based cv builder",
     "no account resume builder",
-    "offline resume builder",
     "resume pdf export",
     "cv pdf export",
     "resume json export",
@@ -76,7 +75,7 @@ export const metadata = {
   openGraph: {
     type: "website",
     url: SITE_URL,
-    title: "CVForge — Free CV Builder + ATS Resume Checker | EU A4 + US Letter",
+    title: "CVForge — CV Builder + ATS Parser | EU A4 + US Letter",
     description: SITE.description,
     siteName: SITE.name,
     images: [
@@ -90,7 +89,7 @@ export const metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "CVForge — Free CV Builder + ATS Resume Checker",
+    title: "CVForge — CV Builder + ATS Parser",
     description: SITE.description,
     images: ["/og-image.svg"],
   },

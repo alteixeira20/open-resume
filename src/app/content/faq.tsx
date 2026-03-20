@@ -12,10 +12,11 @@ export const QAS: FAQItem[] = [
     answer: (
       <p>
         A browser-based CV and resume builder. You fill in your details, pick a
-        format (EU A4 or US Letter), preview the PDF live, and export when
-        you're done. There's also a separate ATS Parser that parses any PDF and
-        shows you what a text-based ATS system would extract from it. No
-        account, no server, no uploads.
+        format (EU A4 or US Letter), preview the PDF in the builder, and
+        export when you're done. There's also a separate ATS Parser that
+        parses any PDF and shows you what a text-based ATS system would extract
+        from it. No account required, and CV content is not sent to a
+        CV-processing backend.
       </p>
     ),
   },
@@ -67,10 +68,11 @@ export const QAS: FAQItem[] = [
     question: "Q3. Is my data private?",
     answer: (
       <p>
-        Yes. Everything — the builder, the parser, the ATS scorer, the PDF
-        renderer — runs inside your browser tab. Nothing is sent to a server.
-        There are no analytics on your CV content. You can verify this by
-        checking the network tab while using the tool.
+        Mostly, yes. The builder, parser, ATS scorer, and PDF renderer run in
+        the browser, so your CV content is not sent to a server for parsing or
+        scoring. The site does include general analytics, but not CV-content
+        processing. You can verify the network requests in your browser dev
+        tools.
       </p>
     ),
   },

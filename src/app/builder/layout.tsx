@@ -3,12 +3,11 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "CV Builder — CVForge",
   description:
-    "Build an ATS-friendly CV or resume online. EU A4 and US Letter presets, typography controls, and one-click PDF export. Free and private.",
+    "Build a CV or resume in the browser with EU A4 and US Letter presets, typography controls, and PDF / JSON export.",
   keywords: [
     "resume builder",
     "cv builder",
     "ats friendly resume builder",
-    "ats ready resume",
     "resume builder eu a4",
     "resume builder letter",
     "open source resume builder",
@@ -17,8 +16,8 @@ export const metadata: Metadata = {
     "resume json export",
     "resume import json",
     "resume import pdf",
-    "privacy first resume builder",
-    "local first resume builder",
+    "browser based resume builder",
+    "browser based cv builder",
   ],
 };
 

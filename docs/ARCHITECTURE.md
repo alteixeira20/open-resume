@@ -42,7 +42,7 @@ Important areas:
 ### `src/app/components`
 
 Important component groups:
-- `Resume/` live preview, iframe rendering, download bridge, and PDF document integration
+- `Resume/` PDF preview, iframe rendering, download bridge, and PDF document integration
 - `ResumeForm/` builder forms and editing controls
 - `layout/` shared page shell primitives such as `WorkbenchLayout`, `WorkbenchPreview`, `WorkbenchHeader`, `Section`, and `PageWrapper`
 - `ui/` reusable app primitives such as `Button`, `Card`, `Badge`, and `SectionHeading`
@@ -155,7 +155,6 @@ The browser workbench, CLI, and API all depend on that same core logic under `sr
 Public-facing copy is intentionally centralized:
 - `src/app/content/site.ts`
 - `src/app/content/home.ts`
-- `src/app/content/features.tsx`
 - `src/app/content/faq.tsx`
 - `src/app/content/nav.ts`
 

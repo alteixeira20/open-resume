@@ -21,7 +21,7 @@
     <text x="120" y="245" fill="#F5EDE6" font-family="Arial, Helvetica, sans-serif" font-size="88" font-weight="900" letter-spacing="-3">CV</text>
     <text x="248" y="245" fill="url(#brand)" font-family="Arial, Helvetica, sans-serif" font-size="88" font-weight="900" letter-spacing="-3">Forge</text>
   </g>
-  <text x="120" y="325" fill="#F5EDE6" font-family="Arial, Helvetica, sans-serif" font-size="38" font-weight="700">Forge your career. ATS-ready, EU-native.</text>
+  <text x="120" y="325" fill="#F5EDE6" font-family="Arial, Helvetica, sans-serif" font-size="38" font-weight="700">Browser-based CV builder with a parser workbench.</text>
   <text x="120" y="388" fill="#E8D5C4" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="500">Free · Local ATS Scoring · EU A4 + US Letter · No Sign-up</text>
   <rect x="120" y="448" width="432" height="2" fill="url(#brand)" fill-opacity="0.9"/>
 </svg>

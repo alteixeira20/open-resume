@@ -3,22 +3,17 @@
 import { useEffect, useRef, useState } from "react";
 import { Button } from "components/ui";
 import { parseResumeFromPdf } from "lib/parse-resume-from-pdf";
-import {
-  clearStateFromLocalStorage,
-  getHasUsedAppBefore,
-  saveStateToLocalStorage,
-} from "lib/redux/local-storage";
+import { getHasUsedAppBefore, saveStateToLocalStorage } from "lib/redux/local-storage";
 import { useAppDispatch, useAppSelector } from "lib/redux/hooks";
-import { selectResume, setResume } from "lib/redux/resumeSlice";
+import { setResume } from "lib/redux/resumeSlice";
+import { selectSettings, setSettings } from "lib/redux/settingsSlice";
 import {
-  selectSettings,
-  setSettings,
-  type ShowForm,
-} from "lib/redux/settingsSlice";
+  buildImportedPdfState,
+  parseImportedJsonState,
+} from "lib/redux/import-state";
 
 export const ImportResumeButton = () => {
   const dispatch = useAppDispatch();
-  const resume = useAppSelector(selectResume);
   const settings = useAppSelector(selectSettings);
   const importInputRef = useRef<HTMLInputElement>(null);
   const importPdfInputRef = useRef<HTMLInputElement>(null);
@@ -73,32 +68,27 @@ export const ImportResumeButton = () => {
   ) => {
     const file = event.target.files?.[0];
     if (!file) return;
-    if (getHasUsedAppBefore()) {
-      const confirmed = window.confirm(
-        "This will overwrite your current resume and settings. Do you want to continue?"
-      );
-      if (!confirmed) {
-        event.target.value = "";
-        return;
-      }
-      clearStateFromLocalStorage();
-    }
+
     try {
       const text = await file.text();
-      const parsed = JSON.parse(text) as {
-        resume?: typeof resume;
-        settings?: typeof settings;
-      };
-      if (!parsed.resume || !parsed.settings) {
-        alert("Invalid JSON format. Please use a CVForge export file.");
+      const importedState = parseImportedJsonState(text);
+      if (!importedState) {
+        alert("Invalid JSON format. Please use a compatible CVForge export file.");
         return;
       }
-      dispatch(setResume(parsed.resume));
-      dispatch(setSettings(parsed.settings));
-      saveStateToLocalStorage({
-        resume: parsed.resume,
-        settings: parsed.settings,
-      } as any);
+
+      if (getHasUsedAppBefore()) {
+        const confirmed = window.confirm(
+          "This will overwrite your current resume and settings. Do you want to continue?"
+        );
+        if (!confirmed) {
+          return;
+        }
+      }
+
+      dispatch(setResume(importedState.resume));
+      dispatch(setSettings(importedState.settings));
+      saveStateToLocalStorage(importedState);
     } catch {
       alert("Could not read JSON file. Please check the file and try again.");
     } finally {
@@ -111,16 +101,6 @@ export const ImportResumeButton = () => {
   ) => {
     const file = event.target.files?.[0];
     if (!file) return;
-    if (getHasUsedAppBefore()) {
-      const confirmed = window.confirm(
-        "This will overwrite your current resume and settings. Do you want to continue?"
-      );
-      if (!confirmed) {
-        event.target.value = "";
-        return;
-      }
-      clearStateFromLocalStorage();
-    }
     try {
       if (!file.name.toLowerCase().endsWith(".pdf")) {
         alert("Please select a PDF file.");
@@ -129,32 +109,24 @@ export const ImportResumeButton = () => {
       const pdfData = await file.arrayBuffer();
       const parsedResume = await parseResumeFromPdf(pdfData);
 
-      const newSettings = { ...settings };
+      const importedState = buildImportedPdfState({
+        resume: parsedResume,
+        baseSettings: settings,
+        deriveFormVisibility: getHasUsedAppBefore(),
+      });
+
       if (getHasUsedAppBefore()) {
-        const sections = Object.keys(newSettings.formToShow) as ShowForm[];
-        const hasFeaturedSkills =
-          parsedResume.skills.featuredSkills?.some((skill) => skill.skill.trim()) ??
-          false;
-        const sectionToFormToShow: Record<ShowForm, boolean> = {
-          workExperiences: parsedResume.workExperiences.length > 0,
-          educations: parsedResume.educations.length > 0,
-          projects: parsedResume.projects.length > 0,
-          skills:
-            parsedResume.skills.descriptions.length > 0 || hasFeaturedSkills,
-          languages: parsedResume.languages.length > 0,
-          custom: parsedResume.custom.descriptions.length > 0,
-        };
-        for (const section of sections) {
-          newSettings.formToShow[section] = sectionToFormToShow[section];
+        const confirmed = window.confirm(
+          "This will overwrite your current resume and settings. Do you want to continue?"
+        );
+        if (!confirmed) {
+          return;
         }
       }
 
-      dispatch(setResume(parsedResume));
-      dispatch(setSettings(newSettings));
-      saveStateToLocalStorage({
-        resume: parsedResume,
-        settings: newSettings,
-      } as any);
+      dispatch(setResume(importedState.resume));
+      dispatch(setSettings(importedState.settings));
+      saveStateToLocalStorage(importedState);
       window.dispatchEvent(new CustomEvent("resume:refresh-preview"));
     } catch (error) {
       console.error("PDF import failed", error);

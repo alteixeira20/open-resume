@@ -1,5 +1,4 @@
 import type { PDFDocumentProxy } from "pdfjs-dist/types/src/display/api";
-
 import type { TextItem as PdfjsTextItem } from "pdfjs-dist/types/src/display/api";
 import type { TextItem, TextItems } from "lib/parse-resume-from-pdf/types";
 
@@ -18,23 +17,31 @@ import type { TextItem, TextItems } from "lib/parse-resume-from-pdf/types";
  */
 export type PdfSource = string | ArrayBufferLike | Uint8Array;
 
-type PdfjsModule = typeof import("pdfjs-dist/build/pdf.mjs");
+type PdfjsModule = {
+  getDocument: (source: string | { data: Uint8Array }) => {
+    promise: Promise<PDFDocumentProxy>;
+  };
+  GlobalWorkerOptions?: {
+    workerSrc: string;
+  };
+};
 
 let pdfjsPromise: Promise<PdfjsModule> | null = null;
 
 const loadPdfjs = async () => {
   if (!pdfjsPromise) {
     pdfjsPromise = (async () => {
+      if (typeof window === "undefined") {
+        return (await import(
+          "pdfjs-dist/legacy/build/pdf.mjs"
+        )) as unknown as PdfjsModule;
+      }
+
       const pdfjsUrl = new URL("/pdfjs/pdf.mjs", window.location.origin).toString();
-      const workerUrl = new URL(
-        "/pdfjs/pdf.worker.mjs",
-        window.location.origin
-      ).toString();
 
       const pdfjs = (await import(
         /* webpackIgnore: true */ pdfjsUrl
       )) as PdfjsModule;
-      pdfjs.GlobalWorkerOptions.workerSrc = workerUrl;
       return pdfjs;
     })();
   }
@@ -42,16 +49,18 @@ const loadPdfjs = async () => {
 };
 
 export const readPdf = async (fileSource: PdfSource): Promise<TextItems> => {
-  if (typeof window === "undefined") {
-    throw new Error("readPdf can only run in the browser");
+  const pdfjs = await loadPdfjs();
+  if (typeof window !== "undefined" && pdfjs.GlobalWorkerOptions) {
+    pdfjs.GlobalWorkerOptions.workerSrc = new URL(
+      "/pdfjs/pdf.worker.mjs",
+      window.location.origin
+    ).toString();
   }
-
-  const { getDocument } = await loadPdfjs();
 
   const loadingTask =
     typeof fileSource === "string"
-      ? getDocument(fileSource)
-      : getDocument({ data: normalizePdfData(fileSource) });
+      ? pdfjs.getDocument(fileSource)
+      : pdfjs.getDocument({ data: normalizePdfData(fileSource) });
 
   const pdfFile: PDFDocumentProxy = await loadingTask.promise;
   let textItems: TextItems = [];

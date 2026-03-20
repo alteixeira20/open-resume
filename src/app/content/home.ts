@@ -3,7 +3,7 @@ export const HOME_HERO = {
   headline: "",
   headlineAccent: "Forge your career.",
   description:
-    "Build a clean, ATS-safe CV or resume, export it as PDF, and check how a parser would read it. Everything runs locally — no uploads, no tracking, no sign-up.",
+    "Build a clean CV or resume, export it as PDF, and check how a parser reads it. Editing, parsing, and ATS scoring happen in the browser. No sign-up required.",
   primaryCta: {
     label: "Build my CV",
     href: "/builder",
@@ -16,7 +16,8 @@ export const HOME_HERO = {
     show: "Preview Example",
     hide: "Hide Example",
   },
-  privacyNote: "No account · No uploads · No tracking · MIT licensed",
+  privacyNote:
+    "No account · Browser-based editing and parsing · MIT licensed",
 } as const;
 
 export const HOME_STEPS = {
@@ -29,7 +30,7 @@ export const HOME_STEPS = {
     },
     {
       title: "Build and preview",
-      text: "Edit sections, tune layout, see the PDF live",
+      text: "Edit sections, tune layout, and refresh the PDF preview",
       href: "/builder",
     },
     {
@@ -46,7 +47,7 @@ export const HOME_HIGHLIGHTS = {
     "Build a CV, export a clean PDF, and verify how a parser actually reads it. No accounts, no paywall, no black-box scoring.",
   items: [
     {
-      title: "ATS-safe layout",
+      title: "Parser-friendly layout",
       bullets: [
         "Keeps the document single-column, readable, and easy to extract as text.",
         "Reduces friction with ATS parsing by avoiding fragile multi-column formatting.",

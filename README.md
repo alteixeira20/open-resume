@@ -9,10 +9,10 @@
 
 <h1 align="center">CVForge</h1>
 <p align="center">
-  <strong>Forge your career. ATS-ready, EU-native.</strong>
+  <strong>Browser-based CV builder with a parser workbench.</strong>
 </p>
 <p align="center">
-  Free, open-source CV builder · Local ATS scoring · EU A4 + US Letter · Privacy-first
+  Free, open-source CV builder · Local ATS scoring · EU A4 + US Letter · No sign-up
 </p>
 <p align="center">
   <sub>Built on <a href="https://github.com/xitanggg/open-resume">OpenResume</a> by Xitang Zhao
@@ -24,7 +24,7 @@
 </p>
 
 <p align="center">
-  <img src="public/assets/ATS_scoring.png" alt="ATS scoring preview" width="85%" />
+  <img src="public/og-image.svg" alt="CVForge preview" width="85%" />
   <br />
   <em>Local ATS scoring breakdown inside the Parser Workbench.</em>
 </p>
@@ -47,7 +47,7 @@
 ## At a Glance
 > **Highlights:** CV builder, parser workbench, local ATS scoring, and no server-side CV processing.
 
-- `/builder` is the editing workbench: build a CV, preview it live, and export PDF or JSON.
+- `/builder` is the editing workbench: build a CV, refresh the PDF preview, and export PDF or JSON.
 - `/parser` is the parser workbench: upload any PDF and inspect parsing results plus ATS scoring.
 - `/resume-import` is the import hub: continue the last session, start fresh, or import PDF/JSON.
 - EU A4 and US Letter presets are supported in both building and parsing flows.
@@ -59,7 +59,7 @@ CVForge is a Next.js 16 / React 19 fork of the OpenResume project. It keeps the 
 
 The app is still built around one printable PDF template rendered with `@react-pdf/renderer`. The builder and parser are separate workbenches that share layout primitives, but they solve different problems:
 
-- The builder workbench edits Redux-backed CV state and renders the live PDF preview.
+- The builder workbench edits Redux-backed CV state and renders the PDF preview.
 - The parser workbench reads a PDF with pdf.js, reconstructs text lines and sections, extracts a resume model, and scores it heuristically.
 - The import hub bridges those flows by taking JSON exports or PDFs and moving the user back into the builder.
 
@@ -163,7 +163,7 @@ npm run build
 - `src/app/builder` — Builder Workbench route
 - `src/app/parser` — Parser Workbench route
 - `src/app/resume-import` — import hub route
-- `src/app/components/Resume` — live PDF preview and download bridge
+- `src/app/components/Resume` — PDF preview and download bridge
 - `src/app/components/ResumeForm` — builder controls and editable sections
 - `src/app/components/layout` — shared workbench shell primitives
 - `src/app/lib` — parsing, ATS scoring, Redux state, and utilities

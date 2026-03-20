@@ -1,9 +1,9 @@
 export const SITE = {
   name: "CVForge",
-  tagline: "Forge your career. ATS-ready, EU-native.",
-  shortDescription: "Local ATS scoring. EU A4 + US Letter. Privacy-first.",
+  tagline: "Browser-based CV builder with a parser workbench.",
+  shortDescription: "Local ATS scoring. EU A4 + US Letter. No sign-up required.",
   description:
-    "CVForge is a free, open-source resume and CV builder with local ATS scoring, EU A4 and US Letter presets, and privacy-first PDF export. No sign-up required.",
+    "CVForge is a free, open-source CV and resume builder with a parser workbench, local ATS scoring, and EU A4 / US Letter support. CV parsing and ATS scoring happen in the browser. No sign-up required.",
   github: "https://github.com/alteixeira20/cvforge",
   liveUrl: "https://cvforge.alexandreteixeira.dev",
   author: {

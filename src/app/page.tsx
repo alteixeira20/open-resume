@@ -16,10 +16,10 @@ const structuredData = {
   url: SITE.liveUrl,
   description: SITE.description,
   featureList: [
-    "Local ATS scoring — grade your CV offline",
+    "Local ATS scoring in the browser",
     "EU A4 and US Letter presets",
-    "ATS-friendly single-column resume templates",
-    "Privacy-first — no sign-up, no data uploads",
+    "Single-column resume template",
+    "No sign-up required",
     "PDF export and JSON backup",
     "Resume parser with field extraction transparency",
     "Typography controls: body size, name size, spacing, line height",

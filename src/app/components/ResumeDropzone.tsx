@@ -3,18 +3,20 @@ import { LockClosedIcon } from "@heroicons/react/24/solid";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { parseResumeFromPdf } from "lib/parse-resume-from-pdf";
 import {
-  clearStateFromLocalStorage,
   getHasUsedAppBefore,
   saveStateToLocalStorage,
 } from "lib/redux/local-storage";
-import { type ShowForm, initialSettings } from "lib/redux/settingsSlice";
+import { initialSettings } from "lib/redux/settingsSlice";
 import { useRouter } from "next/navigation";
 import addPdfSrc from "public/assets/add-pdf.svg";
 import Image from "next/image";
 import { cx } from "lib/cx";
 import { deepClone } from "lib/deep-clone";
-import type { RootState } from "lib/redux/store";
 import { Button } from "components/ui";
+import {
+  buildImportedPdfState,
+  parseImportedJsonState,
+} from "lib/redux/import-state";
 
 const defaultFileState = {
   name: "",
@@ -105,31 +107,25 @@ export const ResumeDropzone = ({
   };
 
   const onImportClick = async () => {
-    if (getHasUsedAppBefore()) {
-      const confirmed = window.confirm(
-        "This will overwrite your current resume and settings. Do you want to continue?"
-      );
-      if (!confirmed) {
+    if (file.type === "json" && file.file) {
+      const text = await file.file.text();
+      const importedState = parseImportedJsonState(text);
+      if (!importedState) {
+        alert("Invalid JSON format. Please use a compatible CVForge export file.");
         return;
       }
-      clearStateFromLocalStorage();
-    }
-    if (file.type === "json" && file.file) {
-      try {
-        const text = await file.file.text();
-        const parsed = JSON.parse(text) as Partial<RootState>;
-        if (!parsed?.resume || !parsed?.settings) {
-          alert("Invalid JSON format. Please use a CVForge export file.");
+
+      if (getHasUsedAppBefore()) {
+        const confirmed = window.confirm(
+          "This will overwrite your current resume and settings. Do you want to continue?"
+        );
+        if (!confirmed) {
           return;
         }
-        saveStateToLocalStorage({
-          resume: parsed.resume,
-          settings: parsed.settings,
-        } as RootState);
-        router.push("/builder");
-      } catch {
-        alert("Could not read JSON file. Please check the file and try again.");
       }
+
+      saveStateToLocalStorage(importedState);
+      router.push("/builder");
       return;
     }
     if (!file.fileUrl) {
@@ -137,28 +133,22 @@ export const ResumeDropzone = ({
       return;
     }
     const resume = await parseResumeFromPdf(file.fileUrl);
-    const settings = deepClone(initialSettings);
+    const importedState = buildImportedPdfState({
+      resume,
+      baseSettings: deepClone(initialSettings),
+      deriveFormVisibility: getHasUsedAppBefore(),
+    });
 
-    // Set formToShow settings based on uploaded resume if users have used the app before
     if (getHasUsedAppBefore()) {
-      const sections = Object.keys(settings.formToShow) as ShowForm[];
-      const hasFeaturedSkills =
-        resume.skills.featuredSkills?.some((skill) => skill.skill.trim()) ??
-        false;
-      const sectionToFormToShow: Record<ShowForm, boolean> = {
-        workExperiences: resume.workExperiences.length > 0,
-        educations: resume.educations.length > 0,
-        projects: resume.projects.length > 0,
-        skills: resume.skills.descriptions.length > 0 || hasFeaturedSkills,
-        languages: resume.languages.length > 0,
-        custom: resume.custom.descriptions.length > 0,
-      };
-      for (const section of sections) {
-        settings.formToShow[section] = sectionToFormToShow[section];
+      const confirmed = window.confirm(
+        "This will overwrite your current resume and settings. Do you want to continue?"
+      );
+      if (!confirmed) {
+        return;
       }
     }
 
-    saveStateToLocalStorage({ resume, settings });
+    saveStateToLocalStorage(importedState);
     router.push("/builder");
   };
 

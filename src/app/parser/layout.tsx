@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Parser Workbench — CVForge",
   description:
-    "Check your CV or resume ATS score for free. Local ATS scoring across parsing, structure, readability, and keyword alignment. No uploads.",
+    "Parse a CV or resume PDF in the browser and inspect local ATS scoring across parsing, structure, readability, and optional keyword alignment.",
   keywords: [
     "resume parser",
     "ats resume parser",

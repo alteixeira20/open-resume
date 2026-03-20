@@ -5,6 +5,8 @@
     "outDir": "./dist/cli",
     "module": "commonjs",
     "target": "es2019",
+    "lib": ["es2020", "dom"],
+    "types": ["node"],
     "baseUrl": "./src/app",
     "rootDir": "./",
     "isolatedModules": false,
@@ -13,7 +15,12 @@
   },
   "include": [
     "scripts/ats-score.ts",
-    "src/app/**/*.ts",
-    "src/app/**/*.tsx"
+    "src/app/lib/**/*.ts"
+  ],
+  "exclude": [
+    "src/app/**/*.test.ts",
+    "src/app/**/*.test.tsx",
+    "src/app/**/__tests__/**",
+    "src/app/lib/parse-resume-from-pdf/read-pdf.test.ts"
   ]
 }

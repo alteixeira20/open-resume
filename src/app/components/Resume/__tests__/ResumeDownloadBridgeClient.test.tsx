@@ -28,9 +28,8 @@ jest.mock("components/fonts/hooks", () => ({
 }));
 
 jest.mock("lib/parser-handoff", () => ({
-  blobToDataUrl: (...args: unknown[]) => blobToDataUrlMock(...args),
-  writeBuilderParserHandoff: (...args: unknown[]) =>
-    writeBuilderParserHandoffMock(...args),
+  blobToDataUrl: blobToDataUrlMock,
+  writeBuilderParserHandoff: writeBuilderParserHandoffMock,
   BUILDER_TO_PARSER_QUERY: "source=builder",
 }));
 

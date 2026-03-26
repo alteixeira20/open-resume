@@ -1,4 +1,4 @@
-require("@testing-library/jest-dom");
+import "@testing-library/jest-dom";
 
 if (typeof globalThis.structuredClone !== "function") {
   globalThis.structuredClone = (value: unknown) =>

@@ -71,6 +71,7 @@ describe("calculateAtsScore", () => {
         email: "john@example.com",
         phone: "+1 555 123 4567",
         url: "https://example.com",
+        github: "",
         summary:
           "Built and optimized linux docker pipelines; automated testing across ubuntu",
         location: "San Francisco, CA",
@@ -109,6 +110,7 @@ describe("calculateAtsScore", () => {
         featuredSkills: [],
         descriptions: ["Linux", "Testing", "Automation", "CI/CD"],
       },
+      languages: [],
       custom: {
         descriptions: [],
       },
@@ -154,6 +156,7 @@ describe("calculateAtsScore", () => {
         email: "",
         phone: "",
         url: "",
+        github: "",
         summary: "",
         location: "",
       },
@@ -164,6 +167,7 @@ describe("calculateAtsScore", () => {
         featuredSkills: [],
         descriptions: [],
       },
+      languages: [],
       custom: {
         descriptions: [],
       },
@@ -207,6 +211,7 @@ describe("calculateAtsScore", () => {
         email: "jane@example.com",
         phone: "+1 555 555 5555",
         url: "",
+        github: "",
         summary: "",
         location: "Lisbon, PT",
       },
@@ -214,6 +219,7 @@ describe("calculateAtsScore", () => {
       educations: [],
       projects: [],
       skills: { featuredSkills: [], descriptions: [] },
+      languages: [],
       custom: { descriptions: [] },
     };
 
@@ -235,6 +241,7 @@ describe("calculateAtsScore", () => {
         email: "jane@example.com",
         phone: "+351 912 345 678",
         url: "https://example.com",
+        github: "",
         summary: "",
         location: "Lisbon, PT",
       },
@@ -242,6 +249,7 @@ describe("calculateAtsScore", () => {
       educations: [],
       projects: [],
       skills: { featuredSkills: [], descriptions: [] },
+      languages: [],
       custom: { descriptions: [] },
     };
 

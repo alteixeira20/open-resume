@@ -21,11 +21,11 @@ export const QAS: FAQItem[] = [
     ),
   },
   {
-    question: "Q2. How does the ATS score work?",
+    question: "Q2. How does the format score work?",
     answer: (
       <>
         <p>
-          The score runs four checks, all locally in your browser:
+          The score runs three checks, all locally in your browser:
         </p>
         <p>
           <span className="font-semibold">Parsing (40 pts)</span> — did the
@@ -44,21 +44,15 @@ export const QAS: FAQItem[] = [
           no run-together words from PDF extraction artefacts?
         </p>
         <p>
-          <span className="font-semibold">Keywords (30 pts, optional)</span> —
-          only scored if you paste a job description in the CLI or API. Not
-          available in the browser UI yet.
+          The three categories total 70 points, rescaled to 100. A score above
+          75 generally means the parser read your CV cleanly and the layout is
+          solid. Lower scores point to specific issues in the suggestions list —
+          read those, and decide what actually matters for your situation.
         </p>
         <p>
-          Without a job description the score rescales to 100 across the first
-          three categories. A score above 75 is generally fine — it means the
-          parser read your CV cleanly and the layout is solid. Lower scores
-          point to specific issues in the suggestions list. Read those, decide
-          what actually matters for your situation.
-        </p>
-        <p>
-          This is a heuristic diagnostic tool, not a real ATS. Real ATS systems
-          vary enormously. The score tells you about parse quality and layout
-          choices — it says nothing about whether your CV will get you an
+          This is a heuristic formatting check, not a real ATS and not a
+          judgement of your CV's content. It tells you how cleanly a text parser
+          can read your document — nothing about whether you will get an
           interview.
         </p>
       </>
@@ -122,9 +116,9 @@ export const QAS: FAQItem[] = [
           >
             Zhigang Wen
           </a>
-          . The original project is a clean, privacy-first resume builder —
-          CVForge keeps that foundation and adds local ATS scoring, EU A4
-          support, parser diagnostics, and updated dependencies.
+          . The original project is a clean, local-first resume builder —
+          CVForge builds on that foundation with parser diagnostics, ATS-style
+          scoring, EU A4 support, and updated dependencies.
         </p>
         <p>
           Maintained by{" "}

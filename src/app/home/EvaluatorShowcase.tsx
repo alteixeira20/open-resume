@@ -15,7 +15,6 @@ const demoScore: AtsScoreResult = {
     parsing: 40,
     structure: 18,
     readability: 10,
-    keywords: 29,
   },
   issues: [],
 };

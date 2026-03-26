@@ -2,7 +2,7 @@
 import { useState } from "react";
 import type { AtsScoreResult } from "lib/ats-score";
 import { cx } from "lib/cx";
-import { formatBreakdown, scoreColor } from "lib/ats-display";
+import { formatBreakdown, scoreCategoryInsights, scoreColor } from "lib/ats-display";
 import { Card } from "components/ui";
 
 interface AtsScoreCardProps {
@@ -11,6 +11,7 @@ interface AtsScoreCardProps {
 
 export const AtsScoreCard = ({ result }: AtsScoreCardProps) => {
   const breakdown = formatBreakdown(result);
+  const categoryInsights = scoreCategoryInsights(result);
   const [expandedIssues, setExpandedIssues] = useState<Set<string>>(
     () => new Set()
   );
@@ -19,10 +20,10 @@ export const AtsScoreCard = ({ result }: AtsScoreCardProps) => {
     return (
       <Card className="mt-6">
         <h2 className="text-lg font-black text-[color:var(--color-text-primary)]">
-          ATS Score
+          Format Score
         </h2>
         <p className="mt-2 text-sm text-[color:var(--color-text-secondary)]">
-          Upload a CV to generate a local ATS readiness score.
+          Upload a CV to get a local formatting score and diagnostic breakdown.
         </p>
       </Card>
     );
@@ -32,14 +33,36 @@ export const AtsScoreCard = ({ result }: AtsScoreCardProps) => {
     <Card className="mt-6">
       <div>
         <h2 className="text-lg font-black text-[color:var(--color-text-primary)]">
-          ATS Score
+          Format Score
         </h2>
         <p className="mt-1 text-sm text-[color:var(--color-text-secondary)]">
-          Deterministic, local evaluation across parsing, structure, readability
-          {typeof result.breakdown.keywords === "number"
-            ? ", and job description alignment."
-            : "."}
+          A heuristic check of parsing reliability, layout structure, and
+          readability — all run locally in your browser.
         </p>
+        <div className="mt-4 rounded-xl border border-[color:var(--color-surface-border)] bg-[color:var(--color-surface-raised)] px-4 py-3 text-sm text-[color:var(--color-text-secondary)]">
+          <p className="font-semibold text-[color:var(--color-text-primary)]">
+            How the score is calculated
+          </p>
+          <div className="mt-3 grid gap-2 sm:grid-cols-3">
+            {[
+              "Parsing: 40 points",
+              "Structure: 20 points",
+              "Readability: 10 points",
+            ].map((item) => (
+              <div
+                key={item}
+                className="rounded-lg border border-[color:var(--color-surface-border)] bg-[color:var(--color-surface-base)] px-3 py-2 text-xs font-semibold text-[color:var(--color-text-primary)]"
+              >
+                {item}
+              </div>
+            ))}
+          </div>
+          <p className="mt-2 text-xs text-[color:var(--color-text-muted)]">
+            The three categories total 70 points, rescaled to 100. This tool
+            checks whether your CV is well-structured for text parsing — it does
+            not evaluate content, relevance, or job fit.
+          </p>
+        </div>
         <div className="mt-4">
           <p className="text-sm uppercase tracking-wide text-[color:var(--color-text-muted)]">
             Score
@@ -69,10 +92,13 @@ export const AtsScoreCard = ({ result }: AtsScoreCardProps) => {
       </div>
 
       {breakdown.length > 0 && (
-        <dl className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <dl className="mt-6 grid gap-3 sm:grid-cols-3">
           {breakdown.map((item) => (
-            <div key={item.label} className="rounded-md border border-[color:var(--color-surface-border)] p-4">
-              <dt className="text-sm font-medium text-[color:var(--color-text-secondary)]">{item.label}</dt>
+            <div
+              key={item.label}
+              className="rounded-xl border border-[color:var(--color-surface-border)] bg-[color:var(--color-surface-base)]/70 p-4"
+            >
+              <dt className="text-xs font-semibold uppercase tracking-wide text-[color:var(--color-text-muted)]">{item.label}</dt>
               <dd className="mt-2 flex items-baseline gap-2 text-xl font-semibold text-[color:var(--color-text-primary)]">
                 <span>{Math.round(item.value)}</span>
                 <span className="text-xs font-normal text-[color:var(--color-text-muted)]">/ {item.max}</span>
@@ -90,6 +116,58 @@ export const AtsScoreCard = ({ result }: AtsScoreCardProps) => {
             </div>
           ))}
         </dl>
+      )}
+
+      {categoryInsights.length > 0 && (
+        <div className="mt-6 space-y-3">
+          <div>
+            <h3 className="text-sm font-semibold uppercase tracking-wide text-[color:var(--color-text-muted)]">
+              Point attribution
+            </h3>
+            <p className="mt-1 text-xs text-[color:var(--color-text-muted)]">
+              Each block shows the category total first, then the specific signals that kept or cost points.
+            </p>
+          </div>
+          {categoryInsights.map((category) => (
+            <div
+              key={category.label}
+              className="rounded-xl border border-[color:var(--color-surface-border)] bg-[color:var(--color-surface-raised)] px-4 py-3"
+            >
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <p className="text-sm font-semibold text-[color:var(--color-text-primary)]">
+                    {category.label}
+                  </p>
+                  <p className="mt-1 text-xs text-[color:var(--color-text-muted)]">
+                    {category.summary}
+                  </p>
+                </div>
+                <p className="text-sm font-black text-[color:var(--color-text-primary)]">
+                  {Math.round(category.value)} / {category.max}
+                </p>
+              </div>
+              <div className="mt-3 space-y-2">
+                {category.why.map((item) => (
+                  <div
+                    key={`${category.label}-${item.issue}`}
+                    className="rounded-lg border border-[color:var(--color-surface-border)] bg-[color:var(--color-surface-base)] px-3 py-2"
+                  >
+                    <p className="text-sm font-medium text-[color:var(--color-text-primary)]">
+                      {item.issue}
+                    </p>
+                    {item.details.length > 0 && (
+                      <ul className="mt-1 space-y-1 text-xs leading-relaxed text-[color:var(--color-text-secondary)]">
+                        {item.details.map((detail) => (
+                          <li key={detail}>{detail}</li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
       )}
 
       {result.issues.length > 0 && (
@@ -156,8 +234,9 @@ export const AtsScoreCard = ({ result }: AtsScoreCardProps) => {
       )}
 
       <p className="mt-6 text-xs text-[color:var(--color-text-muted)]">
-        Disclaimer: this score is a diagnostic aid, not a guarantee of interviews or outcomes.
-        Use it to check parsing quality and refine layout, and apply your own judgment.
+        This score is a heuristic formatting aid, not a guarantee of any outcome.
+        It tells you how cleanly a text parser can read your CV — nothing more.
+        Use your own judgement on the suggestions.
       </p>
     </Card>
   );

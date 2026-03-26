@@ -6,9 +6,9 @@ describe("AtsScoreCard", () => {
   const baseResult: AtsScoreResult = {
     score: 82,
     breakdown: {
-      parsing: 30,
-      structure: 18,
-      readability: 9,
+      parsing: 45,
+      structure: 22,
+      readability: 15,
     },
     issues: ["Email not found", "Few metrics detected"],
   };

@@ -121,11 +121,11 @@ describe("calculateAtsScore", () => {
       resume,
     });
 
-    // parsing(40) + structure(20) + readability(8) = 68 → (68/70)*100 = 97
-    expect(result.score).toBe(97);
-    expect(result.breakdown.parsing).toBe(40);
-    expect(result.breakdown.structure).toBe(20);
-    expect(result.breakdown.readability).toBe(8);
+    // parsing(60) + structure(25) + readability(10) = 95
+    expect(result.score).toBe(95);
+    expect(result.breakdown.parsing).toBe(60);
+    expect(result.breakdown.structure).toBe(25);
+    expect(result.breakdown.readability).toBe(10);
     expect(result.issues).toEqual(
       expect.arrayContaining(["Limited quantifiable impact statements"])
     );
@@ -192,8 +192,7 @@ describe("calculateAtsScore", () => {
       result.breakdown.parsing +
       result.breakdown.structure +
       result.breakdown.readability;
-    const expected = Math.round((subtotal / 70) * 100);
-    expect(result.score).toBe(expected);
+    expect(result.score).toBe(subtotal);
   });
 
   it("does not treat email as a URL", () => {

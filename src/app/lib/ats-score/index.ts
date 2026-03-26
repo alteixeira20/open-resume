@@ -32,10 +32,8 @@ export interface AtsScoreInput {
   locale?: ResumeLocale;
 }
 
-// Score is always out of 70 (parsing 40 + structure 20 + readability 10),
-// rescaled to 100. This keeps the tool honest: it measures parse quality
-// and layout — not job-description fit.
-const MAX_RAW_SCORE = 70;
+// Score is the direct sum of three categories:
+// Parsing (max 60) + Structure (max 25) + Readability (max 15) = 100 maximum.
 
 export const calculateAtsScore = (input: AtsScoreInput): AtsScoreResult => {
   const textItems = input.textItems ?? [];
@@ -70,8 +68,7 @@ export const calculateAtsScore = (input: AtsScoreInput): AtsScoreResult => {
     issueDetails
   );
 
-  const total = parsingScore + structureScore + readabilityScore;
-  const score = clamp(Math.round((total / MAX_RAW_SCORE) * 100), 0, 100);
+  const score = clamp(parsingScore + structureScore + readabilityScore, 0, 100);
 
   return {
     score,
@@ -115,7 +112,7 @@ const scoreParsingReliability = (
     scoreEducationSection(educations, issues, issueDetails) +
     scoreWorkSection(workExperiences, issues, issueDetails);
 
-  return clamp(score, 0, 40);
+  return clamp(score, 0, 60);
 };
 
 const scoreLinks = (
@@ -129,7 +126,7 @@ const scoreLinks = (
   const textMatches = textItems.some((item) => containsUrl(item.text));
 
   if (containsUrl(profileUrl) || containsUrl(githubUrl) || textMatches) {
-    return 5;
+    return 7;
   }
 
   issues.push("No links detected");
@@ -154,7 +151,7 @@ const scoreStructure = (
   score += scoreBulletStyle(lines, issues, issueDetails);
   score += scoreLength(textItems, issues, issueDetails, locale);
 
-  return clamp(score, 0, 20);
+  return clamp(score, 0, 25);
 };
 
 const scoreSingleColumn = (
@@ -177,7 +174,7 @@ const scoreSingleColumn = (
   const significant = entries.filter(([, count]) => count / total >= 0.1);
 
   if (significant.length <= 1) {
-    return 6;
+    return 8;
   }
 
   const spread =
@@ -192,7 +189,7 @@ const scoreSingleColumn = (
     return 0;
   }
 
-  return 4;
+  return 5;
 };
 
 const getLineLeft = (line: TextItem[]) => {
@@ -233,7 +230,7 @@ const scoreNameField = (
     .some((line) => normalizeComparable(lineToText(line)).includes(normalizeComparable(name)));
 
   if (lettersOnly && hasTwoWords && appearsInHeader) {
-    return 8;
+    return 12;
   }
 
   issues.push("Name recognition uncertain");
@@ -243,7 +240,7 @@ const scoreNameField = (
   if (!appearsInHeader) nameChecks.push("Not detected in top lines.");
   addIssueDetail(issueDetails, "Name recognition uncertain", nameChecks);
   if (hasTwoWords || appearsInHeader) {
-    return 4;
+    return 6;
   }
 
   return 0;
@@ -261,7 +258,7 @@ const scoreEmailField = (
     ]);
     return 0;
   }
-  return 6;
+  return 9;
 };
 
 const scorePhoneField = (
@@ -283,17 +280,17 @@ const scorePhoneField = (
     const usPattern =
       /^(?:\+1\s?)?(?:\(\d{3}\)|\d{3})[\s-]?\d{3}[\s-]?\d{4}$/;
     if (usPattern.test(phone.trim())) {
-      return 6;
+      return 9;
     }
   } else {
     const euPattern = /^\+?[\d\s\-()]{7,}$/;
     if (digits >= 9 && digits <= 15 && euPattern.test(phone.trim())) {
-      return 6;
+      return 9;
     }
   }
 
   if (digits >= 9 && /^\+?[\d\s\-()]{7,}$/.test(phone.trim())) {
-    return 6;
+    return 9;
   }
 
   issues.push("Phone number format unclear");
@@ -301,7 +298,7 @@ const scorePhoneField = (
     `Detected: "${phone}"`,
     "Try +351 9xx xxx xxx (EU) or (123) 456-7890 (US).",
   ]);
-  return 2;
+  return 3;
 };
 
 const scoreLocationField = (
@@ -329,7 +326,7 @@ const scoreLocationField = (
   );
 
   if (canonicalPattern.test(location.trim()) && appears) {
-    return 5;
+    return 8;
   }
 
   issues.push("Location format unusual");
@@ -337,7 +334,7 @@ const scoreLocationField = (
     `Detected: "${location}"`,
     "Use City, Country (EU) or City, ST (US).",
   ]);
-  return appears ? 3 : 1;
+  return appears ? 5 : 1;
 };
 
 const detectLocale = (resume: Resume): ResumeLocale => {
@@ -377,7 +374,7 @@ const scoreEducationSection = (
   );
 
   if (strong) {
-    return 5;
+    return 8;
   }
 
   const partial = educations.some(
@@ -395,7 +392,7 @@ const scoreEducationSection = (
       : null;
   }).filter(Boolean) as string[];
   addIssueDetail(issueDetails, "Education details incomplete", missing);
-  return partial ? 3 : 1;
+  return partial ? 5 : 1;
 };
 
 const scoreWorkSection = (
@@ -419,7 +416,7 @@ const scoreWorkSection = (
   );
 
   if (strong) {
-    return 5;
+    return 7;
   }
 
   const partial = workExperiences.some(
@@ -439,7 +436,7 @@ const scoreWorkSection = (
       : null;
   }).filter(Boolean) as string[];
   addIssueDetail(issueDetails, "Work experience details incomplete", missing);
-  return partial ? 3 : 1;
+  return partial ? 4 : 1;
 };
 
 const scoreHeadings = (
@@ -483,21 +480,21 @@ const scoreHeadings = (
   });
 
   if (recognized.length >= 3) {
-    return 6;
+    return 7;
   }
   if (recognized.length > 0) {
     issues.push("Some headings may be hard to detect");
     addIssueDetail(issueDetails, "Some headings may be hard to detect", [
       `Detected headings: ${headings.join(", ")}`,
     ]);
-    return 4;
+    return 5;
   }
 
   issues.push("Headings formatting unclear");
   addIssueDetail(issueDetails, "Headings formatting unclear", [
     `Detected headings: ${headings.join(", ")}`,
   ]);
-  return 2;
+  return 3;
 };
 
 const hasTitleShape = (text: string) => /[A-Z][a-z]+/.test(text);
@@ -507,7 +504,7 @@ const scoreBulletStyle = (
   issues: string[],
   issueDetails: Record<string, string[]>
 ) => {
-  if (!lines.length) return 4;
+  if (!lines.length) return 5;
 
   const textLines = lines.map((line) => line.map((item) => item.text).join(" "));
   const bulletRegex = /^\s*(?:[-•◦·*]|\d+[.)])/;
@@ -522,17 +519,17 @@ const scoreBulletStyle = (
   }
 
   if (cleanBullets / textLines.length >= 0.1) {
-    return 4;
+    return 5;
   }
   if (cleanBullets > 0) {
-    return 3;
+    return 4;
   }
 
   issues.push("Few bullet points detected");
   addIssueDetail(issueDetails, "Few bullet points detected", [
     `Detected ${cleanBullets} bullet lines.`,
   ]);
-  return 2;
+  return 3;
 };
 
 const scoreLength = (
@@ -541,12 +538,12 @@ const scoreLength = (
   issueDetails: Record<string, string[]>,
   locale: ResumeLocale
 ) => {
-  if (!textItems.length) return 4;
+  if (!textItems.length) return 5;
 
   const pages = aggregatePages(textItems);
   const pageCount = pages.length;
 
-  if (pageCount === 0) return 4;
+  if (pageCount === 0) return 5;
 
   const effectiveLength = pages.reduce((acc, page) => acc + page.effectiveHeight, 0);
 
@@ -554,7 +551,7 @@ const scoreLength = (
   const slightOverThreshold = locale === "eu" ? 1.3 : 1.25;
 
   if (pageCount === 1 && effectiveLength <= singlePageThreshold) {
-    return 4;
+    return 5;
   }
 
   if (effectiveLength <= slightOverThreshold) {
@@ -562,7 +559,7 @@ const scoreLength = (
     addIssueDetail(issueDetails, "Slightly over one page", [
       `Estimated length ≈ ${(effectiveLength * 100).toFixed(0)}% of one page.`,
     ]);
-    return 3;
+    return 4;
   }
 
   if (effectiveLength <= 2) {
@@ -624,7 +621,7 @@ const scoreReadability = (
   const urlsScore = scorePlainUrls(joinedText, issues, issueDetails);
   const punctuationScore = scoreGluedWords(joinedText, issues, issueDetails);
 
-  return clamp(metricsScore + urlsScore + punctuationScore, 0, 10);
+  return clamp(metricsScore + urlsScore + punctuationScore, 0, 15);
 };
 
 const scoreMetrics = (
@@ -635,7 +632,7 @@ const scoreMetrics = (
   const metrics = collectMetricTokens(text);
 
   if (metrics.size >= 3) {
-    return 5;
+    return 8;
   }
   if (metrics.size >= 1) {
     issues.push("Limited quantifiable impact statements");
@@ -644,14 +641,14 @@ const scoreMetrics = (
       "Limited quantifiable impact statements",
       Array.from(metrics).slice(0, 8)
     );
-    return 3;
+    return 5;
   }
 
   issues.push("Few metrics detected");
   addIssueDetail(issueDetails, "Few metrics detected", [
     "Add concrete numbers (%, $, time saved, scale, volume).",
   ]);
-  return 1;
+  return 2;
 };
 
 const scorePlainUrls = (
@@ -660,13 +657,13 @@ const scorePlainUrls = (
   issueDetails: Record<string, string[]>
 ) => {
   if (containsUrl(text)) {
-    return 3;
+    return 4;
   }
   issues.push("Consider adding raw URLs");
   addIssueDetail(issueDetails, "Consider adding raw URLs", [
     "Include full LinkedIn/GitHub or project URLs as visible text.",
   ]);
-  return 1;
+  return 2;
 };
 
 const scoreGluedWords = (
@@ -694,7 +691,7 @@ const scoreGluedWords = (
   });
 
   if (!gluedTokens.length) {
-    return 2;
+    return 3;
   }
 
   if (gluedTokens.length <= 2) {
@@ -704,7 +701,7 @@ const scoreGluedWords = (
       "Minor spacing issues detected",
       Array.from(new Set(gluedTokens)).slice(0, 10)
     );
-    return 1;
+    return 2;
   }
 
   issues.push("Multiple run-together words detected");

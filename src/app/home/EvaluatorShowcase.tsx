@@ -10,11 +10,11 @@ import { Section } from "components/layout/Section";
 import { Button, SectionHeading } from "components/ui";
 
 const demoScore: AtsScoreResult = {
-  score: 97,
+  score: 95,
   breakdown: {
-    parsing: 40,
-    structure: 18,
-    readability: 10,
+    parsing: 60,
+    structure: 22,
+    readability: 13,
   },
   issues: [],
 };

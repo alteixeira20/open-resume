@@ -6,9 +6,9 @@ export const formatBreakdown = (
   if (!result) return [];
 
   return [
-    { label: "Parsing", value: result.breakdown.parsing, max: 40 },
-    { label: "Structure", value: result.breakdown.structure, max: 20 },
-    { label: "Readability", value: result.breakdown.readability, max: 10 },
+    { label: "Parsing", value: result.breakdown.parsing, max: 60 },
+    { label: "Structure", value: result.breakdown.structure, max: 25 },
+    { label: "Readability", value: result.breakdown.readability, max: 15 },
   ];
 };
 

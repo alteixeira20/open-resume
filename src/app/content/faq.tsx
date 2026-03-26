@@ -28,23 +28,23 @@ export const QAS: FAQItem[] = [
           The score runs three checks, all locally in your browser:
         </p>
         <p>
-          <span className="font-semibold">Parsing (40 pts)</span> — did the
+          <span className="font-semibold">Parsing (60 pts)</span> — did the
           parser successfully extract your name, email, phone, location, links,
           education, and work experience? Missing or garbled fields lose points
           here.
         </p>
         <p>
-          <span className="font-semibold">Structure (20 pts)</span> — is the
+          <span className="font-semibold">Structure (25 pts)</span> — is the
           layout single-column, are section headings recognisable, are bullets
           used consistently, and is the length appropriate for the format?
         </p>
         <p>
-          <span className="font-semibold">Readability (10 pts)</span> — are
+          <span className="font-semibold">Readability (15 pts)</span> — are
           there quantifiable results (numbers, percentages), visible URLs, and
           no run-together words from PDF extraction artefacts?
         </p>
         <p>
-          The three categories total 70 points, rescaled to 100. A score above
+          The three categories add up directly to 100. A score above
           75 generally means the parser read your CV cleanly and the layout is
           solid. Lower scores point to specific issues in the suggestions list —
           read those, and decide what actually matters for your situation.

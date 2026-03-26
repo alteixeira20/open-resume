@@ -52,9 +52,9 @@ Options:
 const prettify = (result: AtsScoreResult) => {
   const lines = [
     `Format Score: ${result.score}`,
-    `- Parsing: ${result.breakdown.parsing}/40`,
-    `- Structure: ${result.breakdown.structure}/20`,
-    `- Readability: ${result.breakdown.readability}/10`,
+    `- Parsing: ${result.breakdown.parsing}/60`,
+    `- Structure: ${result.breakdown.structure}/25`,
+    `- Readability: ${result.breakdown.readability}/15`,
   ];
 
   if (result.issues.length) {

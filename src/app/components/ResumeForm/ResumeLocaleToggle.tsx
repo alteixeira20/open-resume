@@ -12,15 +12,24 @@ const LOCALE_OPTIONS: Array<{ id: ResumeLocale; label: string }> = [
   { id: "us", label: "US (Letter)" },
 ];
 
-export const ResumeLocaleToggle = () => {
+export const ResumeLocaleToggle = ({
+  showLabel = true,
+}: {
+  showLabel?: boolean;
+}) => {
   const settings = useAppSelector(selectSettings);
   const dispatch = useAppDispatch();
 
   return (
     <div>
-      <InputGroupWrapper label="Resume Region" />
+      {showLabel && (
+        <InputGroupWrapper
+          label="Resume region"
+          className="text-sm font-semibold text-[color:var(--color-text-primary)]"
+        />
+      )}
       <select
-        className="mt-2 inline-flex h-9 w-auto rounded-md border border-gray-300 bg-white px-3 text-sm font-medium text-gray-700 shadow-sm focus:border-gray-400 focus:outline-none"
+        className={`${showLabel ? "mt-2" : ""} inline-flex h-10 min-w-[180px] rounded-lg border border-[color:var(--color-surface-border)] bg-white px-3 text-sm font-medium text-[color:var(--color-text-primary)] shadow-sm focus:border-[color:var(--color-brand-primary)] focus:outline-none focus:ring-2 focus:ring-[color:var(--color-brand-primary)]/20`}
         value={settings.resumeLocale}
         onChange={(event) =>
           dispatch(

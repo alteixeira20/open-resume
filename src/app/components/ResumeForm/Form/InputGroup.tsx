@@ -31,7 +31,9 @@ export const InputGroupWrapper = ({
   labelAction?: React.ReactNode;
   children?: React.ReactNode;
 }) => (
-  <label className={`text-base font-medium text-gray-700 ${className}`}>
+  <label
+    className={`text-sm font-semibold text-[color:var(--color-text-primary)] ${className}`}
+  >
     <div className="flex items-center gap-2">
       <span>{label}</span>
       {labelAction}
@@ -41,7 +43,7 @@ export const InputGroupWrapper = ({
 );
 
 export const INPUT_CLASS_NAME =
-  "mt-1 px-3 py-2 block w-full rounded-md border border-gray-300 text-gray-900 shadow-sm outline-none font-normal text-base";
+  "mt-2 block w-full rounded-lg border border-[color:var(--color-surface-border)] bg-[color:var(--color-surface-raised)]/80 px-3 py-2 text-base font-normal text-[color:var(--color-text-primary)] shadow-sm outline-none transition focus:border-[color:var(--color-brand-primary)] focus:ring-2 focus:ring-[color:var(--color-brand-primary)]/15";
 
 export const Input = <K extends string>({
   name,
@@ -88,7 +90,7 @@ export const Input = <K extends string>({
         className={INPUT_CLASS_NAME}
       />
       {typeof maxLength === "number" && showCounter && (
-        <div className="mt-1 text-right text-xs text-gray-500">
+        <div className="mt-1 text-right text-xs text-[color:var(--color-text-muted)]">
           {clampedValue.length}/{maxLength}
         </div>
       )}
@@ -143,7 +145,7 @@ export const Textarea = <T extends string>({
         }}
       />
       {typeof maxLength === "number" && showCounter && (
-        <div className="mt-1 text-right text-xs text-gray-500">
+        <div className="mt-1 text-right text-xs text-[color:var(--color-text-muted)]">
           {clampedValue.length}/{maxLength}
         </div>
       )}
@@ -238,7 +240,7 @@ const BulletListTextareaGeneral = <T extends string>({
         html={html}
       />
       {typeof maxLength === "number" && showCounter && (
-        <div className="mt-1 text-right text-xs text-gray-500">
+        <div className="mt-1 text-right text-xs text-[color:var(--color-text-muted)]">
           {totalLength}/{maxLength * Math.max(1, normalizedStrings.length)}
         </div>
       )}

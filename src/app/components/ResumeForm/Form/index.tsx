@@ -44,7 +44,7 @@ export const BaseForm = ({
 }) => (
   <section
     id={id}
-    className={`flex flex-col gap-3 rounded-md border border-[color:var(--color-surface-border)] bg-white/70 p-6 pt-4 shadow-sm backdrop-blur-sm transition-opacity duration-200 ${className}`}
+    className={`flex flex-col gap-3 rounded-md border border-[color:var(--color-surface-border)] bg-[color:var(--color-surface-base)]/85 p-6 pt-4 shadow-sm backdrop-blur-sm transition-opacity duration-200 ${className}`}
   >
     {children}
   </section>
@@ -97,10 +97,10 @@ export const Form = ({
     >
       <div className="flex items-center justify-between gap-4">
         <div className="flex grow items-center gap-2">
-          <Icon className="h-6 w-6 text-gray-600" aria-hidden="true" />
+          <Icon className="h-6 w-6 text-[color:var(--color-text-secondary)]" aria-hidden="true" />
           <input
             type="text"
-            className="block w-full border-b border-transparent text-lg font-semibold tracking-wide text-gray-900 outline-none hover:border-gray-300 hover:shadow-sm focus:border-gray-300 focus:shadow-sm"
+            className="block w-full border-b border-transparent text-lg font-semibold tracking-wide text-[color:var(--color-text-primary)] outline-none hover:border-[color:var(--color-surface-border)] hover:shadow-sm focus:border-[color:var(--color-surface-border)] focus:shadow-sm"
             value={heading}
             onChange={(e) => setHeading(e.target.value)}
           />
@@ -125,10 +125,10 @@ export const Form = ({
             onClick={() => {
               dispatch(addSectionInForm({ form }));
             }}
-            className="flex items-center rounded-md bg-white py-2 pl-3 pr-4 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+            className="flex items-center rounded-md bg-[color:var(--color-surface-base)] py-2 pl-3 pr-4 text-sm font-semibold text-[color:var(--color-text-primary)] shadow-sm ring-1 ring-inset ring-[color:var(--color-surface-border)] hover:bg-[color:var(--color-surface-raised)]"
           >
             <PlusSmallIcon
-              className="-ml-0.5 mr-1.5 h-5 w-5 text-gray-400"
+              className="-ml-0.5 mr-1.5 h-5 w-5 text-[color:var(--color-text-muted)]"
               aria-hidden="true"
             />
             {addButtonText}
@@ -167,7 +167,7 @@ export const FormSection = ({
   return (
     <>
       {idx !== 0 && (
-        <div className="mb-4 mt-6 border-t-2 border-dotted border-gray-200" />
+        <div className="mb-4 mt-6 border-t-2 border-dotted border-[color:var(--color-surface-border)]" />
       )}
       <div className="relative grid grid-cols-6 gap-3">
         {children}

@@ -1,9 +1,19 @@
+import { Cog6ToothIcon, ChevronDownIcon } from "@heroicons/react/24/outline";
+import { ExpanderWithHeightTransition } from "components/ExpanderWithHeightTransition";
 import { BaseForm } from "components/ResumeForm/Form";
-import { InputGroupWrapper } from "components/ResumeForm/Form/InputGroup";
-import { THEME_COLORS } from "components/ResumeForm/ThemeForm/constants";
-import { InlineInput } from "components/ResumeForm/ThemeForm/InlineInput";
 import { FontFamilySelectionsCSR } from "components/ResumeForm/ThemeForm/Selection";
+import {
+  clampNumericSettingDraft,
+  getDefaultThemeDraftSettings,
+  normalizeThemeColorDraft,
+  NUMERIC_SETTING_META,
+  THEME_COLORS,
+  type NumericThemeDraftField,
+  type ThemeDraftField,
+  type ThemeDraftSettings,
+} from "components/ResumeForm/ThemeForm/constants";
 import { ResumeLocaleToggle } from "components/ResumeForm/ResumeLocaleToggle";
+import { useAppDispatch, useAppSelector } from "lib/redux/hooks";
 import {
   changeSettings,
   DEFAULT_THEME_COLOR,
@@ -11,437 +21,290 @@ import {
   selectSettings,
   setSettings,
   type GeneralSetting,
+  type Settings,
 } from "lib/redux/settingsSlice";
-import { useAppDispatch, useAppSelector } from "lib/redux/hooks";
-import { Cog6ToothIcon } from "@heroicons/react/24/outline";
-import { selectResume } from "lib/redux/resumeSlice";
-import { saveStateToLocalStorage } from "lib/redux/local-storage";
-import { Button, Card } from "components/ui";
-import { useEffect, useState } from "react";
+import {
+  useEffect,
+  useState,
+  type FocusEventHandler,
+  type KeyboardEventHandler,
+  type MouseEventHandler,
+} from "react";
 
+// ─── Sub-label used inside the Advanced section ───────────────────────────────
+const GroupLabel = ({ title }: { title: string }) => (
+  <p className="mb-1 mt-5 text-[10px] font-black uppercase tracking-widest text-[color:var(--color-text-muted)] first:mt-0">
+    {title}
+  </p>
+);
+
+// ─── Compact numeric row: label left, input right ────────────────────────────
+const CompactNumericRow = ({
+  field,
+  value,
+  onChange,
+  onBlur,
+  onKeyDown,
+  onKeyUp,
+  onMouseUp,
+}: {
+  field: NumericThemeDraftField;
+  value: string;
+  onChange: (field: NumericThemeDraftField, value: string) => void;
+  onBlur: FocusEventHandler<HTMLInputElement>;
+  onKeyDown: KeyboardEventHandler<HTMLInputElement>;
+  onKeyUp: KeyboardEventHandler<HTMLInputElement>;
+  onMouseUp: MouseEventHandler<HTMLInputElement>;
+}) => {
+  const meta = NUMERIC_SETTING_META[field];
+  return (
+    <div className="flex items-center justify-between gap-3 py-1.5 pl-3">
+      <span className="leading-none text-sm text-[color:var(--color-text-primary)]">
+        {meta.label}
+      </span>
+      <input
+        type="number"
+        min={meta.min}
+        max={meta.max}
+        step={meta.step}
+        value={value}
+        onChange={(e) => onChange(field, e.target.value)}
+        onBlur={onBlur}
+        onKeyDown={onKeyDown}
+        onKeyUp={onKeyUp}
+        onMouseUp={onMouseUp}
+        className="h-8 w-20 rounded-md border border-[color:var(--color-surface-border)] bg-[color:var(--color-surface-base)] px-2 text-center text-sm font-semibold text-[color:var(--color-text-primary)] outline-none transition focus:border-[color:var(--color-brand-primary)] focus:ring-2 focus:ring-[color:var(--color-brand-primary)]/20 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+      />
+    </div>
+  );
+};
+
+// ─── Section label shared by Basic and Advanced sections ─────────────────────
+const SectionLabel = ({ children }: { children: React.ReactNode }) => (
+  <p className="mb-2 text-[10px] font-black uppercase tracking-widest text-[color:var(--color-text-muted)]">
+    {children}
+  </p>
+);
+
+// ─── Helpers ─────────────────────────────────────────────────────────────────
+const fieldsByGroup = (groupId: string): NumericThemeDraftField[] =>
+  (Object.keys(NUMERIC_SETTING_META) as NumericThemeDraftField[]).filter(
+    (f) => NUMERIC_SETTING_META[f].group === groupId
+  );
+
+const ADVANCED_GROUPS: Array<{ id: string; label: string }> = [
+  { id: "type", label: "Typography" },
+  { id: "document", label: "Document" },
+  { id: "profile", label: "Profile header" },
+  { id: "entries", label: "Entry spacing" },
+];
+
+// ─── Main component ───────────────────────────────────────────────────────────
 export const ThemeForm = () => {
-  const sectionTitleClassName = "text-base font-semibold text-gray-900";
   const settings = useAppSelector(selectSettings);
-  const resume = useAppSelector(selectResume);
-  const {
-    fontSize,
-    fontFamily,
-    lineHeight,
-    sectionSpacing,
-    linksSummarySpacing,
-    languagesSpacing,
-    companyRoleSpacing,
-    companyItemSpacing,
-    schoolDegreeSpacing,
-    projectItemSpacing,
-    topBarHeight,
-  } = settings;
-  const themeColor = settings.themeColor || DEFAULT_THEME_COLOR;
   const dispatch = useAppDispatch();
-  const [draftSettings, setDraftSettings] = useState({
-    themeColor: settings.themeColor ?? "",
-    sectionSpacing: sectionSpacing ?? "",
-    linksSummarySpacing: linksSummarySpacing ?? "",
-    languagesSpacing: languagesSpacing ?? "",
-    companyRoleSpacing: companyRoleSpacing ?? "",
-    companyItemSpacing: companyItemSpacing ?? "",
-    schoolDegreeSpacing: schoolDegreeSpacing ?? "",
-    projectItemSpacing: projectItemSpacing ?? "",
-    topBarHeight: topBarHeight ?? "",
-    lineHeight: lineHeight ?? "",
-    fontSize: fontSize ?? "",
-    nameFontSize: settings.nameFontSize ?? "",
-    sectionHeadingSize: settings.sectionHeadingSize ?? "",
-  });
+  const { fontFamily, themeColor } = settings;
+  const appliedThemeColor = settings.themeColor || DEFAULT_THEME_COLOR;
+
+  const [draftSettings, setDraftSettings] = useState<ThemeDraftSettings>(
+    getDefaultThemeDraftSettings(settings)
+  );
+  const [showAdvanced, setShowAdvanced] = useState(false);
 
   useEffect(() => {
-    setDraftSettings({
-      themeColor: settings.themeColor ?? "",
-      sectionSpacing: settings.sectionSpacing ?? "",
-      linksSummarySpacing: settings.linksSummarySpacing ?? "",
-      languagesSpacing: settings.languagesSpacing ?? "",
-      companyRoleSpacing: settings.companyRoleSpacing ?? "",
-      companyItemSpacing: settings.companyItemSpacing ?? "",
-      schoolDegreeSpacing: settings.schoolDegreeSpacing ?? "",
-      projectItemSpacing: settings.projectItemSpacing ?? "",
-      topBarHeight: settings.topBarHeight ?? "",
-      lineHeight: settings.lineHeight ?? "",
-      fontSize: settings.fontSize ?? "",
-      nameFontSize: settings.nameFontSize ?? "",
-      sectionHeadingSize: settings.sectionHeadingSize ?? "",
-    });
+    setDraftSettings(getDefaultThemeDraftSettings(settings));
   }, [settings]);
 
   const refreshPreview = () => {
+    if (typeof window === "undefined") return;
     window.dispatchEvent(new CustomEvent("resume:refresh-preview"));
   };
 
-  const handleSettingsChange = (
+  const commitSetting = (
     field: GeneralSetting,
     value: string,
-    refresh = false
+    refresh = true
   ) => {
     dispatch(changeSettings({ field, value }));
     if (refresh) refreshPreview();
   };
 
-  const handleDraftChange = (field: keyof typeof draftSettings, value: string) => {
+  const handleDraftChange = (field: ThemeDraftField, value: string) => {
     setDraftSettings((prev) => ({ ...prev, [field]: value }));
   };
 
-  const commitDraftSetting = (
-    field: keyof typeof draftSettings,
-    nextValue: string
-  ) => {
-    setDraftSettings((prev) => ({ ...prev, [field]: nextValue }));
-    const currentValue = settings[field as keyof typeof settings];
-    if (nextValue === currentValue) return;
-    handleSettingsChange(field as GeneralSetting, nextValue, true);
+  const commitThemeColor = (rawValue: string) => {
+    const nextValue = normalizeThemeColorDraft(rawValue, settings.themeColor);
+    setDraftSettings((prev) => ({ ...prev, themeColor: nextValue }));
+    if (nextValue === settings.themeColor) return;
+    commitSetting("themeColor", nextValue);
   };
 
-  const handleSettingsInputKeyDown =
-    (field: keyof typeof draftSettings): React.KeyboardEventHandler<HTMLInputElement> =>
-    (event) => {
-      if (event.key === "Enter") {
-        commitDraftSetting(field, event.currentTarget.value);
-        event.currentTarget.blur();
+  const commitNumericSetting = (
+    field: NumericThemeDraftField,
+    rawValue: string
+  ) => {
+    const nextValue = clampNumericSettingDraft(field, rawValue);
+    setDraftSettings((prev) => ({ ...prev, [field]: nextValue }));
+    if (nextValue === settings[field as keyof Settings]) return;
+    commitSetting(field as GeneralSetting, nextValue);
+  };
+
+  const handleNumericBlur =
+    (field: NumericThemeDraftField): FocusEventHandler<HTMLInputElement> =>
+    (e) =>
+      commitNumericSetting(field, e.currentTarget.value);
+
+  const handleNumericKeyDown =
+    (field: NumericThemeDraftField): KeyboardEventHandler<HTMLInputElement> =>
+    (e) => {
+      if (e.key === "Enter") {
+        commitNumericSetting(field, e.currentTarget.value);
+        e.currentTarget.blur();
       }
     };
 
-  const handleSettingsInputBlur =
-    (field: keyof typeof draftSettings): React.FocusEventHandler<HTMLInputElement> =>
-    (event) => {
-      commitDraftSetting(field, event.currentTarget.value);
+  const handleNumericKeyUp =
+    (field: NumericThemeDraftField): KeyboardEventHandler<HTMLInputElement> =>
+    (e) => {
+      if (["ArrowUp", "ArrowDown"].includes(e.key))
+        commitNumericSetting(field, e.currentTarget.value);
     };
 
-  const handleSettingsNumberMouseUp =
-    (field: keyof typeof draftSettings): React.MouseEventHandler<HTMLInputElement> =>
-    (event) => {
-      commitDraftSetting(field, event.currentTarget.value);
-    };
+  const handleNumericMouseUp =
+    (field: NumericThemeDraftField): MouseEventHandler<HTMLInputElement> =>
+    (e) =>
+      commitNumericSetting(field, e.currentTarget.value);
 
-  const handleSettingsNumberKeyUp =
-    (field: keyof typeof draftSettings): React.KeyboardEventHandler<HTMLInputElement> =>
-    (event) => {
-      if (!["ArrowUp", "ArrowDown"].includes(event.key)) return;
-      commitDraftSetting(field, event.currentTarget.value);
-    };
-
-  const handleResetSettings = () => {
-    const confirmed = window.confirm(
-      "Reset all settings to their default values?"
-    );
-    if (!confirmed) return;
+  const handleReset = () => {
+    if (!window.confirm("Reset all settings to their default values?")) return;
     dispatch(setSettings(initialSettings));
-    saveStateToLocalStorage({
-      resume,
-      settings: initialSettings,
-    } as any);
-    window.dispatchEvent(new CustomEvent("resume:refresh-preview"));
+    refreshPreview();
   };
 
   return (
     <BaseForm id="section-settings" className="scroll-mt-40">
-      <div className="flex flex-col gap-6">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-2">
-            <Cog6ToothIcon className="h-6 w-6 text-gray-600" aria-hidden="true" />
-            <h1 className="text-xl font-semibold tracking-wide text-gray-900 ">
-              Settings
-            </h1>
-          </div>
-          <Button variant="secondary" size="sm" onClick={handleResetSettings}>
-            Reset to defaults
-          </Button>
-        </div>
-        <div>
-          <InlineInput
-            label="Theme Color"
-            name="themeColor"
-            value={draftSettings.themeColor}
-            placeholder={DEFAULT_THEME_COLOR}
-            onChange={(field, value) =>
-              handleDraftChange(field as keyof typeof draftSettings, value)
-            }
-            onBlur={(event) =>
-              commitDraftSetting("themeColor", event.currentTarget.value)
-            }
-            onKeyDown={handleSettingsInputKeyDown("themeColor")}
-            inputStyle={{ color: themeColor }}
-            labelClassName={sectionTitleClassName}
+      {/* Header */}
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center gap-2">
+          <Cog6ToothIcon
+            className="h-5 w-5 text-[color:var(--color-text-secondary)]"
+            aria-hidden="true"
           />
-          <div className="mt-2 flex flex-wrap gap-2">
-            {THEME_COLORS.map((color, idx) => (
-              <div
-                className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-md text-sm text-white"
-                style={{ backgroundColor: color }}
-                key={idx}
-                onClick={() => handleSettingsChange("themeColor", color, true)}
-                onKeyDown={(e) => {
-                  if (["Enter", " "].includes(e.key))
-                    handleSettingsChange("themeColor", color, true);
-                }}
-                tabIndex={0}
-              >
-                {settings.themeColor === color ? "✓" : ""}
-              </div>
-            ))}
+          <h1 className="text-lg font-semibold text-[color:var(--color-text-primary)]">
+            Settings
+          </h1>
+        </div>
+        <button
+          type="button"
+          onClick={handleReset}
+          className="rounded-full px-3 py-1.5 text-xs font-semibold text-[color:var(--color-text-secondary)] transition hover:bg-black/5 hover:text-[color:var(--color-text-primary)]"
+        >
+          Reset
+        </button>
+      </div>
+
+      <div className="mt-5 flex flex-col gap-6">
+        {/* ── Region ── */}
+        <div>
+          <SectionLabel>Region</SectionLabel>
+          <ResumeLocaleToggle showLabel={false} />
+        </div>
+
+        {/* ── Accent color ── */}
+        <div>
+          <SectionLabel>Accent color</SectionLabel>
+          <div className="flex flex-wrap gap-2">
+            {THEME_COLORS.map((color) => {
+              const selected = themeColor === color;
+              return (
+                <button
+                  key={color}
+                  type="button"
+                  className="h-7 w-7 rounded-md border-2 shadow-sm transition-transform hover:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+                  style={{
+                    backgroundColor: color,
+                    borderColor: selected
+                      ? "var(--color-text-primary)"
+                      : "transparent",
+                  }}
+                  onClick={() => commitSetting("themeColor", color)}
+                  aria-label={`Use ${color} as accent color`}
+                />
+              );
+            })}
+          </div>
+          <div className="mt-3 flex items-center gap-2">
+            <div
+              className="h-7 w-7 shrink-0 rounded-md border border-[color:var(--color-surface-border)]"
+              style={{ backgroundColor: appliedThemeColor }}
+              aria-hidden="true"
+            />
+            <input
+              type="text"
+              name="themeColor"
+              value={draftSettings.themeColor}
+              placeholder={DEFAULT_THEME_COLOR}
+              onChange={(e) => handleDraftChange("themeColor", e.target.value)}
+              onBlur={(e) => commitThemeColor(e.currentTarget.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  commitThemeColor(e.currentTarget.value);
+                  e.currentTarget.blur();
+                }
+              }}
+              className="h-7 w-32 rounded-md border border-[color:var(--color-surface-border)] bg-[color:var(--color-surface-base)] px-2 text-sm font-semibold outline-none transition focus:border-[color:var(--color-brand-primary)] focus:ring-2 focus:ring-[color:var(--color-brand-primary)]/20"
+              style={{ color: appliedThemeColor }}
+            />
           </div>
         </div>
+
+        {/* ── Font family ── */}
         <div>
-          <InputGroupWrapper label="Font Family" className={sectionTitleClassName} />
+          <SectionLabel>Font</SectionLabel>
           <FontFamilySelectionsCSR
             selectedFontFamily={fontFamily}
-            themeColor={themeColor}
-            handleSettingsChange={handleSettingsChange}
+            themeColor={appliedThemeColor}
+            handleSettingsChange={commitSetting}
           />
         </div>
+
+        {/* ── Advanced toggle ── */}
         <div>
-          <h2 className={sectionTitleClassName}>Typography</h2>
-          <div className="mt-4 grid gap-4 md:grid-cols-2">
-            <div>
-              <label className="flex items-center gap-2 text-base font-medium text-gray-700">
-                <span className="flex w-36 items-center gap-2">Section Spacing</span>
-                <input
-                  type="number"
-                  min="0.1"
-                  max="3"
-                  step="0.05"
-                  className="w-[5rem] border-b border-gray-300 text-center font-semibold leading-3 outline-none"
-                  value={draftSettings.sectionSpacing}
-                  onChange={(event) =>
-                    handleDraftChange("sectionSpacing", event.target.value)
-                  }
-                  onBlur={handleSettingsInputBlur("sectionSpacing")}
-                  onKeyDown={handleSettingsInputKeyDown("sectionSpacing")}
-                  onKeyUp={handleSettingsNumberKeyUp("sectionSpacing")}
-                  onMouseUp={handleSettingsNumberMouseUp("sectionSpacing")}
-                />
-              </label>
+          <button
+            type="button"
+            className="flex w-full items-center justify-between rounded-lg border border-[color:var(--color-surface-border)] bg-[color:var(--color-surface-raised)]/60 px-4 py-2.5 text-sm font-semibold text-[color:var(--color-text-secondary)] transition hover:bg-[color:var(--color-surface-raised)]"
+            onClick={() => setShowAdvanced((v) => !v)}
+            aria-expanded={showAdvanced}
+          >
+            <span>Advanced spacing &amp; typography</span>
+            <ChevronDownIcon
+              className={`h-4 w-4 transition-transform duration-200 ${showAdvanced ? "rotate-180" : ""}`}
+              aria-hidden="true"
+            />
+          </button>
+
+          <ExpanderWithHeightTransition expanded={showAdvanced}>
+            <div className="mt-2 rounded-lg border border-[color:var(--color-surface-border)] bg-[color:var(--color-surface-base)] px-4 pb-4 pt-3">
+              {ADVANCED_GROUPS.map(({ id, label }) => (
+                <div key={id}>
+                  <GroupLabel title={label} />
+                  {fieldsByGroup(id).map((field) => (
+                    <CompactNumericRow
+                      key={field}
+                      field={field}
+                      value={draftSettings[field]}
+                      onChange={handleDraftChange}
+                      onBlur={handleNumericBlur(field)}
+                      onKeyDown={handleNumericKeyDown(field)}
+                      onKeyUp={handleNumericKeyUp(field)}
+                      onMouseUp={handleNumericMouseUp(field)}
+                    />
+                  ))}
+                </div>
+              ))}
             </div>
-            <div>
-              <label className="flex items-center gap-2 text-base font-medium text-gray-700">
-                <span className="flex w-36 items-center gap-2">Language Gap (pt)</span>
-                <input
-                  type="number"
-                  min="0"
-                  max="20"
-                  step="1"
-                  className="w-[5rem] border-b border-gray-300 text-center font-semibold leading-3 outline-none"
-                  value={draftSettings.languagesSpacing}
-                  onChange={(event) =>
-                    handleDraftChange("languagesSpacing", event.target.value)
-                  }
-                  onBlur={handleSettingsInputBlur("languagesSpacing")}
-                  onKeyDown={handleSettingsInputKeyDown("languagesSpacing")}
-                  onKeyUp={handleSettingsNumberKeyUp("languagesSpacing")}
-                  onMouseUp={handleSettingsNumberMouseUp("languagesSpacing")}
-                />
-              </label>
-            </div>
-            <div>
-              <label className="flex items-center gap-2 text-base font-medium text-gray-700">
-                <span className="flex w-36 items-center gap-2">Role Gap (pt)</span>
-                <input
-                  type="number"
-                  min="0"
-                  max="20"
-                  step="0.5"
-                  className="w-[5rem] border-b border-gray-300 text-center font-semibold leading-3 outline-none"
-                  value={draftSettings.companyRoleSpacing}
-                  onChange={(event) =>
-                    handleDraftChange("companyRoleSpacing", event.target.value)
-                  }
-                  onBlur={handleSettingsInputBlur("companyRoleSpacing")}
-                  onKeyDown={handleSettingsInputKeyDown("companyRoleSpacing")}
-                  onKeyUp={handleSettingsNumberKeyUp("companyRoleSpacing")}
-                  onMouseUp={handleSettingsNumberMouseUp("companyRoleSpacing")}
-                />
-              </label>
-            </div>
-            <div>
-              <label className="flex items-center gap-2 text-base font-medium text-gray-700">
-                <span className="flex w-36 items-center gap-2">Companies Gap (pt)</span>
-                <input
-                  type="number"
-                  min="0"
-                  max="30"
-                  step="0.5"
-                  className="w-[5rem] border-b border-gray-300 text-center font-semibold leading-3 outline-none"
-                  value={draftSettings.companyItemSpacing}
-                  onChange={(event) =>
-                    handleDraftChange("companyItemSpacing", event.target.value)
-                  }
-                  onBlur={handleSettingsInputBlur("companyItemSpacing")}
-                  onKeyDown={handleSettingsInputKeyDown("companyItemSpacing")}
-                  onKeyUp={handleSettingsNumberKeyUp("companyItemSpacing")}
-                  onMouseUp={handleSettingsNumberMouseUp("companyItemSpacing")}
-                />
-              </label>
-            </div>
-            <div>
-              <label className="flex items-center gap-2 text-base font-medium text-gray-700">
-                <span className="flex w-36 items-center gap-2">School Gap (pt)</span>
-                <input
-                  type="number"
-                  min="0"
-                  max="20"
-                  step="0.5"
-                  className="w-[5rem] border-b border-gray-300 text-center font-semibold leading-3 outline-none"
-                  value={draftSettings.schoolDegreeSpacing}
-                  onChange={(event) =>
-                    handleDraftChange("schoolDegreeSpacing", event.target.value)
-                  }
-                  onBlur={handleSettingsInputBlur("schoolDegreeSpacing")}
-                  onKeyDown={handleSettingsInputKeyDown("schoolDegreeSpacing")}
-                  onKeyUp={handleSettingsNumberKeyUp("schoolDegreeSpacing")}
-                  onMouseUp={handleSettingsNumberMouseUp("schoolDegreeSpacing")}
-                />
-              </label>
-            </div>
-            <div>
-              <label className="flex items-center gap-2 text-base font-medium text-gray-700">
-                <span className="flex w-36 items-center gap-2">Projects Gap (pt)</span>
-                <input
-                  type="number"
-                  min="0"
-                  max="30"
-                  step="0.5"
-                  className="w-[5rem] border-b border-gray-300 text-center font-semibold leading-3 outline-none"
-                  value={draftSettings.projectItemSpacing}
-                  onChange={(event) =>
-                    handleDraftChange("projectItemSpacing", event.target.value)
-                  }
-                  onBlur={handleSettingsInputBlur("projectItemSpacing")}
-                  onKeyDown={handleSettingsInputKeyDown("projectItemSpacing")}
-                  onKeyUp={handleSettingsNumberKeyUp("projectItemSpacing")}
-                  onMouseUp={handleSettingsNumberMouseUp("projectItemSpacing")}
-                />
-              </label>
-            </div>
-            <div>
-              <label className="flex items-center gap-2 text-base font-medium text-gray-700">
-                <span className="flex w-36 items-center gap-2">Top Bar Height (pt)</span>
-                <input
-                  type="number"
-                  min="0"
-                  max="30"
-                  step="0.5"
-                  className="w-[5rem] border-b border-gray-300 text-center font-semibold leading-3 outline-none"
-                  value={draftSettings.topBarHeight}
-                  onChange={(event) =>
-                    handleDraftChange("topBarHeight", event.target.value)
-                  }
-                  onBlur={handleSettingsInputBlur("topBarHeight")}
-                  onKeyDown={handleSettingsInputKeyDown("topBarHeight")}
-                  onKeyUp={handleSettingsNumberKeyUp("topBarHeight")}
-                  onMouseUp={handleSettingsNumberMouseUp("topBarHeight")}
-                />
-              </label>
-            </div>
-            <div>
-              <label className="flex items-center gap-2 text-base font-medium text-gray-700">
-                <span className="flex w-36 items-center gap-2">Summary Gap (pt)</span>
-                <input
-                  type="number"
-                  min="0"
-                  max="40"
-                  step="1"
-                  className="w-[5rem] border-b border-gray-300 text-center font-semibold leading-3 outline-none"
-                  value={draftSettings.linksSummarySpacing}
-                  onChange={(event) =>
-                    handleDraftChange("linksSummarySpacing", event.target.value)
-                  }
-                  onBlur={handleSettingsInputBlur("linksSummarySpacing")}
-                  onKeyDown={handleSettingsInputKeyDown("linksSummarySpacing")}
-                  onKeyUp={handleSettingsNumberKeyUp("linksSummarySpacing")}
-                  onMouseUp={handleSettingsNumberMouseUp("linksSummarySpacing")}
-                />
-              </label>
-            </div>
-            <div>
-              <label className="flex items-center gap-2 text-base font-medium text-gray-700">
-                <span className="flex w-36 items-center gap-2">Line Height</span>
-                <input
-                  type="number"
-                  min="0.6"
-                  max="2.5"
-                  step="0.05"
-                  className="w-[5rem] border-b border-gray-300 text-center font-semibold leading-3 outline-none"
-                  value={draftSettings.lineHeight}
-                  onChange={(event) =>
-                    handleDraftChange("lineHeight", event.target.value)
-                  }
-                  onBlur={handleSettingsInputBlur("lineHeight")}
-                  onKeyDown={handleSettingsInputKeyDown("lineHeight")}
-                  onKeyUp={handleSettingsNumberKeyUp("lineHeight")}
-                  onMouseUp={handleSettingsNumberMouseUp("lineHeight")}
-                />
-              </label>
-            </div>
-            <div>
-              <label className="flex items-center gap-2 text-base font-medium text-gray-700">
-                <span className="flex w-36 items-center gap-2">Body Size (pt)</span>
-                <input
-                  type="number"
-                  min="6"
-                  max="20"
-                  step="0.5"
-                  name="fontSize"
-                  value={draftSettings.fontSize}
-                  placeholder="11"
-                  onChange={(event) =>
-                    handleDraftChange("fontSize", event.target.value)
-                  }
-                  onBlur={handleSettingsInputBlur("fontSize")}
-                  onKeyDown={handleSettingsInputKeyDown("fontSize")}
-                  onKeyUp={handleSettingsNumberKeyUp("fontSize")}
-                  onMouseUp={handleSettingsNumberMouseUp("fontSize")}
-                  className="w-[5rem] border-b border-gray-300 text-center font-semibold leading-3 outline-none"
-                />
-              </label>
-            </div>
-            <div>
-              <label className="flex items-center gap-2 text-base font-medium text-gray-700">
-                <span className="flex w-36 items-center gap-2">Name Size (pt)</span>
-                <input
-                  type="number"
-                  min="16"
-                  max="48"
-                  step="0.5"
-                  value={draftSettings.nameFontSize}
-                  onChange={(event) =>
-                    handleDraftChange("nameFontSize", event.target.value)
-                  }
-                  onBlur={handleSettingsInputBlur("nameFontSize")}
-                  onKeyDown={handleSettingsInputKeyDown("nameFontSize")}
-                  onKeyUp={handleSettingsNumberKeyUp("nameFontSize")}
-                  onMouseUp={handleSettingsNumberMouseUp("nameFontSize")}
-                  className="w-[5rem] border-b border-gray-300 text-center font-semibold leading-3 outline-none"
-                />
-              </label>
-            </div>
-            <div>
-              <label className="flex items-center gap-2 text-base font-medium text-gray-700">
-                <span className="flex w-36 items-center gap-2">Heading Size (pt)</span>
-                <input
-                  type="number"
-                  min="8"
-                  max="20"
-                  step="0.5"
-                  value={draftSettings.sectionHeadingSize}
-                  onChange={(event) =>
-                    handleDraftChange("sectionHeadingSize", event.target.value)
-                  }
-                  onBlur={handleSettingsInputBlur("sectionHeadingSize")}
-                  onKeyDown={handleSettingsInputKeyDown("sectionHeadingSize")}
-                  onKeyUp={handleSettingsNumberKeyUp("sectionHeadingSize")}
-                  onMouseUp={handleSettingsNumberMouseUp("sectionHeadingSize")}
-                  className="w-[5rem] border-b border-gray-300 text-center font-semibold leading-3 outline-none"
-                />
-              </label>
-            </div>
-          </div>
+          </ExpanderWithHeightTransition>
         </div>
       </div>
     </BaseForm>

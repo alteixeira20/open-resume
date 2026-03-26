@@ -29,22 +29,22 @@ const Selection = ({
   };
 
   return (
-    <div
-      className="flex w-[105px] cursor-pointer items-center justify-center rounded-md border border-gray-300 py-1.5 shadow-sm hover:border-gray-400 hover:bg-gray-100"
+    <button
+      type="button"
+      className="flex min-h-12 min-w-[128px] cursor-pointer items-center justify-center rounded-xl border border-[color:var(--color-surface-border)] bg-[color:var(--color-surface-base)] px-3 py-2 text-sm font-semibold text-[color:var(--color-text-primary)] shadow-sm transition hover:-translate-y-0.5 hover:border-[color:var(--color-brand-primary)] hover:bg-[color:var(--color-surface-raised)]"
       onClick={onClick}
       style={isSelected ? selectedStyle : style}
       onKeyDown={(e) => {
         if (["Enter", " "].includes(e.key)) onClick();
       }}
-      tabIndex={0}
     >
       {children}
-    </div>
+    </button>
   );
 };
 
 const SelectionsWrapper = ({ children }: { children: React.ReactNode }) => {
-  return <div className="mt-2 flex flex-wrap gap-3">{children}</div>;
+  return <div className="mt-3 flex flex-wrap gap-3">{children}</div>;
 };
 
 const FontFamilySelections = ({

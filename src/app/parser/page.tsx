@@ -8,7 +8,7 @@ import { extractResumeFromSections } from "lib/parse-resume-from-pdf/extract-res
 import { ResumeDropzone } from "components/ResumeDropzone";
 import { WorkbenchHeader } from "components/layout/WorkbenchHeader";
 import { cx } from "lib/cx";
-import { Heading, Link, Paragraph } from "components/documentation";
+import { Link } from "components/documentation";
 import { Button } from "components/ui";
 import { WorkbenchLayout } from "components/layout/WorkbenchLayout";
 import { ResumeTable } from "parser/ResumeTable";
@@ -19,6 +19,12 @@ import type { ResumeLocale } from "lib/redux/settingsSlice";
 import { A4_HEIGHT_PX, A4_WIDTH_PX, LETTER_HEIGHT_PX, LETTER_WIDTH_PX } from "lib/constants";
 import { useWorkbenchCollapse } from "lib/hooks/useWorkbenchCollapse";
 import { WORKBENCH_UI } from "components/layout/workbench-ui";
+import {
+  clearBuilderParserHandoff,
+  dataUrlToObjectUrl,
+  isBuilderParserArrival,
+  readBuilderParserHandoff,
+} from "lib/parser-handoff";
 
 const RESUME_EXAMPLES = [
   {
@@ -51,8 +57,12 @@ export default function ResumeParser() {
   const [fileUrl, setFileUrl] = useState(defaultFileUrl);
   const [textItems, setTextItems] = useState<TextItems>([]);
   const [parserRegion, setParserRegion] = useState<ResumeLocale>("eu");
+  const [builderHandoffName, setBuilderHandoffName] = useState<string | null>(
+    null
+  );
   const { isCollapsed, showPreview, togglePreview } = useWorkbenchCollapse();
   const previewContainerRef = useRef<HTMLDivElement | null>(null);
+  const handoffObjectUrlRef = useRef<string | null>(null);
   const [previewScale, setPreviewScale] = useState(1);
 
   const lines = useMemo(
@@ -125,6 +135,46 @@ export default function ResumeParser() {
   }, [isCollapsed, updatePreviewScale]);
 
   useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    let cancelled = false;
+
+    const loadBuilderHandoff = async () => {
+      if (!isBuilderParserArrival(window.location.search)) return;
+
+      const handoff = readBuilderParserHandoff();
+      if (!handoff) return;
+
+      try {
+        const objectUrl = await dataUrlToObjectUrl(handoff.dataUrl);
+        if (cancelled) {
+          URL.revokeObjectURL(objectUrl);
+          return;
+        }
+
+        if (handoffObjectUrlRef.current) {
+          URL.revokeObjectURL(handoffObjectUrlRef.current);
+        }
+
+        handoffObjectUrlRef.current = objectUrl;
+        setFileUrl(objectUrl);
+        setBuilderHandoffName(handoff.fileName);
+        if (handoff.resumeLocale === "eu" || handoff.resumeLocale === "us") {
+          setParserRegion(handoff.resumeLocale);
+        }
+      } catch {
+        clearBuilderParserHandoff();
+      }
+    };
+
+    loadBuilderHandoff();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
     try {
       const storedState =
         localStorage.getItem(BUILDER_STATE_STORAGE_KEY) ??
@@ -147,11 +197,50 @@ export default function ResumeParser() {
     localStorage.removeItem(LEGACY_PARSER_REGION_STORAGE_KEY);
   }, [parserRegion]);
 
+  useEffect(() => {
+    return () => {
+      if (handoffObjectUrlRef.current) {
+        URL.revokeObjectURL(handoffObjectUrlRef.current);
+        handoffObjectUrlRef.current = null;
+      }
+    };
+  }, []);
+
+  const clearBuilderHandoffContext = () => {
+    clearBuilderParserHandoff();
+    setBuilderHandoffName(null);
+    if (handoffObjectUrlRef.current) {
+      URL.revokeObjectURL(handoffObjectUrlRef.current);
+      handoffObjectUrlRef.current = null;
+    }
+  };
+
+  const handleExampleSelect = (url: string) => {
+    clearBuilderHandoffContext();
+    setFileUrl(url);
+  };
+
+  const handleUploadedFileUrlChange = (url: string | undefined) => {
+    clearBuilderHandoffContext();
+    setFileUrl(url || defaultFileUrl);
+  };
+
   const workbenchContent = (
     <div className={WORKBENCH_UI.contentStackClass}>
       <WorkbenchHeader
         title="Parser Workbench"
-        description="Upload a PDF to see what a text parser extracts from it. Check field detection, layout flags, and parsing diagnostics."
+        description={
+          builderHandoffName ? (
+            <>
+              <p>Evaluating the PDF generated from your current builder state.</p>
+              <p className="mt-1 text-xs text-[color:var(--color-text-muted)]">
+                Source file: {builderHandoffName}
+              </p>
+            </>
+          ) : (
+            "Upload a PDF to see what a text parser extracts from it. Check field detection, layout flags, and parsing diagnostics."
+          )
+        }
         actions={
           isCollapsed ? (
             <Button
@@ -234,11 +323,14 @@ export default function ResumeParser() {
                       ? "border-[color:var(--color-brand-primary)] bg-[color:var(--color-forge-100)]"
                       : "border-[color:var(--color-surface-border)] bg-[color:var(--color-surface-base)]"
                   )}
-                  onClick={() => setFileUrl(example.fileUrl)}
                   onKeyDown={(e) => {
-                    if (["Enter", " "].includes(e.key)) setFileUrl(example.fileUrl);
+                    if (["Enter", " "].includes(e.key))
+                      handleExampleSelect(example.fileUrl);
                   }}
                   tabIndex={0}
+                  role="button"
+                  aria-label={`Use CV example ${idx + 1}`}
+                  onClick={() => handleExampleSelect(example.fileUrl)}
                 >
                   <p className="font-semibold text-[color:var(--color-text-primary)]">
                     CV Example {idx + 1}
@@ -258,23 +350,41 @@ export default function ResumeParser() {
             <p className="text-sm font-semibold text-[color:var(--color-text-primary)]">
               Upload your CV
             </p>
-            <Paragraph smallMarginTop={true}>
+            <p className="mt-2 text-sm text-[color:var(--color-text-secondary)]">
               Drop a PDF to see how the parser interprets its structure. Everything happens locally in your browser.
-            </Paragraph>
+            </p>
             <div className="mt-3">
               <ResumeDropzone
-                onFileUrlChange={(url) => setFileUrl(url || defaultFileUrl)}
+                onFileUrlChange={handleUploadedFileUrlChange}
                 playgroundView={true}
               />
             </div>
           </section>
 
           <section id="results" className="space-y-4">
-            <Heading level={2} className="!mt-0">
-              CV Parsing Results
-            </Heading>
+            <div className="rounded-xl border border-[color:var(--color-surface-border)] bg-[color:var(--color-surface-base)]/75 px-4 py-3">
+              <p className="text-xs font-semibold uppercase tracking-wide text-[color:var(--color-text-muted)]">
+                Parser results
+              </p>
+              <h2 className="mt-1 text-lg font-black text-[color:var(--color-text-primary)]">
+                What the parser extracted from this PDF
+              </h2>
+              <p className="mt-2 text-sm text-[color:var(--color-text-secondary)]">
+                Start with the score, then inspect the parsed resume model and the parser snapshot below.
+              </p>
+            </div>
             <AtsScoreCard result={atsScore} />
-            <ResumeTable resume={resume} />
+            <section className="rounded-xl border border-[color:var(--color-surface-border)] bg-[color:var(--color-surface-base)]/85 p-4">
+              <p className="text-sm font-semibold text-[color:var(--color-text-primary)]">
+                Parsed resume model
+              </p>
+              <p className="mt-1 text-xs text-[color:var(--color-text-muted)]">
+                This is the structured data the parser reconstructed from the PDF text.
+              </p>
+              <div className="mt-3 overflow-x-auto">
+                <ResumeTable resume={resume} />
+              </div>
+            </section>
             <ResumeParserAlgorithmArticle
               textItems={textItems}
               lines={lines}
@@ -282,25 +392,6 @@ export default function ResumeParser() {
             />
           </section>
 
-          <section className="rounded-xl border border-dashed border-[color:var(--color-surface-border)] bg-[color:var(--color-surface-base)] p-3 text-sm text-[color:var(--color-text-muted)]">
-            <p>
-              CVForge is built on{" "}
-              <a
-                href="https://github.com/xitanggg/open-resume"
-                className="underline underline-offset-2 transition-colors hover:text-[color:var(--color-brand-primary)]"
-              >
-                OpenResume
-              </a>{" "}
-              by Xitang Zhao and maintained by{" "}
-              <a
-                href="https://github.com/alteixeira20"
-                className="underline underline-offset-2 transition-colors hover:text-[color:var(--color-brand-primary)]"
-              >
-                Alexandre Teixeira
-              </a>
-              . All parsing and ATS scoring run locally in your browser.
-            </p>
-          </section>
     </div>
   );
 

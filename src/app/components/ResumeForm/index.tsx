@@ -1,6 +1,7 @@
 "use client";
 import {
   useAppSelector,
+  useDebouncedPreviewRefreshOnChange,
   useSaveStateToLocalStorageOnChange,
   useSetInitialStore,
 } from "lib/redux/hooks";
@@ -43,6 +44,7 @@ export const ResumeForm = ({
 }: ResumeFormProps) => {
   useSetInitialStore();
   useSaveStateToLocalStorageOnChange();
+  useDebouncedPreviewRefreshOnChange({ delay: 425 });
 
   const formsOrder = useAppSelector(selectFormsOrder);
 
@@ -53,21 +55,43 @@ export const ResumeForm = ({
         <WorkbenchHeader
           title="Builder Workbench"
           wrapperClassName="mb-0 min-h-0 gap-1"
+          contentClassName="grid w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-x-8 gap-y-3"
+          textBlockClassName="max-w-prose"
+          actionsClassName="justify-center self-start"
           description={
-            <>
-              Press{" "}
-              <kbd className="align-middle rounded border border-[color:var(--color-surface-border)] bg-[color:var(--color-surface-raised)] px-1.5 py-0.5 text-xs font-semibold text-[color:var(--color-text-secondary)]">
-                Enter
-              </kbd>{" "}
-              to refresh the preview.
-            </>
+            <div className="flex min-h-[3.75rem] flex-col justify-between">
+              <p>Preview updates automatically after a short pause.</p>
+              <p>
+                Use{" "}
+                <span className="rounded-md border border-[color:var(--color-brand-primary)]/25 bg-[color:var(--color-forge-100)] px-1.5 py-0.5 text-xs font-semibold uppercase tracking-wide text-[color:var(--color-forge-700)]">
+                  Refresh now
+                </span>{" "}
+                for an immediate update.
+              </p>
+            </div>
           }
           actions={
-            <>
-              <ImportResumeButton />
-              {showRefreshButton && (
+            <div className="flex w-auto origin-top scale-[0.82] flex-col items-end gap-4 sm:scale-[0.9] md:scale-100">
+              <div className="shrink-0 whitespace-nowrap md:mr-18">
+                <ImportResumeButton />
+              </div>
+              <div className="shrink-0 whitespace-nowrap md:mr-8">
                 <Button
                   variant="secondary"
+                  size="sm"
+                  onClick={() =>
+                    window.dispatchEvent(
+                      new CustomEvent("resume:evaluate-in-parser")
+                    )
+                  }
+                >
+                  Evaluate CV
+                </Button>
+              </div>
+              {showRefreshButton && (
+                <div className="shrink-0 whitespace-nowrap">
+                  <Button
+                    variant="secondary"
                     size="sm"
                     onClick={() =>
                       window.dispatchEvent(
@@ -75,10 +99,12 @@ export const ResumeForm = ({
                       )
                     }
                   >
-                    Refresh Preview
+                    Refresh now
                   </Button>
-                )}
-                {onTogglePreview && (
+                </div>
+              )}
+              {onTogglePreview && (
+                <div className="shrink-0 self-end whitespace-nowrap">
                   <Button
                     variant="secondary"
                     size="sm"
@@ -87,10 +113,11 @@ export const ResumeForm = ({
                   >
                     {showPreview ? "Hide preview" : "Show preview"}
                   </Button>
-                )}
-              </>
-            }
-          />
+                </div>
+              )}
+            </div>
+          }
+        />
           {preview && showPreview && (
             <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
               <Button
@@ -102,7 +129,7 @@ export const ResumeForm = ({
                   )
                 }
               >
-                Refresh Preview
+                Refresh now
               </Button>
             </div>
           )}

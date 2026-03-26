@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import {
   useDispatch,
   useSelector,
@@ -31,6 +31,64 @@ export const useSaveStateToLocalStorageOnChange = () => {
     });
     return unsubscribe;
   }, []);
+};
+
+export const useDebouncedPreviewRefreshOnChange = ({
+  delay = 450,
+  enabled = true,
+}: {
+  delay?: number;
+  enabled?: boolean;
+} = {}) => {
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const previousResumeRef = useRef(store.getState().resume);
+  const previousSettingsRef = useRef(store.getState().settings);
+
+  useEffect(() => {
+    if (!enabled || typeof window === "undefined") {
+      return;
+    }
+
+    const cancelPendingRefresh = () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
+    };
+
+    const unsubscribe = store.subscribe(() => {
+      const state = store.getState();
+      const resumeChanged = state.resume !== previousResumeRef.current;
+      const settingsChanged = state.settings !== previousSettingsRef.current;
+
+      if (!resumeChanged && !settingsChanged) {
+        return;
+      }
+
+      previousResumeRef.current = state.resume;
+      previousSettingsRef.current = state.settings;
+
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+
+      timeoutRef.current = setTimeout(() => {
+        window.dispatchEvent(new CustomEvent("resume:refresh-preview"));
+        timeoutRef.current = null;
+      }, delay);
+    });
+
+    window.addEventListener("resume:refresh-preview", cancelPendingRefresh);
+
+    return () => {
+      unsubscribe();
+      window.removeEventListener(
+        "resume:refresh-preview",
+        cancelPendingRefresh
+      );
+      cancelPendingRefresh();
+    };
+  }, [delay, enabled]);
 };
 
 export const useSetInitialStore = () => {

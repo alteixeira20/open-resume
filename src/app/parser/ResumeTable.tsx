@@ -5,7 +5,7 @@ import { deepClone } from "lib/deep-clone";
 import { cx } from "lib/cx";
 
 const TableRowHeader = ({ children }: { children: React.ReactNode }) => (
-  <tr className="divide-x border-[color:var(--color-surface-border)] bg-[color:var(--color-forge-100)]">
+  <tr className="divide-x border-[color:var(--color-surface-border)] bg-[color:var(--color-forge-100)]/85">
     <th
       className="px-3 py-2 font-semibold text-[color:var(--color-text-primary)]"
       scope="colgroup"
@@ -64,7 +64,7 @@ export const ResumeTable = ({ resume }: { resume: Resume }) => {
     skills.unshift(featuredSkills);
   }
   return (
-    <table className="mt-2 w-full border border-[color:var(--color-surface-border)] text-sm">
+    <table className="w-full border border-[color:var(--color-surface-border)] text-sm">
       <tbody className="divide-y divide-[color:var(--color-surface-border)] text-left align-top">
         <TableRowHeader>Profile</TableRowHeader>
         <TableRow label="Name" value={resume.profile.name} />

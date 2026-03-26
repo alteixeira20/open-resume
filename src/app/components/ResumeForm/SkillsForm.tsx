@@ -40,10 +40,16 @@ export const SkillsForm = () => {
   return (
     <Form form={form}>
       <div className="col-span-full grid grid-cols-6 gap-3">
-        <div className="relative col-span-full">
+        <div className="col-span-full">
           <BulletListTextarea
             label="Skills List"
             labelClassName="col-span-full"
+            labelAction={
+              <BulletListIconButton
+                showBulletPoints={showBulletPoints}
+                onClick={handleShowBulletPoints}
+              />
+            }
             name="descriptions"
             placeholder="Bullet points"
             value={descriptions}
@@ -51,12 +57,6 @@ export const SkillsForm = () => {
             onChange={handleSkillsChange}
             showBulletPoints={showBulletPoints}
           />
-          <div className="absolute left-[4.5rem] top-[0.07rem]">
-            <BulletListIconButton
-              showBulletPoints={showBulletPoints}
-              onClick={handleShowBulletPoints}
-            />
-          </div>
         </div>
         <div className="col-span-full mb-4 mt-6 border-t-2 border-dotted border-gray-200" />
         <div className="col-span-full flex items-center justify-between gap-4">

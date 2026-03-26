@@ -93,24 +93,22 @@ export const EducationsForm = () => {
                 onChange={handleEducationChange}
               />
             )}
-            <div className="relative col-span-full">
-              <BulletListTextarea
-                label="Additional Information (Optional)"
-                labelClassName="col-span-full"
-                name="descriptions"
-                placeholder={labels.educationAdditionalPlaceholder}
-                value={descriptions}
-                maxLength={200}
-                onChange={handleEducationChange}
-                showBulletPoints={showBulletPoints}
-              />
-              <div className="absolute left-[15.6rem] top-[0.07rem]">
+            <BulletListTextarea
+              label="Additional Information (Optional)"
+              labelClassName="col-span-full"
+              labelAction={
                 <BulletListIconButton
                   showBulletPoints={showBulletPoints}
                   onClick={handleShowBulletPoints}
                 />
-              </div>
-            </div>
+              }
+              name="descriptions"
+              placeholder={labels.educationAdditionalPlaceholder}
+              value={descriptions}
+              maxLength={200}
+              onChange={handleEducationChange}
+              showBulletPoints={showBulletPoints}
+            />
           </FormSection>
         );
       })}

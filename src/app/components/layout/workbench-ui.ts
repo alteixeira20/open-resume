@@ -20,7 +20,7 @@ export const WORKBENCH_UI = {
     titleClass:
       "text-primary text-2xl font-black leading-none tracking-tight md:text-[1.75rem]",
     descriptionClass:
-      "max-w-prose text-sm leading-relaxed text-[color:var(--color-text-secondary)]",
+      "mt-1 max-w-prose text-sm leading-relaxed text-[color:var(--color-text-secondary)]",
     actionsClass: "flex flex-wrap gap-2",
   },
   contentStackClass: "space-y-8",

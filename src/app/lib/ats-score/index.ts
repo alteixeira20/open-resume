@@ -14,7 +14,6 @@ import { PROFILE_SECTION } from "lib/parse-resume-from-pdf/group-lines-into-sect
 export interface AtsScoreBreakdown {
   parsing: number;
   structure: number;
-  keywords?: number;
   readability: number;
 }
 
@@ -30,9 +29,13 @@ export interface AtsScoreInput {
   resume?: Resume;
   lines?: Lines;
   sections?: ResumeSectionToLines;
-  jobDescription?: string;
   locale?: ResumeLocale;
 }
+
+// Score is always out of 70 (parsing 40 + structure 20 + readability 10),
+// rescaled to 100. This keeps the tool honest: it measures parse quality
+// and layout — not job-description fit.
+const MAX_RAW_SCORE = 70;
 
 export const calculateAtsScore = (input: AtsScoreInput): AtsScoreResult => {
   const textItems = input.textItems ?? [];
@@ -40,7 +43,6 @@ export const calculateAtsScore = (input: AtsScoreInput): AtsScoreResult => {
   const sections = input.sections ?? groupLinesIntoSections(lines);
   const resume = input.resume ?? extractResumeFromSections(sections);
   const locale = input.locale ?? detectLocale(resume);
-  const jobDescription = input.jobDescription?.trim();
 
   const issues: string[] = [];
   const issueDetails: Record<string, string[]> = {};
@@ -68,38 +70,20 @@ export const calculateAtsScore = (input: AtsScoreInput): AtsScoreResult => {
     issueDetails
   );
 
-  let keywordsScore: number | undefined;
-  let total = parsingScore + structureScore + readabilityScore;
+  const total = parsingScore + structureScore + readabilityScore;
+  const score = clamp(Math.round((total / MAX_RAW_SCORE) * 100), 0, 100);
 
-  if (jobDescription) {
-    keywordsScore = scoreKeywords(resume, jobDescription, issues, issueDetails);
-    total += keywordsScore;
-  } else {
-    total = rescaleWithoutKeywords(total);
-  }
-
-  const score = clamp(Math.round(total), 0, 100);
-
-  const result: AtsScoreResult = {
+  return {
     score,
     breakdown: {
       parsing: parsingScore,
       structure: structureScore,
       readability: readabilityScore,
-      ...(keywordsScore !== undefined ? { keywords: keywordsScore } : {}),
     },
     issues: Array.from(new Set(issues)),
     issueDetails:
       Object.keys(issueDetails).length > 0 ? issueDetails : undefined,
   };
-
-  return result;
-};
-
-const rescaleWithoutKeywords = (scoreWithoutKeywords: number) => {
-  // A + B + D max to 70; rescale to 100
-  const rescaled = Math.round((scoreWithoutKeywords / 70) * 100);
-  return clamp(rescaled, 0, 100);
 };
 
 const addIssueDetail = (
@@ -625,206 +609,6 @@ const aggregatePages = (textItems: TextItems): PageHeight[] => {
         effectiveHeight: isLast ? normalized : 1,
       };
     });
-};
-
-const scoreKeywords = (
-  resume: Resume,
-  jobDescription: string,
-  issues: string[],
-  issueDetails: Record<string, string[]>
-) => {
-  const resumeCorpus = resumeText(resume).toLowerCase();
-  const jdCorpus = jobDescription.toLowerCase();
-  const resumeTokens = getStemmedTokenSet(resumeCorpus);
-  const jdTokens = getStemmedTokenSet(jdCorpus);
-
-  const categories: KeywordCategory[] = [
-    {
-      label: "critical tech",
-      keywords: [
-        "linux",
-        "git",
-        "docker",
-        "bash",
-        "ci/cd",
-        "pipeline",
-        "automation",
-        "c",
-        "gdb",
-        "valgrind",
-      ],
-      weight: 10,
-    },
-    {
-      label: "impact verbs",
-      keywords: [
-        "built",
-        "implement",
-        "optimiz",
-        "reduc",
-        "automat",
-        "debug",
-        "design",
-      ],
-      weight: 10,
-    },
-    {
-      label: "environment",
-      keywords: [
-        "ubuntu",
-        "debian",
-        "fedora",
-        "arch",
-        "suse",
-        "scripting",
-        "container",
-        "kubernetes",
-        "version control",
-        "testing",
-      ],
-      weight: 10,
-    },
-  ];
-
-  let score = 0;
-
-  categories.forEach(({ label, keywords, weight }) => {
-    const normalizedKeywords = keywords.map((kw) => ({
-      original: kw,
-      normalized: normalizeKeyword(kw),
-    }));
-
-    const presentInJd = normalizedKeywords.filter(({ normalized, original }) =>
-      jdTokens.has(normalized) || jdCorpus.includes(searchToken(original))
-    );
-    if (!presentInJd.length) {
-      return;
-    }
-
-    const resumeHits = presentInJd.filter(({ normalized, original }) =>
-      matchKeyword(normalized, resumeTokens, resumeCorpus, original)
-    ).length;
-    const categoryScore = (resumeHits / presentInJd.length) * weight;
-    score += categoryScore;
-
-    if (resumeHits < presentInJd.length) {
-      const missing = presentInJd
-        .filter(
-          ({ normalized, original }) =>
-            !matchKeyword(normalized, resumeTokens, resumeCorpus, original)
-        )
-        .map(({ original }) => original);
-      if (missing.length) {
-        const issue = `Missing JD keywords (${label}): ${missing.join(", ")}`;
-        issues.push(issue);
-        addIssueDetail(issueDetails, issue, missing);
-      }
-    }
-  });
-
-  return Math.round(clamp(score, 0, 30));
-};
-
-interface KeywordCategory {
-  label: string;
-  keywords: string[];
-  weight: number;
-}
-
-const resumeText = (resume: Resume) => {
-  const profileValues = Object.values(resume.profile ?? {}).join(" ");
-  const educationText = resume.educations
-    .map((education) => Object.values(education).join(" "))
-    .join(" ");
-  const workText = resume.workExperiences
-    .map((experience) => Object.values(experience).join(" "))
-    .join(" ");
-  const projectText = resume.projects
-    .map((project) => Object.values(project).join(" "))
-    .join(" ");
-  const skillsText = Object.values(resume.skills ?? {}).join(" ");
-  const customText = Object.values(resume.custom ?? {}).join(" ");
-
-  return [
-    profileValues,
-    educationText,
-    workText,
-    projectText,
-    skillsText,
-    customText,
-  ]
-    .join(" ")
-    .trim();
-};
-
-const getStemmedTokenSet = (text: string) => {
-  const tokens = splitTokens(text).map(normalizeKeyword);
-  return new Set(tokens.filter(Boolean));
-};
-
-const splitTokens = (text: string) =>
-  text
-    .toLowerCase()
-    .split(/[\s,;:()+\-]+/)
-    .filter(Boolean);
-
-const normalizeKeyword = (keyword: string) => stem(keyword.toLowerCase());
-
-const searchToken = (keyword: string) =>
-  keyword
-    .toLowerCase()
-    .replace(/[^a-z0-9\s]/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
-
-const matchKeyword = (
-  keyword: string,
-  tokens: Set<string>,
-  corpus: string,
-  original: string
-) => {
-  if (tokens.has(keyword)) {
-    return true;
-  }
-  const collapsed = keyword.replace(/[^a-z0-9]/g, "");
-  if (collapsed && tokens.has(collapsed)) {
-    return true;
-  }
-
-  const search = searchToken(original);
-  if (search && corpus.includes(search)) {
-    return true;
-  }
-  if (collapsed && corpus.includes(collapsed)) {
-    return true;
-  }
-
-  return false;
-};
-
-const stem = (word: string) => {
-  let result = word.trim();
-  if (!result) return "";
-
-  result = result.replace(/[^a-z0-9+]/g, "");
-
-  const rules: [RegExp, string][] = [
-    [/ies$/, "y"],
-    [/ves$/, "f"],
-    [/ing$/, ""],
-    [/ed$/, ""],
-    [/ers?$/, ""],
-    [/s$/, ""],
-  ];
-
-  for (const [pattern, replacement] of rules) {
-    if (pattern.test(result) && result.replace(pattern, replacement).length >= 3) {
-      result = result.replace(pattern, replacement);
-      break;
-    }
-  }
-
-  return result;
 };
 
 const scoreReadability = (

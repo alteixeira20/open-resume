@@ -9,8 +9,6 @@ import type { AtsScoreResult } from "lib/ats-score";
 
 interface CliOptions {
   file?: string;
-  job?: string;
-  jobText?: string;
   json: boolean;
 }
 
@@ -23,13 +21,6 @@ const parseArgs = (argv: string[]): CliOptions => {
       case "-f":
       case "--file":
         options.file = argv[++i];
-        break;
-      case "-j":
-      case "--job":
-        options.job = argv[++i];
-        break;
-      case "--job-text":
-        options.jobText = argv[++i];
         break;
       case "--json":
         options.json = true;
@@ -51,43 +42,20 @@ const parseArgs = (argv: string[]): CliOptions => {
 };
 
 const printUsage = () => {
-  console.log(`Usage: npm run ats-score -- [--file resume.pdf] [--job jd.txt]
+  console.log(`Usage: npm run ats-score -- [--file resume.pdf]
 Options:
-  -f, --file       Path to the resume PDF (required)
-  -j, --job        Path to a job description text file (optional)
-      --job-text   Inline job description string (optional)
-      --json       Output raw JSON result
-  -h, --help       Show this message`);
-};
-
-const readJobDescription = (options: CliOptions) => {
-  if (options.jobText) {
-    return options.jobText;
-  }
-
-  if (!options.job) {
-    return undefined;
-  }
-
-  const jobPath = resolve(options.job);
-  if (!existsSync(jobPath)) {
-    throw new Error(`Job description file not found: ${options.job}`);
-  }
-  return readFileSync(jobPath, "utf8");
+  -f, --file   Path to the resume PDF (required)
+      --json   Output raw JSON result
+  -h, --help   Show this message`);
 };
 
 const prettify = (result: AtsScoreResult) => {
   const lines = [
-    `ATS Score: ${result.score}`,
+    `Format Score: ${result.score}`,
     `- Parsing: ${result.breakdown.parsing}/40`,
     `- Structure: ${result.breakdown.structure}/20`,
+    `- Readability: ${result.breakdown.readability}/10`,
   ];
-
-  if (typeof result.breakdown.keywords === "number") {
-    lines.push(`- Keywords: ${result.breakdown.keywords}/30`);
-  }
-
-  lines.push(`- Readability: ${result.breakdown.readability}/10`);
 
   if (result.issues.length) {
     lines.push("Issues:");
@@ -119,14 +87,12 @@ const main = async () => {
     const lines = groupTextItemsIntoLines(textItems);
     const sections = groupLinesIntoSections(lines);
     const resume = extractResumeFromSections(sections);
-    const jobDescription = readJobDescription(options);
 
     const result = calculateAtsScore({
       textItems,
       lines,
       sections,
       resume,
-      jobDescription,
     });
 
     if (options.json) {

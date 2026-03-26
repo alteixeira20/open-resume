@@ -12,7 +12,6 @@ import type { Resume } from "lib/redux/types";
 
 interface AtsScoreRequestBody {
   textItems?: TextItems;
-  jobDescription?: string;
   lines?: Lines;
   sections?: ResumeSectionToLines;
   resume?: Resume;
@@ -21,7 +20,7 @@ interface AtsScoreRequestBody {
 export async function POST(request: NextRequest) {
   try {
     const body = (await request.json()) as AtsScoreRequestBody;
-    const { textItems, jobDescription } = body;
+    const { textItems } = body;
 
     if (!Array.isArray(textItems) || textItems.length === 0) {
       return NextResponse.json(
@@ -39,7 +38,6 @@ export async function POST(request: NextRequest) {
       lines,
       sections,
       resume,
-      jobDescription,
     });
 
     return NextResponse.json(result);

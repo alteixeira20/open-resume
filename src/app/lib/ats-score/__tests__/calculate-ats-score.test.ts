@@ -20,7 +20,7 @@ const baseTextItem = (overrides: Partial<TextItem>): TextItem => ({
 });
 
 describe("calculateAtsScore", () => {
-  it("returns a strong score for a well structured resume with JD", () => {
+  it("returns a strong score for a well structured resume", () => {
     const textItems: TextItems = [
       baseTextItem({ text: "John Doe", x: 60, y: 720 }),
       baseTextItem({ text: "john@example.com", x: 60, y: 700 }),
@@ -114,34 +114,24 @@ describe("calculateAtsScore", () => {
       },
     };
 
-    const jobDescription = `We need engineers who have built and implemented automation for linux systems.
-      Must know git, docker, bash, CI/CD pipelines, automation in C, and debugging with gdb or valgrind.
-      Ideal candidates designed solutions, optimized performance, reduced incidents, automated workflows,
-      debugged complex services, and built resilient infrastructure. Familiarity with ubuntu or other distro,
-      scripting, containers, kubernetes, version control, and testing environments is required.`;
-
     const result = calculateAtsScore({
       textItems,
       lines,
       sections,
       resume,
-      jobDescription,
     });
 
-    expect(result.score).toBe(96);
+    // parsing(40) + structure(20) + readability(8) = 68 → (68/70)*100 = 97
+    expect(result.score).toBe(97);
     expect(result.breakdown.parsing).toBe(40);
     expect(result.breakdown.structure).toBe(20);
     expect(result.breakdown.readability).toBe(8);
-    expect(result.breakdown.keywords).toBe(28);
     expect(result.issues).toEqual(
-      expect.arrayContaining([
-        "Limited quantifiable impact statements",
-        "Missing JD keywords (environment): version control",
-      ])
+      expect.arrayContaining(["Limited quantifiable impact statements"])
     );
   });
 
-  it("rescales score without JD and reports gaps", () => {
+  it("reports parsing gaps for a poor resume", () => {
     const textItems: TextItems = [];
     const lines: Lines = [];
 
@@ -181,7 +171,6 @@ describe("calculateAtsScore", () => {
 
     const result = calculateAtsScore({ textItems, lines, sections, resume });
 
-    expect(result.breakdown.keywords).toBeUndefined();
     expect(result.issues).toEqual(
       expect.arrayContaining([
         "Name not found",

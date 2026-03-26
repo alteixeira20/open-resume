@@ -9,28 +9,30 @@ describe("AtsScoreCard", () => {
       parsing: 30,
       structure: 18,
       readability: 9,
-      keywords: 25,
     },
     issues: ["Email not found", "Few metrics detected"],
   };
 
   it("renders a placeholder when no result is provided", () => {
     render(<AtsScoreCard result={null} />);
-    expect(screen.getByText("ATS Score")).toBeInTheDocument();
+    expect(screen.getByText("Format Score")).toBeInTheDocument();
     expect(
-      screen.getByText("Upload a CV to generate a local ATS readiness score.")
+      screen.getByText(
+        "Upload a CV to get a local formatting score and diagnostic breakdown."
+      )
     ).toBeInTheDocument();
   });
 
   it("displays the score and breakdown when result is present", () => {
     render(<AtsScoreCard result={baseResult} />);
-    expect(screen.getByText("ATS Score")).toBeInTheDocument();
+    expect(screen.getByText("Format Score")).toBeInTheDocument();
     expect(screen.getByText("82")).toBeInTheDocument();
-    expect(screen.getByText("Parsing")).toBeInTheDocument();
-    expect(screen.getByText("Structure")).toBeInTheDocument();
-    expect(screen.getByText("Keywords")).toBeInTheDocument();
-    expect(screen.getByText("Readability")).toBeInTheDocument();
-    expect(screen.getByText("Email not found")).toBeInTheDocument();
-    expect(screen.getByText("Few metrics detected")).toBeInTheDocument();
+    expect(screen.getAllByText("Parsing").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Structure").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Readability").length).toBeGreaterThan(0);
+    expect(screen.getByText("How the score is calculated")).toBeInTheDocument();
+    expect(screen.getByText("Point attribution")).toBeInTheDocument();
+    expect(screen.getAllByText("Email not found").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Few metrics detected").length).toBeGreaterThan(0);
   });
 });

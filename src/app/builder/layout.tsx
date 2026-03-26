@@ -7,7 +7,6 @@ export const metadata: Metadata = {
   keywords: [
     "resume builder",
     "cv builder",
-    "ats friendly resume builder",
     "resume builder eu a4",
     "resume builder letter",
     "open source resume builder",

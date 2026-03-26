@@ -3,7 +3,7 @@ export const HOME_HERO = {
   headline: "",
   headlineAccent: "Forge your career.",
   description:
-    "Build a clean CV or resume, export it as PDF, and check how a parser reads it. Editing, parsing, and ATS scoring happen in the browser. No sign-up required.",
+    "Build a clean CV or resume, export it as PDF, and check how a parser reads it. Editing, parsing, and ATS-style scoring happen in the browser. No sign-up required.",
   primaryCta: {
     label: "Build my CV",
     href: "/builder",
@@ -87,7 +87,7 @@ export const HOME_HIGHLIGHTS = {
       ],
     },
     {
-      title: "ATS scoring with receipts",
+      title: "ATS-style scoring with receipts",
       bullets: [
         "The parser does not just hand you a number.",
         "It shows extracted fields, structural warnings, and the specific issues that pulled the score down.",

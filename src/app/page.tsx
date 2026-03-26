@@ -16,7 +16,7 @@ const structuredData = {
   url: SITE.liveUrl,
   description: SITE.description,
   featureList: [
-    "Local ATS scoring in the browser",
+    "Local parser diagnostics and ATS-style scoring in the browser",
     "EU A4 and US Letter presets",
     "Single-column resume template",
     "No sign-up required",

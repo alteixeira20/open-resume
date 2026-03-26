@@ -59,7 +59,7 @@ const ResumeControlBar = ({
         >
           <ArrowPathIcon className="h-4 w-4" />
           <span className="hidden whitespace-nowrap sm:inline">
-            Refresh Preview
+            Refresh now
           </span>
           <span className="whitespace-nowrap sm:hidden">Refresh</span>
         </button>

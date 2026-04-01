@@ -1,7 +1,7 @@
 export const WORKBENCH_UI = {
   headerDescriptionDividerGapRem: 0.42,
   shellMaxWidthClass: "max-w-[1820px]",
-  previewPanePreferredWidthPx: 760,
+  previewPanePreferredWidthPx: 920,
   previewPaneStartPaddingPx: 24,
   workbenchMinWidthPx: 520,
   mainClass:

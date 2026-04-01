@@ -94,7 +94,7 @@ export const Resume = () => {
         ref={viewportRef}
         className="h-full w-full min-w-0 overflow-hidden"
       >
-        <div className="flex h-full w-full items-start justify-center overflow-hidden">
+        <div className="flex h-full w-full items-start justify-end overflow-hidden">
         <ResumeIframeCSR
           documentSize={previewSettings.documentSize}
           scale={scale}

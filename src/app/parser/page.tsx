@@ -64,7 +64,9 @@ export default function ResumeParser() {
   const [builderHandoffName, setBuilderHandoffName] = useState<string | null>(
     null
   );
-  const { isCollapsed, showPreview, togglePreview } = useWorkbenchCollapse();
+  const { isCollapsed, showPreview, togglePreview } = useWorkbenchCollapse({
+    documentSize: parserRegion === "eu" ? "A4" : "Letter",
+  });
   const previewContainerRef = useRef<HTMLDivElement | null>(null);
   const handoffObjectUrlRef = useRef<string | null>(null);
   const [previewScale, setPreviewScale] = useState(1);
@@ -114,11 +116,14 @@ export default function ResumeParser() {
   const updatePreviewScale = useCallback(() => {
     const container = previewContainerRef.current;
     if (!container) return;
+    const pageWidth = parserRegion === "eu" ? A4_WIDTH_PX : LETTER_WIDTH_PX;
     const pageHeight = parserRegion === "eu" ? A4_HEIGHT_PX : LETTER_HEIGHT_PX;
+    const width = container.clientWidth;
     const height = container.clientHeight;
-    if (!height) return;
+    if (!width || !height) return;
     const heightScale = height / pageHeight;
-    setPreviewScale(Math.min(heightScale, 1));
+    const widthScale = width / pageWidth;
+    setPreviewScale(Math.min(heightScale, widthScale, 1));
   }, [parserRegion]);
 
   useEffect(() => {
@@ -398,7 +403,7 @@ export default function ResumeParser() {
     <div className="sticky top-0 h-full w-full pb-2">
               <div
                 ref={previewContainerRef}
-                className="flex h-full w-full justify-center overflow-hidden"
+                className="flex h-full w-full justify-end overflow-hidden"
               >
                 <div
                   style={{

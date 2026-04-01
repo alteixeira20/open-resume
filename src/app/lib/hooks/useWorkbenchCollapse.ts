@@ -9,6 +9,7 @@ import {
   LETTER_HEIGHT_PX,
   LETTER_WIDTH_PX,
 } from "lib/constants";
+import { WORKBENCH_UI } from "components/layout/workbench-ui";
 
 export type DocumentSize = "A4" | "Letter";
 
@@ -59,10 +60,17 @@ export function useWorkbenchCollapse(
         return;
       }
 
-      const workbenchWidthPx =
-        screenWidthPx >= 1800 ? screenWidthPx * 0.7 : screenWidthPx;
-      const availableWidthPx =
-        workbenchWidthPx / 2 - panelPaddingPx * 2;
+      const workbenchWidthPx = Math.min(screenWidthPx, 1820);
+      const previewPaneWidthPx = WORKBENCH_UI.previewPanePreferredWidthPx;
+      const minimumExpandedWidthPx =
+        WORKBENCH_UI.workbenchMinWidthPx + previewPaneWidthPx;
+
+      if (workbenchWidthPx < minimumExpandedWidthPx) {
+        setIsCollapsed(true);
+        return;
+      }
+
+      const availableWidthPx = previewPaneWidthPx - panelPaddingPx * 2;
       const availableHeightPx =
         screenHeightPx -
         topNavBarHeightRem * PX_PER_REM -

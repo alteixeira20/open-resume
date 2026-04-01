@@ -17,6 +17,12 @@ export const WorkbenchLayout = ({
   isCollapsed,
   leftPaneClassName,
 }: WorkbenchLayoutProps) => {
+  const expandedGridStyle = !isCollapsed
+    ? {
+        gridTemplateColumns: `minmax(0, 1fr) fit-content(${WORKBENCH_UI.previewPanePreferredWidthPx}px)`,
+      }
+    : undefined;
+
   return (
     <main className={WORKBENCH_UI.mainClass}>
       <div
@@ -27,6 +33,7 @@ export const WorkbenchLayout = ({
             ? WORKBENCH_UI.gridCollapsedClass
             : WORKBENCH_UI.gridExpandedClass
         )}
+        style={expandedGridStyle}
       >
         <div
           className={cx(
@@ -35,14 +42,19 @@ export const WorkbenchLayout = ({
             leftPaneClassName
           )}
         >
-          <div className="w-full" style={WORKBENCH_UI.panelContentInlinePadding}>
+          <div
+            className="w-full"
+            style={{
+              paddingRight: WORKBENCH_UI.panelContentInlinePadding.paddingRight,
+            }}
+          >
             {workbench}
           </div>
         </div>
 
         {!isCollapsed && (
           <div className={WORKBENCH_UI.rightPaneClass}>
-            <div className="h-full w-full" style={WORKBENCH_UI.panelContentInlinePadding}>
+            <div className="h-full pl-3 md:pl-4 xl:pl-6">
               <WorkbenchPreview>{preview}</WorkbenchPreview>
             </div>
           </div>

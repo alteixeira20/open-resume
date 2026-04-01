@@ -19,19 +19,14 @@ export const TopNavBar = () => {
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-[linear-gradient(90deg,transparent,rgba(196,74,10,0.16),transparent)]" />
         <div
           className={cx(
-            "relative mx-auto h-[var(--top-nav-bar-height)]",
+            "relative h-[var(--top-nav-bar-height)]",
             isWorkbenchRoute
-              ? `${WORKBENCH_UI.shellMaxWidthClass} px-3 md:px-4 xl:px-6`
-              : "max-w-6xl px-6 lg:px-8"
+              ? `mx-auto ${WORKBENCH_UI.shellMaxWidthClass} px-3 md:px-4 xl:px-6`
+              : "mx-auto w-full max-w-screen-xl px-8 lg:px-12"
           )}
         >
           <div
             className="flex h-full items-center justify-between gap-3"
-            style={
-              isWorkbenchRoute
-                ? { paddingLeft: WORKBENCH_UI.panelContentInlinePadding.paddingLeft }
-                : undefined
-            }
           >
             <Link href="/" className="flex shrink-0 items-center gap-0">
               <span className="sr-only">{SITE.name}</span>
@@ -55,7 +50,7 @@ export const TopNavBar = () => {
             </Link>
             <nav
               aria-label="Site Nav Bar"
-              className="flex items-center gap-1.5 text-sm font-semibold sm:gap-2.5"
+              className="ml-auto flex min-w-0 items-center justify-end gap-1.5 text-sm font-semibold sm:gap-2.5"
             >
               {NAV_LINKS.map(({ href, label }) => (
                 <Link
@@ -79,12 +74,12 @@ export const TopNavBar = () => {
                   )}
                 </Link>
               ))}
-              <div className="ml-1 hidden shrink-0 items-center sm:flex">
+              <div className="-mr-6 ml-1 hidden shrink-0 items-center overflow-hidden sm:flex">
                 <iframe
                   src="https://ghbtns.com/github-btn.html?user=alteixeira20&repo=cvforge&type=star&count=true"
-                  width="132"
+                  width="96"
                   height="20"
-                  className="overflow-hidden border-none"
+                  className="block overflow-hidden border-none"
                   title="GitHub"
                 />
               </div>

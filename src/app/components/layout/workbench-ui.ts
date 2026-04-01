@@ -1,9 +1,11 @@
 export const WORKBENCH_UI = {
   headerDescriptionDividerGapRem: 0.42,
   shellMaxWidthClass: "max-w-[1820px]",
+  previewPanePreferredWidthPx: 820,
+  workbenchMinWidthPx: 520,
   mainClass:
     "h-full w-full overflow-hidden bg-[color:var(--color-surface-base)]",
-  gridExpandedClass: "grid grid-cols-2",
+  gridExpandedClass: "grid",
   gridCollapsedClass: "grid grid-cols-1",
   gridBaseClass: "mx-auto h-full w-full px-3 md:px-4 xl:px-6",
   leftPaneClass:

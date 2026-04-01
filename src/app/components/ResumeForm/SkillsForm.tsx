@@ -32,16 +32,6 @@ export const SkillsForm = () => {
   const themeColor = useAppSelector(selectThemeColor) || "#38bdf8";
   const [showFeaturedSkills, setShowFeaturedSkills] = useState(false);
 
-  const handleSkillsChange = (
-    field:
-      | "technicalTitle"
-      | "technicalDescriptions"
-      | "softSkillsTitle"
-      | "softSkillsDescriptions",
-    value: string | string[]
-  ) => {
-    dispatch(changeSkills({ field, value }));
-  };
   const handleFeaturedSkillsChange = (
     idx: number,
     skill: string,
@@ -67,7 +57,9 @@ export const SkillsForm = () => {
             placeholder="Technical"
             value={technicalTitle}
             maxLength={40}
-            onChange={handleSkillsChange}
+            onChange={(field, value) =>
+              dispatch(changeSkills({ field, value }))
+            }
           />
           <BulletListTextarea
             label="Description"
@@ -82,7 +74,9 @@ export const SkillsForm = () => {
             placeholder="One skill per line"
             value={technicalDescriptions}
             maxLength={420}
-            onChange={handleSkillsChange}
+            onChange={(field, value) =>
+              dispatch(changeSkills({ field, value }))
+            }
             showBulletPoints={technicalBulletPoints}
           />
         </div>
@@ -94,7 +88,9 @@ export const SkillsForm = () => {
             placeholder="Soft Skills"
             value={softSkillsTitle}
             maxLength={40}
-            onChange={handleSkillsChange}
+            onChange={(field, value) =>
+              dispatch(changeSkills({ field, value }))
+            }
           />
           <BulletListTextarea
             label="Description"
@@ -109,7 +105,9 @@ export const SkillsForm = () => {
             placeholder="Optional second list"
             value={softSkillsDescriptions}
             maxLength={420}
-            onChange={handleSkillsChange}
+            onChange={(field, value) =>
+              dispatch(changeSkills({ field, value }))
+            }
             showBulletPoints={softSkillsBulletPoints}
           />
         </div>

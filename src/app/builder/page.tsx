@@ -23,7 +23,6 @@ const BuilderContent = () => {
 
   const workbenchContent = (
     <ResumeForm
-      showRefreshButton={!isCollapsed}
       preview={isCollapsed && showPreview ? <ResumeInlinePreview /> : undefined}
       onTogglePreview={isCollapsed ? togglePreview : undefined}
       showPreview={showPreview}

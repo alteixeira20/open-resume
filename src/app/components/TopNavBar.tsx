@@ -29,7 +29,7 @@ export const TopNavBar = () => {
             className="flex h-full items-center justify-between gap-3"
             style={
               isWorkbenchRoute
-                ? WORKBENCH_UI.panelContentInlinePadding
+                ? { paddingLeft: WORKBENCH_UI.panelContentInlinePadding.paddingLeft }
                 : undefined
             }
           >
@@ -82,7 +82,7 @@ export const TopNavBar = () => {
               <div className="ml-1 hidden shrink-0 items-center sm:flex">
                 <iframe
                   src="https://ghbtns.com/github-btn.html?user=alteixeira20&repo=cvforge&type=star&count=true"
-                  width="150"
+                  width="132"
                   height="20"
                   className="overflow-hidden border-none"
                   title="GitHub"

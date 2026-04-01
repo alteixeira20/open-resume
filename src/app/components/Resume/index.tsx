@@ -15,8 +15,13 @@ import {
   useRegisterReactPDFHyphenationCallback,
 } from "components/fonts/hooks";
 import { NonEnglishFontsCSSLazyLoader } from "components/fonts/NonEnglishFontsCSSLoader";
+import { WORKBENCH_UI } from "components/layout/workbench-ui";
 
-export const Resume = () => {
+export const Resume = ({
+  onPreviewWidthChange,
+}: {
+  onPreviewWidthChange?: (widthPx: number) => void;
+}) => {
   const store = useStore<RootState>();
   const [scale, setScale] = useState(0.8);
   const [previewResume, setPreviewResume] = useState(
@@ -74,6 +79,15 @@ export const Resume = () => {
       setScale((prevScale) =>
         Math.abs(prevScale - nextScale) < 0.01 ? prevScale : nextScale
       );
+      if (onPreviewWidthChange) {
+        onPreviewWidthChange(
+          Math.min(
+            docWidth * Math.min(heightScale, 1) +
+              WORKBENCH_UI.previewPaneStartPaddingPx,
+            WORKBENCH_UI.previewPanePreferredWidthPx
+          )
+        );
+      }
     };
 
     computeScale();
@@ -85,7 +99,7 @@ export const Resume = () => {
       observer.disconnect();
       window.removeEventListener("resize", computeScale);
     };
-  }, [previewSettings.documentSize]);
+  }, [onPreviewWidthChange, previewSettings.documentSize]);
 
   return (
     <>

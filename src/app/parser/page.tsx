@@ -70,6 +70,9 @@ export default function ResumeParser() {
   const previewContainerRef = useRef<HTMLDivElement | null>(null);
   const handoffObjectUrlRef = useRef<string | null>(null);
   const [previewScale, setPreviewScale] = useState(1);
+  const [previewColumnWidthPx, setPreviewColumnWidthPx] = useState<number>(
+    WORKBENCH_UI.previewPanePreferredWidthPx
+  );
 
   const atsScore = useMemo(() => {
     if (!textItems.length) {
@@ -124,6 +127,13 @@ export default function ResumeParser() {
     const heightScale = height / pageHeight;
     const widthScale = width / pageWidth;
     setPreviewScale(Math.min(heightScale, widthScale, 1));
+    setPreviewColumnWidthPx(
+      Math.min(
+        pageWidth * Math.min(heightScale, 1) +
+          WORKBENCH_UI.previewPaneStartPaddingPx,
+        WORKBENCH_UI.previewPanePreferredWidthPx
+      )
+    );
   }, [parserRegion]);
 
   useEffect(() => {
@@ -431,6 +441,7 @@ export default function ResumeParser() {
       workbench={workbenchContent}
       preview={previewContent}
       isCollapsed={isCollapsed}
+      previewColumnWidthPx={previewColumnWidthPx}
     />
   );
 }

@@ -10,9 +10,11 @@ import { useAppSelector } from "lib/redux/hooks";
 import { selectSettings } from "lib/redux/settingsSlice";
 import { useWorkbenchCollapse } from "lib/hooks/useWorkbenchCollapse";
 import { WorkbenchLayout } from "components/layout/WorkbenchLayout";
+import { useState } from "react";
 
 const BuilderContent = () => {
   const settings = useAppSelector(selectSettings);
+  const [previewColumnWidthPx, setPreviewColumnWidthPx] = useState<number>();
   const { isCollapsed, showPreview, togglePreview } = useWorkbenchCollapse({
     documentSize: settings.documentSize as "A4" | "Letter",
   });
@@ -29,7 +31,9 @@ const BuilderContent = () => {
     />
   );
 
-  const previewContent = <Resume />;
+  const previewContent = (
+    <Resume onPreviewWidthChange={setPreviewColumnWidthPx} />
+  );
 
   return (
     <>
@@ -37,6 +41,7 @@ const BuilderContent = () => {
         workbench={workbenchContent}
         preview={previewContent}
         isCollapsed={isCollapsed}
+        previewColumnWidthPx={previewColumnWidthPx}
       />
         <ResumeDownloadBridge />
     </>

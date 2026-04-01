@@ -9,6 +9,7 @@ interface WorkbenchLayoutProps {
   preview: React.ReactNode;
   isCollapsed: boolean;
   leftPaneClassName?: string;
+  previewColumnWidthPx?: number;
 }
 
 export const WorkbenchLayout = ({
@@ -16,10 +17,15 @@ export const WorkbenchLayout = ({
   preview,
   isCollapsed,
   leftPaneClassName,
+  previewColumnWidthPx,
 }: WorkbenchLayoutProps) => {
+  const effectivePreviewWidthPx = Math.min(
+    Math.max(previewColumnWidthPx ?? WORKBENCH_UI.previewPanePreferredWidthPx, 0),
+    WORKBENCH_UI.previewPanePreferredWidthPx
+  );
   const expandedGridStyle = !isCollapsed
     ? {
-        gridTemplateColumns: `minmax(0, 1fr) fit-content(${WORKBENCH_UI.previewPanePreferredWidthPx}px)`,
+        gridTemplateColumns: `minmax(0, 1fr) minmax(0, ${effectivePreviewWidthPx}px)`,
       }
     : undefined;
 
@@ -54,7 +60,7 @@ export const WorkbenchLayout = ({
 
         {!isCollapsed && (
           <div className={WORKBENCH_UI.rightPaneClass}>
-            <div className="h-full pl-3 md:pl-4 xl:pl-6">
+            <div className="h-full w-full pl-3 md:pl-4 xl:pl-6">
               <WorkbenchPreview>{preview}</WorkbenchPreview>
             </div>
           </div>

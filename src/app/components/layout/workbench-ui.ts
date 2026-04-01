@@ -1,7 +1,8 @@
 export const WORKBENCH_UI = {
   headerDescriptionDividerGapRem: 0.42,
   shellMaxWidthClass: "max-w-[1820px]",
-  previewPanePreferredWidthPx: 820,
+  previewPanePreferredWidthPx: 760,
+  previewPaneStartPaddingPx: 24,
   workbenchMinWidthPx: 520,
   mainClass:
     "h-full w-full overflow-hidden bg-[color:var(--color-surface-base)]",
@@ -25,7 +26,7 @@ export const WORKBENCH_UI = {
     descriptionClass:
       "mt-0.5 max-w-prose text-sm leading-snug text-[color:var(--color-text-secondary)]",
     actionsClass: "flex flex-wrap gap-2",
-    compactActionClass: "h-8 rounded-lg px-2.5 py-0 text-xs font-semibold",
+    compactActionClass: "h-9 rounded-lg px-3 py-0 text-sm font-semibold",
     dividerClass: "h-px w-full bg-[color:var(--color-surface-border)]",
   },
   contentStackClass: "space-y-4",

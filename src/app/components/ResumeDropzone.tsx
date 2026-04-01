@@ -251,8 +251,8 @@ export const ResumeDropzone = ({
                 </Button>
               )}
               <p className={cx(" text-[color:var(--color-text-muted)]", !playgroundView && "mt-6")}>
-                Note: {!playgroundView ? "Import" : "Parser"} works best on
-                single-column CVs
+                Note: {!playgroundView ? "Import" : "Parser"} is most reliable
+                on single-column CVs
               </p>
             </>
           )}

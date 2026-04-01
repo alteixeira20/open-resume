@@ -161,7 +161,8 @@ export const ResumeParserAlgorithmArticle = ({
         <p className="mt-2 text-sm leading-relaxed text-[color:var(--color-text-secondary)]">
           CVForge uses pdf.js to read raw text items, reconstructs them into lines,
           groups those lines into sections, and then extracts a structured resume model.
-          The parser is heuristic and text-based, so it works best on clean, selectable PDFs.
+          The parser is heuristic and text-based, so it is most reliable on clean,
+          selectable PDFs.
         </p>
         <div className="mt-4 grid gap-3 md:grid-cols-3">
           <div className="rounded-xl border border-[color:var(--color-surface-border)] bg-[color:var(--color-surface-raised)]/70 px-4 py-3">

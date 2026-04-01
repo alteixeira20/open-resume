@@ -1,10 +1,7 @@
 "use client";
 import { useState, useEffect, useMemo, useRef, useCallback } from "react";
-import { readPdf } from "lib/parse-resume-from-pdf/read-pdf";
-import type { TextItems } from "lib/parse-resume-from-pdf/types";
-import { groupTextItemsIntoLines } from "lib/parse-resume-from-pdf/group-text-items-into-lines";
-import { groupLinesIntoSections } from "lib/parse-resume-from-pdf/group-lines-into-sections";
-import { extractResumeFromSections } from "lib/parse-resume-from-pdf/extract-resume-from-sections";
+import { analyzeResumePdf } from "lib/parse-resume-from-pdf/analyze-pdf";
+import type { Lines, ResumeSectionToLines, TextItems } from "lib/parse-resume-from-pdf/types";
 import { ResumeDropzone } from "components/ResumeDropzone";
 import { WorkbenchHeader } from "components/layout/WorkbenchHeader";
 import { cx } from "lib/cx";
@@ -25,6 +22,7 @@ import {
   isBuilderParserArrival,
   readBuilderParserHandoff,
 } from "lib/parser-handoff";
+import { initialResumeState } from "lib/redux/resumeSlice";
 
 const RESUME_EXAMPLES = [
   {
@@ -56,6 +54,12 @@ const LEGACY_BUILDER_STATE_STORAGE_KEY = "open-resume-state";
 export default function ResumeParser() {
   const [fileUrl, setFileUrl] = useState(defaultFileUrl);
   const [textItems, setTextItems] = useState<TextItems>([]);
+  const [lines, setLines] = useState<Lines>([]);
+  const [sections, setSections] = useState<ResumeSectionToLines>({});
+  const [resume, setResume] = useState(initialResumeState);
+  const [resumeSource, setResumeSource] = useState<"parsed" | "embedded">(
+    "parsed"
+  );
   const [parserRegion, setParserRegion] = useState<ResumeLocale>("eu");
   const [builderHandoffName, setBuilderHandoffName] = useState<string | null>(
     null
@@ -64,17 +68,6 @@ export default function ResumeParser() {
   const previewContainerRef = useRef<HTMLDivElement | null>(null);
   const handoffObjectUrlRef = useRef<string | null>(null);
   const [previewScale, setPreviewScale] = useState(1);
-
-  const lines = useMemo(
-    () => groupTextItemsIntoLines(textItems || []),
-    [textItems]
-  );
-
-  const sections = useMemo(() => groupLinesIntoSections(lines), [lines]);
-  const resume = useMemo(
-    () => extractResumeFromSections(sections),
-    [sections]
-  );
 
   const atsScore = useMemo(() => {
     if (!textItems.length) {
@@ -90,11 +83,23 @@ export default function ResumeParser() {
   }, [textItems, lines, sections, resume, parserRegion]);
 
   useEffect(() => {
-    async function test() {
-      const textItems = await readPdf(fileUrl);
-      setTextItems(textItems);
+    let cancelled = false;
+
+    async function analyzeFile() {
+      const analysis = await analyzeResumePdf(fileUrl);
+      if (cancelled) return;
+      setTextItems(analysis.textItems);
+      setLines(analysis.lines);
+      setSections(analysis.sections);
+      setResume(analysis.resume);
+      setResumeSource(analysis.source);
     }
-    test();
+
+    analyzeFile();
+
+    return () => {
+      cancelled = true;
+    };
   }, [fileUrl]);
 
   useEffect(() => {
@@ -227,9 +232,30 @@ export default function ResumeParser() {
 
   const workbenchContent = (
     <div className={WORKBENCH_UI.contentStackClass}>
-      <WorkbenchHeader
-        title="Parser Workbench"
-        description={
+      <section>
+        <WorkbenchHeader
+          title="Parser Workbench"
+          wrapperClassName="mb-0 min-h-0 gap-0.5"
+          titleActions={
+            <div className="flex items-center gap-2">
+              {(["eu", "us"] as ResumeLocale[]).map((region) => (
+                <button
+                  key={region}
+                  type="button"
+                  className={`inline-flex items-center border transition-colors ${WORKBENCH_UI.header.compactActionClass} ${
+                    parserRegion === region
+                      ? "border-[color:var(--color-brand-primary)] bg-[color:var(--color-brand-primary)] text-white"
+                      : "border-[color:var(--color-surface-border)] bg-[color:var(--color-surface-base)] text-[color:var(--color-text-secondary)] hover:border-[color:var(--color-brand-primary)]"
+                  }`}
+                  onClick={() => setParserRegion(region)}
+                  aria-pressed={parserRegion === region}
+                >
+                  {region === "eu" ? "EU (A4)" : "US (Letter)"}
+                </button>
+              ))}
+            </div>
+          }
+          description={
           builderHandoffName ? (
             <>
               <p>Evaluating the PDF generated from your current builder state.</p>
@@ -238,7 +264,18 @@ export default function ResumeParser() {
               </p>
             </>
           ) : (
-            "Upload a PDF to see what a text parser extracts from it. Check field detection, layout flags, and parsing diagnostics."
+            <>
+              <p>
+                Parse a PDF here. Check extracted fields, layout flags, and diagnostics.
+              </p>
+              {resumeSource === "embedded" && (
+                <p className="mt-1 text-xs text-[color:var(--color-text-muted)]">
+                  CVForge metadata was detected, so structured fields are being read
+                  directly from the exported document while ATS scoring still uses the
+                  PDF text layer.
+                </p>
+              )}
+            </>
           )
         }
         actions={
@@ -246,6 +283,7 @@ export default function ResumeParser() {
             <Button
               variant="secondary"
               size="sm"
+              className={WORKBENCH_UI.header.compactActionClass}
               onClick={togglePreview}
               aria-expanded={showPreview}
             >
@@ -253,7 +291,8 @@ export default function ResumeParser() {
             </Button>
           ) : undefined
         }
-      />
+        />
+      </section>
           {isCollapsed && showPreview && (
             <section className="mt-3">
               <div
@@ -281,39 +320,8 @@ export default function ResumeParser() {
             </section>
           )}
 
-          <section
-            id="region"
-            className="rounded-xl border border-[color:var(--color-surface-border)] bg-[color:var(--color-surface-base)] p-4"
-          >
-            <p className="text-sm font-semibold text-[color:var(--color-text-primary)]">
-              Parser Region
-            </p>
-            <p className="text-xs text-[color:var(--color-text-muted)]">
-              EU (A4) vs US (Letter) alters parsing expectations.
-            </p>
-            <div className="mt-3 flex flex-wrap gap-2">
-              {(["eu", "us"] as ResumeLocale[]).map((region) => (
-                <button
-                  key={region}
-                  type="button"
-                  className={`rounded-xl border px-3 py-1.5 text-sm font-medium transition-colors ${
-                    parserRegion === region
-                      ? "border-[color:var(--color-brand-primary)] bg-[color:var(--color-brand-primary)] text-white"
-                      : "border-[color:var(--color-surface-border)] text-[color:var(--color-text-secondary)] hover:border-[color:var(--color-brand-primary)]"
-                  }`}
-                  onClick={() => setParserRegion(region)}
-                >
-                  {region === "eu" ? "EU (A4)" : "US (Letter)"}
-                </button>
-              ))}
-            </div>
-          </section>
-
           <section id="examples" className="space-y-3">
-            <p className="text-xs font-semibold uppercase tracking-wide text-[color:var(--color-text-muted)]">
-              CV Examples
-            </p>
-            <div className="flex flex-col gap-3">
+            <div className="grid grid-cols-2 gap-3">
               {RESUME_EXAMPLES.map((example, idx) => (
                 <article
                   key={idx}
@@ -362,24 +370,15 @@ export default function ResumeParser() {
           </section>
 
           <section id="results" className="space-y-4">
-            <div className="rounded-xl border border-[color:var(--color-surface-border)] bg-[color:var(--color-surface-base)]/75 px-4 py-3">
-              <p className="text-xs font-semibold uppercase tracking-wide text-[color:var(--color-text-muted)]">
-                Parser results
-              </p>
-              <h2 className="mt-1 text-lg font-black text-[color:var(--color-text-primary)]">
-                What the parser extracted from this PDF
-              </h2>
-              <p className="mt-2 text-sm text-[color:var(--color-text-secondary)]">
-                Start with the score, then inspect the parsed resume model and the parser snapshot below.
-              </p>
-            </div>
             <AtsScoreCard result={atsScore} />
             <section className="rounded-xl border border-[color:var(--color-surface-border)] bg-[color:var(--color-surface-base)]/85 p-4">
               <p className="text-sm font-semibold text-[color:var(--color-text-primary)]">
                 Parsed resume model
               </p>
               <p className="mt-1 text-xs text-[color:var(--color-text-muted)]">
-                This is the structured data the parser reconstructed from the PDF text.
+                {resumeSource === "embedded"
+                  ? "This PDF includes CVForge metadata, so the structured model comes from the embedded export payload."
+                  : "This is the structured data the parser reconstructed from the PDF text."}
               </p>
               <div className="mt-3 overflow-x-auto">
                 <ResumeTable resume={resume} />

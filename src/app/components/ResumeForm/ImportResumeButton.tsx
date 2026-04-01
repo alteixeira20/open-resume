@@ -12,7 +12,11 @@ import {
   parseImportedJsonState,
 } from "lib/redux/import-state";
 
-export const ImportResumeButton = () => {
+export const ImportResumeButton = ({
+  buttonClassName,
+}: {
+  buttonClassName?: string;
+} = {}) => {
   const dispatch = useAppDispatch();
   const settings = useAppSelector(selectSettings);
   const importInputRef = useRef<HTMLInputElement>(null);
@@ -101,13 +105,14 @@ export const ImportResumeButton = () => {
   ) => {
     const file = event.target.files?.[0];
     if (!file) return;
+    let fileUrl: string | null = null;
     try {
       if (!file.name.toLowerCase().endsWith(".pdf")) {
         alert("Please select a PDF file.");
         return;
       }
-      const pdfData = await file.arrayBuffer();
-      const parsedResume = await parseResumeFromPdf(pdfData);
+      fileUrl = URL.createObjectURL(file);
+      const parsedResume = await parseResumeFromPdf(fileUrl);
 
       const importedState = buildImportedPdfState({
         resume: parsedResume,
@@ -132,6 +137,9 @@ export const ImportResumeButton = () => {
       console.error("PDF import failed", error);
       alert("Could not import PDF. Please try another file.");
     } finally {
+      if (fileUrl) {
+        URL.revokeObjectURL(fileUrl);
+      }
       event.target.value = "";
     }
   };
@@ -145,6 +153,7 @@ export const ImportResumeButton = () => {
       <Button
         variant="secondary"
         size="sm"
+        className={buttonClassName}
         onClick={() => setIsOpen((prev) => !prev)}
         aria-expanded={isOpen}
         aria-haspopup="menu"

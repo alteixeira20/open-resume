@@ -51,8 +51,8 @@ const ResumeImportBody = () => {
                 Import a CV
               </h2>
               <p className="mt-1 text-xs text-[color:var(--color-text-secondary)]">
-                Parse a PDF to jumpstart your CV, or import a JSON export for
-                a perfect 1:1 restore.
+                Parse a PDF to jumpstart your CV, or import a JSON export to
+                restore both content and settings.
               </p>
             </div>
           </div>

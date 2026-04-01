@@ -31,14 +31,12 @@ const formTypeToComponent: { [type in ShowForm]: () => ReactElement } = {
 
 interface ResumeFormProps {
   preview?: React.ReactNode;
-  showRefreshButton?: boolean;
   onTogglePreview?: () => void;
   showPreview?: boolean;
 }
 
 export const ResumeForm = ({
   preview,
-  showRefreshButton = false,
   onTogglePreview,
   showPreview = false,
 }: ResumeFormProps) => {
@@ -51,88 +49,50 @@ export const ResumeForm = ({
   return (
     <div className="flex min-h-full flex-col">
       <div className={`${WORKBENCH_UI.contentStackClass} pb-16`}>
-        <section className="sticky top-[-1.5rem] z-10 -mx-[var(--workbench-panel-px)] -mt-6 border-b border-[color:var(--color-surface-border)] bg-[color:var(--color-surface-base)]/95 px-[var(--workbench-panel-px)] pb-2 pt-6 backdrop-blur-sm">
-        <WorkbenchHeader
-          title="Builder Workbench"
-          wrapperClassName="mb-0 min-h-0 gap-1"
-          contentClassName="grid w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-x-8 gap-y-3"
-          textBlockClassName="max-w-prose"
-          actionsClassName="justify-center self-start"
-          description={
-            <div className="flex min-h-[3.75rem] flex-col justify-between">
-              <p>Preview updates automatically after a short pause.</p>
-              <p>
-                Use{" "}
-                <span className="rounded-md border border-[color:var(--color-brand-primary)]/25 bg-[color:var(--color-forge-100)] px-1.5 py-0.5 text-xs font-semibold uppercase tracking-wide text-[color:var(--color-forge-700)]">
-                  Refresh now
-                </span>{" "}
-                for an immediate update.
-              </p>
-            </div>
-          }
-          actions={
-            <div className="flex w-auto origin-top scale-[0.82] flex-col items-end gap-4 sm:scale-[0.9] md:scale-100">
-              <div className="shrink-0 whitespace-nowrap md:mr-18">
-                <ImportResumeButton />
-              </div>
-              <div className="shrink-0 whitespace-nowrap md:mr-8">
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  onClick={() =>
-                    window.dispatchEvent(
-                      new CustomEvent("resume:evaluate-in-parser")
-                    )
-                  }
-                >
-                  Evaluate CV
-                </Button>
-              </div>
-              {showRefreshButton && (
+        <section>
+          <WorkbenchHeader
+            title="Builder Workbench"
+            wrapperClassName="mb-0 min-h-0 gap-0.5"
+            description={
+              <p>Edit your CV here. Preview updates after a short pause.</p>
+            }
+            titleActions={
+              <div className="flex flex-wrap items-center justify-end gap-2">
+                <div className="shrink-0 whitespace-nowrap">
+                  <ImportResumeButton
+                    buttonClassName={WORKBENCH_UI.header.compactActionClass}
+                  />
+                </div>
                 <div className="shrink-0 whitespace-nowrap">
                   <Button
                     variant="secondary"
                     size="sm"
+                    className={WORKBENCH_UI.header.compactActionClass}
                     onClick={() =>
                       window.dispatchEvent(
-                        new CustomEvent("resume:refresh-preview")
+                        new CustomEvent("resume:evaluate-in-parser")
                       )
                     }
                   >
-                    Refresh now
+                    Evaluate CV
                   </Button>
                 </div>
-              )}
-              {onTogglePreview && (
-                <div className="shrink-0 self-end whitespace-nowrap">
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    onClick={onTogglePreview}
-                    aria-expanded={showPreview}
-                  >
-                    {showPreview ? "Hide preview" : "Show preview"}
-                  </Button>
-                </div>
-              )}
-            </div>
-          }
-        />
-          {preview && showPreview && (
-            <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
-              <Button
-                variant="secondary"
-                size="sm"
-                onClick={() =>
-                  window.dispatchEvent(
-                    new CustomEvent("resume:refresh-preview")
-                  )
-                }
-              >
-                Refresh now
-              </Button>
-            </div>
-          )}
+                {onTogglePreview && (
+                  <div className="shrink-0 whitespace-nowrap">
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      className={WORKBENCH_UI.header.compactActionClass}
+                      onClick={onTogglePreview}
+                      aria-expanded={showPreview}
+                    >
+                      {showPreview ? "Hide preview" : "Show preview"}
+                    </Button>
+                  </div>
+                )}
+              </div>
+            }
+          />
         </section>
         <section>
           {preview && showPreview && <div className="mt-3 w-full">{preview}</div>}

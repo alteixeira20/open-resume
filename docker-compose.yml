@@ -2,7 +2,7 @@ services:
   cvforge:
     container_name: cvforge
     build:
-      context: /opt/src/cvforge
+      context: /opt/src/CVForge
       dockerfile: Dockerfile
     restart: unless-stopped
     environment:

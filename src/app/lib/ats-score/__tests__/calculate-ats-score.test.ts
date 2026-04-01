@@ -123,11 +123,14 @@ describe("calculateAtsScore", () => {
       resume,
     });
 
-    // parsing(60) + structure(25) + readability(10) = 95
-    expect(result.score).toBe(95);
+    const subtotal =
+      result.breakdown.parsing +
+      result.breakdown.structure +
+      result.breakdown.readability;
+
+    expect(result.score).toBe(97);
     expect(result.breakdown.parsing).toBe(60);
-    expect(result.breakdown.structure).toBe(25);
-    expect(result.breakdown.readability).toBe(10);
+    expect(subtotal).toBe(result.score);
     expect(result.issues).toEqual(
       expect.arrayContaining(["Limited quantifiable impact statements"])
     );

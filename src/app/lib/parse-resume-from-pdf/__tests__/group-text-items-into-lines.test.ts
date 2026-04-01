@@ -32,4 +32,31 @@ describe("groupTextItemsIntoLines", () => {
     expect(lines[0][0].text).toBe("Jan 2020");
     expect(lines[1][0].text).toBe("- Bullet");
   });
+
+  it("removes stray boundary whitespace inside split words", () => {
+    const textItems: TextItems = [
+      makeItem("hands-on expe", { x: 0, y: 100, width: 65 }),
+      makeItem(" rience", { x: 65.2, y: 100, width: 35 }),
+      makeItem(" building", { x: 105, y: 100, width: 45, hasEOL: true }),
+    ];
+
+    const lines = groupTextItemsIntoLines(textItems);
+
+    expect(lines).toHaveLength(1);
+    expect(lines[0]).toHaveLength(1);
+    expect(lines[0][0].text).toBe("hands-on experience building");
+  });
+
+  it("preserves real spaces when adjacent items are separated by a normal gap", () => {
+    const textItems: TextItems = [
+      makeItem("Strong", { x: 0, y: 100, width: 30 }),
+      makeItem(" emphasis", { x: 35, y: 100, width: 45, hasEOL: true }),
+    ];
+
+    const lines = groupTextItemsIntoLines(textItems);
+
+    expect(lines).toHaveLength(1);
+    expect(lines[0]).toHaveLength(1);
+    expect(lines[0][0].text).toBe("Strong emphasis");
+  });
 });

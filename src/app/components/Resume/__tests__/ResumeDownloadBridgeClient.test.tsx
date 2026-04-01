@@ -6,8 +6,6 @@ import { initialSettings, setSettings } from "lib/redux/settingsSlice";
 import { store } from "lib/redux/store";
 
 const pushMock = jest.fn();
-const writeBuilderParserHandoffMock = jest.fn();
-const blobToDataUrlMock = jest.fn(async () => "data:application/pdf;base64,AAA");
 const toBlobMock = jest.fn(async () => new Blob(["pdf"], { type: "application/pdf" }));
 
 jest.mock("next/navigation", () => ({
@@ -28,10 +26,18 @@ jest.mock("components/fonts/hooks", () => ({
 }));
 
 jest.mock("lib/parser-handoff", () => ({
-  blobToDataUrl: blobToDataUrlMock,
-  writeBuilderParserHandoff: writeBuilderParserHandoffMock,
+  blobToDataUrl: jest.fn(async () => "data:application/pdf;base64,AAA"),
+  writeBuilderParserHandoff: jest.fn(),
   BUILDER_TO_PARSER_QUERY: "source=builder",
 }));
+
+const {
+  blobToDataUrl: blobToDataUrlMock,
+  writeBuilderParserHandoff: writeBuilderParserHandoffMock,
+} = jest.requireMock("lib/parser-handoff") as {
+  blobToDataUrl: jest.Mock;
+  writeBuilderParserHandoff: jest.Mock;
+};
 
 describe("ResumeDownloadBridgeClient", () => {
   beforeEach(() => {

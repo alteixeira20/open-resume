@@ -42,10 +42,19 @@ export const groupTextItemsIntoLines = (textItems: TextItems): Lines => {
       const leftItemXEnd = leftItem.x + leftItem.width;
       const distance = currentItem.x - leftItemXEnd;
       if (distance <= typicalCharWidth) {
-        if (shouldAddSpaceBetweenText(leftItem.text, currentItem.text)) {
+        const [normalizedLeftText, normalizedRightText] =
+          normalizeBoundaryWhitespace(
+            leftItem.text,
+            currentItem.text,
+            distance,
+            typicalCharWidth
+          );
+
+        leftItem.text = normalizedLeftText;
+        if (shouldAddSpaceBetweenText(leftItem.text, normalizedRightText)) {
           leftItem.text += " ";
         }
-        leftItem.text += currentItem.text;
+        leftItem.text += normalizedRightText;
         // Update leftItem width to include currentItem after merge before deleting current item
         const currentItemXEnd = currentItem.x + currentItem.width;
         leftItem.width = currentItemXEnd - leftItem.x;
@@ -55,6 +64,35 @@ export const groupTextItemsIntoLines = (textItems: TextItems): Lines => {
   }
 
   return lines;
+};
+
+const normalizeBoundaryWhitespace = (
+  leftText: string,
+  rightText: string,
+  distance: number,
+  typicalCharWidth: number
+) => {
+  const hasBoundaryWhitespace = /\s$/.test(leftText) || /^\s/.test(rightText);
+  if (!hasBoundaryWhitespace) {
+    return [leftText, rightText] as const;
+  }
+
+  const normalizedLeftText = leftText.replace(/\s+$/, "");
+  const normalizedRightText = rightText.replace(/^\s+/, "");
+  const leftBoundary = normalizedLeftText[normalizedLeftText.length - 1] ?? "";
+  const rightBoundary = normalizedRightText[0] ?? "";
+  const touchesAlmostDirectly =
+    Number.isFinite(distance) && distance <= typicalCharWidth * 0.2;
+  const looksLikeBrokenToken =
+    /[\p{L}\p{N})\]]/u.test(leftBoundary) &&
+    /[\p{L}\p{N}(]/u.test(rightBoundary) &&
+    !shouldAddSpaceBetweenText(normalizedLeftText, normalizedRightText);
+
+  if (!touchesAlmostDirectly || !looksLikeBrokenToken) {
+    return [leftText, rightText] as const;
+  }
+
+  return [normalizedLeftText, normalizedRightText] as const;
 };
 
 // Sometimes a space is lost while merging adjacent text items. This accounts for some of those cases

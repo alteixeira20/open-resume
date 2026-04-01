@@ -1,6 +1,8 @@
 import type { PDFDocumentProxy } from "pdfjs-dist/types/src/display/api";
 import type { TextItem as PdfjsTextItem } from "pdfjs-dist/types/src/display/api";
 import type { TextItem, TextItems } from "lib/parse-resume-from-pdf/types";
+import type { Resume } from "lib/redux/types";
+import { parseEmbeddedResumeSubject } from "lib/parse-resume-from-pdf/embedded-resume";
 
 /**
  * Step 1: Read pdf and output textItems by concatenating results from each page.
@@ -48,7 +50,7 @@ const loadPdfjs = async () => {
   return pdfjsPromise;
 };
 
-export const readPdf = async (fileSource: PdfSource): Promise<TextItems> => {
+export const getPdfDocument = async (fileSource: PdfSource) => {
   const pdfjs = await loadPdfjs();
   if (typeof window !== "undefined" && pdfjs.GlobalWorkerOptions) {
     pdfjs.GlobalWorkerOptions.workerSrc = new URL(
@@ -62,7 +64,39 @@ export const readPdf = async (fileSource: PdfSource): Promise<TextItems> => {
       ? pdfjs.getDocument(fileSource)
       : pdfjs.getDocument({ data: normalizePdfData(fileSource) });
 
-  const pdfFile: PDFDocumentProxy = await loadingTask.promise;
+  return loadingTask.promise;
+};
+
+export const readEmbeddedResumeFromPdfDocument = async (
+  pdfFile: PDFDocumentProxy
+): Promise<Resume | null> => {
+  try {
+    const metadata = await pdfFile.getMetadata();
+    const info = (metadata?.info ?? {}) as Record<string, unknown>;
+    const subject =
+      (typeof info["Subject"] === "string" ? info["Subject"] : null) ??
+      (typeof info["subject"] === "string" ? info["subject"] : null) ??
+      metadata?.metadata?.get?.("dc:subject") ??
+      metadata?.metadata?.get?.("subject");
+
+    return parseEmbeddedResumeSubject(
+      typeof subject === "string" ? subject : null
+    );
+  } catch {
+    return null;
+  }
+};
+
+export const readEmbeddedResumeFromPdf = async (
+  fileSource: PdfSource
+): Promise<Resume | null> => {
+  const pdfFile = await getPdfDocument(fileSource);
+  return readEmbeddedResumeFromPdfDocument(pdfFile);
+};
+
+export const readPdfFromDocument = async (
+  pdfFile: PDFDocumentProxy
+): Promise<TextItems> => {
   let textItems: TextItems = [];
 
   for (let i = 1; i <= pdfFile.numPages; i++) {
@@ -127,6 +161,11 @@ export const readPdf = async (fileSource: PdfSource): Promise<TextItems> => {
   textItems = textItems.filter((textItem) => !isEmptySpace(textItem));
 
   return textItems;
+};
+
+export const readPdf = async (fileSource: PdfSource): Promise<TextItems> => {
+  const pdfFile: PDFDocumentProxy = await getPdfDocument(fileSource);
+  return readPdfFromDocument(pdfFile);
 };
 
 const normalizePdfData = (fileSource: ArrayBufferLike | Uint8Array) => {

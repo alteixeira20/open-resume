@@ -13,6 +13,7 @@ import type { Resume } from "lib/redux/types";
 import { SuppressResumePDFErrorMessage } from "components/Resume/ResumePDF/common/SuppressResumePDFErrorMessage";
 import { ResumePDFStyleProvider } from "components/Resume/ResumePDF/common/ResumePDFStyleContext";
 import type { ReactElement } from "react";
+import { buildEmbeddedResumeSubject } from "lib/parse-resume-from-pdf/embedded-resume";
 
 /**
  * Note: ResumePDF is supposed to be rendered inside PDFViewer. However,
@@ -62,7 +63,9 @@ export const ResumePDF = ({
     languagesSpacing,
     companyRoleSpacing,
     companyItemSpacing,
+    companyDescriptionSpacing,
     schoolDegreeSpacing,
+    educationDescriptionSpacing,
     projectItemSpacing,
     topBarHeight,
     nameFontSize,
@@ -85,6 +88,7 @@ export const ResumePDF = ({
         heading={formToHeading["workExperiences"]}
         workExperiences={workExperiences}
         themeColor={themeColor}
+        showBulletPoints={showBulletPoints["workExperiences"]}
       />
     ),
     educations: () => (
@@ -102,6 +106,7 @@ export const ResumePDF = ({
         projects={projects}
         themeColor={themeColor}
         isPDF={isPDF}
+        showBulletPoints={showBulletPoints["projects"]}
       />
     ),
     skills: () => (
@@ -109,7 +114,8 @@ export const ResumePDF = ({
         heading={formToHeading["skills"]}
         skills={skills}
         themeColor={themeColor}
-        showBulletPoints={showBulletPoints["skills"]}
+        showTechnicalBulletPoints={showBulletPoints["skills"]}
+        showSoftSkillsBulletPoints={showBulletPoints["softSkills"]}
       />
     ),
     languages: () => (
@@ -131,7 +137,12 @@ export const ResumePDF = ({
 
   return (
     <>
-      <Document title={`${name} Resume`} author={name} producer={"CVForge"}>
+      <Document
+        title={`${name} Resume`}
+        author={name}
+        producer={"CVForge"}
+        subject={buildEmbeddedResumeSubject(resume)}
+      >
         <Page
           size={documentSize === "A4" ? "A4" : "LETTER"}
           style={{
@@ -158,7 +169,15 @@ export const ResumePDF = ({
               languagesSpacing: parseNumberSetting(languagesSpacing, 0),
               companyRoleSpacing: parseNumberSetting(companyRoleSpacing, 4.5),
               companyItemSpacing: parseNumberSetting(companyItemSpacing, 6),
+              companyDescriptionSpacing: parseNumberSetting(
+                companyDescriptionSpacing,
+                4.5
+              ),
               schoolDegreeSpacing: parseNumberSetting(schoolDegreeSpacing, 4.5),
+              educationDescriptionSpacing: parseNumberSetting(
+                educationDescriptionSpacing,
+                4.5
+              ),
               projectItemSpacing: parseNumberSetting(projectItemSpacing, 6),
               nameFontSize: parseNumberSetting(nameFontSize, 20),
               sectionHeadingSize: parseNumberSetting(sectionHeadingSize, 11),

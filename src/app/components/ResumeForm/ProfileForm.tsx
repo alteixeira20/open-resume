@@ -55,7 +55,7 @@ export const ProfileForm = () => {
           name="summary"
           placeholder={labels.profileSummaryPlaceholder}
           value={summary}
-          maxLength={600}
+          maxLength={1000}
           onChange={handleProfileChange}
         />
         <Input

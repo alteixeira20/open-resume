@@ -93,7 +93,7 @@ export const WorkExperiencesForm = () => {
               name="descriptions"
               placeholder="Bullet points"
               value={descriptions}
-              maxLength={200}
+              maxLength={1000}
               onChange={handleWorkExperienceChange}
               showBulletPoints={showBulletPoints}
             />

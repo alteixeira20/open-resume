@@ -3,6 +3,7 @@ import {
   ResumePDFSection,
   ResumePDFBulletList,
   ResumeFeaturedSkill,
+  ResumePDFText,
 } from "components/Resume/ResumePDF/common";
 import { styles, spacing } from "components/Resume/ResumePDF/styles";
 import type { ResumeSkills } from "lib/redux/types";
@@ -11,15 +12,28 @@ export const ResumePDFSkills = ({
   heading,
   skills,
   themeColor,
-  showBulletPoints,
+  showTechnicalBulletPoints,
+  showSoftSkillsBulletPoints,
 }: {
   heading: string;
   skills: ResumeSkills;
   themeColor: string;
-  showBulletPoints: boolean;
+  showTechnicalBulletPoints: boolean;
+  showSoftSkillsBulletPoints: boolean;
 }) => {
-  const { descriptions, featuredSkills } = skills;
+  const {
+    descriptions,
+    featuredSkills,
+    technicalTitle = "Technical",
+    technicalDescriptions = descriptions,
+    softSkillsTitle = "Soft Skills",
+    softSkillsDescriptions = [],
+  } = skills;
   const featuredSkillsWithText = featuredSkills.filter((item) => item.skill);
+  const hasTechnicalBlock =
+    Boolean(technicalTitle.trim()) || technicalDescriptions.length > 0;
+  const hasSoftSkillsBlock =
+    Boolean(softSkillsTitle.trim()) || softSkillsDescriptions.length > 0;
   const featuredSkillsPair = [
     [featuredSkillsWithText[0], featuredSkillsWithText[3]],
     [featuredSkillsWithText[1], featuredSkillsWithText[4]],
@@ -56,10 +70,36 @@ export const ResumePDFSkills = ({
         </View>
       )}
       <View style={{ ...styles.flexCol }}>
-        <ResumePDFBulletList
-          items={descriptions}
-          showBulletPoints={showBulletPoints}
-        />
+        {hasTechnicalBlock && (
+          <View style={{ ...styles.flexCol, marginTop: spacing["0.5"] }}>
+            {technicalTitle.trim() && (
+              <ResumePDFText bold={true}>{`${technicalTitle.trim()}:`}</ResumePDFText>
+            )}
+            {technicalDescriptions.length > 0 && (
+              <View style={{ marginTop: spacing["0.5"] }}>
+                <ResumePDFBulletList
+                  items={technicalDescriptions}
+                  showBulletPoints={showTechnicalBulletPoints}
+                />
+              </View>
+            )}
+          </View>
+        )}
+        {hasSoftSkillsBlock && (
+          <View style={{ ...styles.flexCol, marginTop: spacing["2"] }}>
+            {softSkillsTitle.trim() && (
+              <ResumePDFText bold={true}>{`${softSkillsTitle.trim()}:`}</ResumePDFText>
+            )}
+            {softSkillsDescriptions.length > 0 && (
+              <View style={{ marginTop: spacing["0.5"] }}>
+                <ResumePDFBulletList
+                  items={softSkillsDescriptions}
+                  showBulletPoints={showSoftSkillsBulletPoints}
+                />
+              </View>
+            )}
+          </View>
+        )}
       </View>
     </ResumePDFSection>
   );

@@ -10,7 +10,9 @@ export type ThemeDraftSettings = Pick<
   | "languagesSpacing"
   | "companyRoleSpacing"
   | "companyItemSpacing"
+  | "companyDescriptionSpacing"
   | "schoolDegreeSpacing"
+  | "educationDescriptionSpacing"
   | "projectItemSpacing"
   | "topBarHeight"
   | "lineHeight"
@@ -133,6 +135,15 @@ export const NUMERIC_SETTING_META: Record<
     defaultValue: initialSettings.companyItemSpacing,
     group: "entries",
   },
+  companyDescriptionSpacing: {
+    label: "Work text gap (pt)",
+    helper: "Space between the role/date line and the work description text.",
+    min: 0,
+    max: 20,
+    step: 0.5,
+    defaultValue: initialSettings.companyDescriptionSpacing,
+    group: "entries",
+  },
   schoolDegreeSpacing: {
     label: "School gap (pt)",
     helper: "Space between the school line and the degree/date line.",
@@ -140,6 +151,15 @@ export const NUMERIC_SETTING_META: Record<
     max: 20,
     step: 0.5,
     defaultValue: initialSettings.schoolDegreeSpacing,
+    group: "entries",
+  },
+  educationDescriptionSpacing: {
+    label: "Education text gap (pt)",
+    helper: "Space between the degree/date line and the education description text.",
+    min: 0,
+    max: 20,
+    step: 0.5,
+    defaultValue: initialSettings.educationDescriptionSpacing,
     group: "entries",
   },
   projectItemSpacing: {
@@ -189,7 +209,9 @@ export const getDefaultThemeDraftSettings = (
   languagesSpacing: settings.languagesSpacing ?? "",
   companyRoleSpacing: settings.companyRoleSpacing ?? "",
   companyItemSpacing: settings.companyItemSpacing ?? "",
+  companyDescriptionSpacing: settings.companyDescriptionSpacing ?? "",
   schoolDegreeSpacing: settings.schoolDegreeSpacing ?? "",
+  educationDescriptionSpacing: settings.educationDescriptionSpacing ?? "",
   projectItemSpacing: settings.projectItemSpacing ?? "",
   topBarHeight: settings.topBarHeight ?? "",
   lineHeight: settings.lineHeight ?? "",
@@ -208,7 +230,9 @@ export const THEME_SETTING_GROUP_FIELDS: Record<
   entries: [
     "companyRoleSpacing",
     "companyItemSpacing",
+    "companyDescriptionSpacing",
     "schoolDegreeSpacing",
+    "educationDescriptionSpacing",
     "projectItemSpacing",
   ],
   type: ["fontSize", "nameFontSize", "sectionHeadingSize"],

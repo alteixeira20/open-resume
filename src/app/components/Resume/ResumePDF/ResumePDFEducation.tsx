@@ -21,8 +21,9 @@ export const ResumePDFEducation = ({
   showBulletPoints: boolean;
   showGpa: boolean;
 }) => {
-  const { schoolDegreeSpacing } = useResumePDFStyle();
+  const { schoolDegreeSpacing, educationDescriptionSpacing } = useResumePDFStyle();
   const schoolDegreeOffsetPt = schoolDegreeSpacing - 4.5;
+  const educationDescriptionOffsetPt = educationDescriptionSpacing - 4.5;
   return (
     <ResumePDFSection themeColor={themeColor} heading={heading}>
       {educations.map(({ school, degree, gpa, date, descriptions = [] }, idx) => {
@@ -60,7 +61,12 @@ export const ResumePDFEducation = ({
                 <ResumePDFText style={{ lineHeight: 1 }}>{dateText}</ResumePDFText>
               </View>
               {showDescriptions && (
-                <View style={{ ...styles.flexCol, marginTop: spacing["1.5"] }}>
+                <View
+                  style={{
+                    ...styles.flexCol,
+                    marginTop: `${educationDescriptionOffsetPt}pt`,
+                  }}
+                >
                   <ResumePDFBulletList
                     items={descriptions}
                     showBulletPoints={showBulletPoints}

@@ -12,7 +12,9 @@ export interface Settings {
   languagesSpacing: string;
   companyRoleSpacing: string;
   companyItemSpacing: string;
+  companyDescriptionSpacing: string;
   schoolDegreeSpacing: string;
+  educationDescriptionSpacing: string;
   projectItemSpacing: string;
   topBarHeight: string;
   nameFontSize: string;
@@ -40,6 +42,7 @@ export interface Settings {
     educations: boolean;
     projects: boolean;
     skills: boolean;
+    softSkills: boolean;
     custom: boolean;
   };
 }
@@ -68,7 +71,9 @@ export const initialSettings: Settings = {
   languagesSpacing: "4",
   companyRoleSpacing: "4",
   companyItemSpacing: "6",
+  companyDescriptionSpacing: "4.5",
   schoolDegreeSpacing: "4",
+  educationDescriptionSpacing: "4.5",
   projectItemSpacing: "6",
   topBarHeight: "10.5",
   nameFontSize: "18",
@@ -103,6 +108,7 @@ export const initialSettings: Settings = {
     educations: true,
     projects: true,
     skills: true,
+    softSkills: true,
     custom: true,
   },
 };

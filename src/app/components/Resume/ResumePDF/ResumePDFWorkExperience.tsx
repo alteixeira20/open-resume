@@ -12,13 +12,20 @@ export const ResumePDFWorkExperience = ({
   heading,
   workExperiences,
   themeColor,
+  showBulletPoints,
 }: {
   heading: string;
   workExperiences: ResumeWorkExperience[];
   themeColor: string;
+  showBulletPoints: boolean;
 }) => {
-  const { companyRoleSpacing, companyItemSpacing } = useResumePDFStyle();
+  const {
+    companyRoleSpacing,
+    companyItemSpacing,
+    companyDescriptionSpacing,
+  } = useResumePDFStyle();
   const companyRoleOffsetPt = companyRoleSpacing - 4.5;
+  const companyDescriptionOffsetPt = companyDescriptionSpacing - 4.5;
   return (
     <ResumePDFSection themeColor={themeColor} heading={heading}>
       {workExperiences.map(({ company, jobTitle, date, descriptions }, idx) => {
@@ -48,8 +55,16 @@ export const ResumePDFWorkExperience = ({
               <ResumePDFText style={{ lineHeight: 1 }}>{jobTitle}</ResumePDFText>
               <ResumePDFText style={{ lineHeight: 1 }}>{dateText}</ResumePDFText>
             </View>
-            <View style={{ ...styles.flexCol, marginTop: spacing["1.5"] }}>
-              <ResumePDFBulletList items={descriptions} />
+            <View
+              style={{
+                ...styles.flexCol,
+                marginTop: `${companyDescriptionOffsetPt}pt`,
+              }}
+            >
+              <ResumePDFBulletList
+                items={descriptions}
+                showBulletPoints={showBulletPoints}
+              />
             </View>
           </View>
         );

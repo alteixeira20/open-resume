@@ -43,6 +43,10 @@ export interface FeaturedSkill {
 export interface ResumeSkills {
   featuredSkills: FeaturedSkill[];
   descriptions: string[];
+  technicalTitle?: string;
+  technicalDescriptions?: string[];
+  softSkillsTitle?: string;
+  softSkillsDescriptions?: string[];
 }
 
 export interface ResumeCustom {

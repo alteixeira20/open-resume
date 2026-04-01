@@ -79,7 +79,7 @@ export const ProjectsForm = () => {
               label="Description"
               placeholder="Bullet points"
               value={descriptions}
-              maxLength={200}
+              maxLength={1000}
               onChange={handleProjectChange}
               labelClassName="col-span-full"
               showBulletPoints={showBulletPoints}

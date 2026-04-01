@@ -14,11 +14,13 @@ export const ResumePDFProject = ({
   projects,
   themeColor,
   isPDF,
+  showBulletPoints,
 }: {
   heading: string;
   projects: ResumeProject[];
   themeColor: string;
   isPDF: boolean;
+  showBulletPoints: boolean;
 }) => {
   const { projectItemSpacing } = useResumePDFStyle();
   return (
@@ -62,7 +64,10 @@ export const ResumePDFProject = ({
               </View>
             )}
             <View style={{ ...styles.flexCol, marginTop: spacing["0.5"] }}>
-              <ResumePDFBulletList items={descriptions} />
+              <ResumePDFBulletList
+                items={descriptions}
+                showBulletPoints={showBulletPoints}
+              />
             </View>
           </View>
         );

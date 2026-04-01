@@ -54,7 +54,22 @@ export const ResumeTable = ({ resume }: { resume: Resume }) => {
     resume.workExperiences.length === 0
       ? [deepClone(initialWorkExperience)]
       : resume.workExperiences;
-  const skills = [...resume.skills.descriptions];
+  const technicalSkills =
+    resume.skills.technicalDescriptions?.length
+      ? resume.skills.technicalDescriptions
+      : resume.skills.descriptions;
+  const softSkills = resume.skills.softSkillsDescriptions ?? [];
+  const skills: string[] = [];
+  if (technicalSkills.length > 0) {
+    skills.push(
+      `${(resume.skills.technicalTitle || "Technical").trim()}: ${technicalSkills.join("; ")}`
+    );
+  }
+  if (softSkills.length > 0) {
+    skills.push(
+      `${(resume.skills.softSkillsTitle || "Soft Skills").trim()}: ${softSkills.join("; ")}`
+    );
+  }
   const featuredSkills = resume.skills.featuredSkills
     .filter((item) => item.skill.trim())
     .map((item) => item.skill)

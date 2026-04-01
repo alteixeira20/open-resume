@@ -128,7 +128,9 @@ export const ResumePDFBulletList = ({
   const { lineHeight } = useResumePDFStyle();
   return (
     <>
-      {items.map((item, idx) => (
+      {items.map((rawItem, idx) => {
+        const item = stripBulletPrefix(rawItem);
+        return (
         <View style={{ ...styles.flexRow }} key={idx}>
           {showBulletPoints && (
             <ResumePDFText
@@ -150,10 +152,13 @@ export const ResumePDFBulletList = ({
             {item}
           </ResumePDFText>
         </View>
-      ))}
+      )})}
     </>
   );
 };
+
+const stripBulletPrefix = (str: string) =>
+  str.replace(/^\s*(?:[•▪◦‣●\-*]\s*)+/, "");
 
 export const ResumePDFLink = ({
   src,

@@ -57,6 +57,12 @@ export const initialFeaturedSkills: FeaturedSkill[] = Array.from(
 export const initialSkills: ResumeSkills = {
   featuredSkills: initialFeaturedSkills,
   descriptions: [],
+  // Keep the legacy aggregate field populated so older JSON/state consumers
+  // still see a single skills list even though the builder now edits two lists.
+  technicalTitle: "Technical",
+  technicalDescriptions: [],
+  softSkillsTitle: "Soft Skills",
+  softSkillsDescriptions: [],
 };
 
 export const initialCustom = {
@@ -138,6 +144,10 @@ export const resumeSlice = createSlice({
       draft,
       action: PayloadAction<
         | { field: "descriptions"; value: string[] }
+        | { field: "technicalTitle"; value: string }
+        | { field: "technicalDescriptions"; value: string[] }
+        | { field: "softSkillsTitle"; value: string }
+        | { field: "softSkillsDescriptions"; value: string[] }
         | {
             field: "featuredSkills";
             idx: number;
@@ -147,9 +157,18 @@ export const resumeSlice = createSlice({
       >
     ) => {
       const { field } = action.payload;
-      if (field === "descriptions") {
+      if (
+        field === "descriptions" ||
+        field === "technicalDescriptions" ||
+        field === "softSkillsDescriptions"
+      ) {
         const { value } = action.payload;
-        draft.skills.descriptions = value;
+        draft.skills[field] = value;
+        // Preserve the legacy combined list for compatibility with existing
+        // saved state, imports, and parser-facing consumers.
+        draft.skills.descriptions = aggregateSkillDescriptions(draft.skills);
+      } else if (field === "technicalTitle" || field === "softSkillsTitle") {
+        draft.skills[field] = action.payload.value;
       } else {
         const { idx, skill, rating } = action.payload;
         const featuredSkill = draft.skills.featuredSkills[idx];
@@ -252,3 +271,8 @@ export const selectLanguages = (state: RootState) => state.resume.languages;
 export const selectCustom = (state: RootState) => state.resume.custom;
 
 export default resumeSlice.reducer;
+
+const aggregateSkillDescriptions = (skills: ResumeSkills) => [
+  ...(skills.technicalDescriptions ?? []),
+  ...(skills.softSkillsDescriptions ?? []),
+];

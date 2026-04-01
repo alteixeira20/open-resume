@@ -92,7 +92,12 @@ export const BulletListIconButton = ({
 
   return (
     <IconButton
-      onClick={() => onClick(!showBulletPoints)}
+      onClick={() => {
+        onClick(!showBulletPoints);
+        if (typeof window !== "undefined") {
+          window.dispatchEvent(new CustomEvent("resume:refresh-preview"));
+        }
+      }}
       tooltipText={tooltipText}
       size="small"
       className={showBulletPoints ? "!bg-[color:var(--color-surface-raised)]" : ""}

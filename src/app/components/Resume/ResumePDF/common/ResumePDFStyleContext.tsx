@@ -7,7 +7,9 @@ export type ResumePDFStyleSettings = {
   languagesSpacing: number;
   companyRoleSpacing: number;
   companyItemSpacing: number;
+  companyDescriptionSpacing: number;
   schoolDegreeSpacing: number;
+  educationDescriptionSpacing: number;
   projectItemSpacing: number;
   nameFontSize: number;
   sectionHeadingSize: number;
@@ -20,7 +22,9 @@ const ResumePDFStyleContext = createContext<ResumePDFStyleSettings>({
   languagesSpacing: 0,
   companyRoleSpacing: 4.5,
   companyItemSpacing: 6,
+  companyDescriptionSpacing: 4.5,
   schoolDegreeSpacing: 4.5,
+  educationDescriptionSpacing: 4.5,
   projectItemSpacing: 6,
   nameFontSize: 20,
   sectionHeadingSize: 11,

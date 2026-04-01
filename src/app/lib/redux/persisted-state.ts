@@ -15,6 +15,7 @@ import type {
   ResumeProfile,
   ResumeProject,
   ResumeWorkExperience,
+  ResumeSkills,
 } from "lib/redux/types";
 
 type UnknownRecord = Record<string, unknown>;
@@ -122,12 +123,7 @@ export const normalizeResume = (value: unknown): Resume | null => {
     projects: Array.isArray(value.projects)
       ? value.projects.map(normalizeProject)
       : initialResumeState.projects,
-    skills: {
-      featuredSkills: Array.isArray(skillsInput.featuredSkills)
-        ? skillsInput.featuredSkills.map(normalizeFeaturedSkill)
-        : initialResumeState.skills.featuredSkills,
-      descriptions: asStringArray(skillsInput.descriptions),
-    },
+    skills: normalizeSkills(skillsInput),
     languages: Array.isArray(value.languages)
       ? value.languages.map(normalizeLanguage)
       : initialResumeState.languages,
@@ -136,6 +132,42 @@ export const normalizeResume = (value: unknown): Resume | null => {
         ? asStringArray(value.custom.descriptions)
         : initialResumeState.custom.descriptions,
     },
+  };
+};
+
+const normalizeSkills = (value: UnknownRecord): ResumeSkills => {
+  const legacyDescriptions = asStringArray(value.descriptions);
+  const technicalDescriptions = asStringArray(value.technicalDescriptions);
+  const softSkillsDescriptions = asStringArray(value.softSkillsDescriptions);
+  // Older state only stored one descriptions array. When split fields are
+  // missing, treat that legacy list as the technical bucket by default.
+  const hasSplitDescriptions =
+    technicalDescriptions.length > 0 || softSkillsDescriptions.length > 0;
+  const normalizedTechnicalDescriptions = hasSplitDescriptions
+    ? technicalDescriptions
+    : legacyDescriptions;
+  const normalizedSoftSkillsDescriptions = hasSplitDescriptions
+    ? softSkillsDescriptions
+    : [];
+
+  return {
+    featuredSkills: Array.isArray(value.featuredSkills)
+      ? value.featuredSkills.map(normalizeFeaturedSkill)
+      : initialResumeState.skills.featuredSkills,
+    technicalTitle: asString(
+      value.technicalTitle,
+      initialResumeState.skills.technicalTitle
+    ),
+    technicalDescriptions: normalizedTechnicalDescriptions,
+    softSkillsTitle: asString(
+      value.softSkillsTitle,
+      initialResumeState.skills.softSkillsTitle
+    ),
+    softSkillsDescriptions: normalizedSoftSkillsDescriptions,
+    descriptions: [
+      ...normalizedTechnicalDescriptions,
+      ...normalizedSoftSkillsDescriptions,
+    ],
   };
 };
 
@@ -169,6 +201,13 @@ const normalizeBulletPointMap = (
   const result = { ...defaults };
 
   for (const field of BULLET_FORMS) {
+    if (field === "softSkills") {
+      result[field] = asBoolean(
+        input[field],
+        asBoolean(input.skills, defaults[field])
+      );
+      continue;
+    }
     result[field] = asBoolean(input[field], defaults[field]);
   }
 
@@ -237,9 +276,17 @@ export const normalizeSettings = (value: unknown): Settings | null => {
       value.companyItemSpacing,
       initialSettings.companyItemSpacing
     ),
+    companyDescriptionSpacing: asString(
+      value.companyDescriptionSpacing,
+      initialSettings.companyDescriptionSpacing
+    ),
     schoolDegreeSpacing: asString(
       value.schoolDegreeSpacing,
       initialSettings.schoolDegreeSpacing
+    ),
+    educationDescriptionSpacing: asString(
+      value.educationDescriptionSpacing,
+      initialSettings.educationDescriptionSpacing
     ),
     projectItemSpacing: asString(
       value.projectItemSpacing,

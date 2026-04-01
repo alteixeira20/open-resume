@@ -1,5 +1,6 @@
 import { Form } from "components/ResumeForm/Form";
 import {
+  Input,
   BulletListTextarea,
   InputGroupWrapper,
 } from "components/ResumeForm/Form/InputGroup";
@@ -17,13 +18,28 @@ import {
 export const SkillsForm = () => {
   const skills = useAppSelector(selectSkills);
   const dispatch = useAppDispatch();
-  const { featuredSkills, descriptions } = skills;
-  const form = "skills";
-  const showBulletPoints = useAppSelector(selectShowBulletPoints(form));
+  const {
+    featuredSkills,
+    technicalTitle = "Technical",
+    technicalDescriptions = [],
+    softSkillsTitle = "Soft Skills",
+    softSkillsDescriptions = [],
+  } = skills;
+  const technicalBulletPoints = useAppSelector(selectShowBulletPoints("skills"));
+  const softSkillsBulletPoints = useAppSelector(
+    selectShowBulletPoints("softSkills")
+  );
   const themeColor = useAppSelector(selectThemeColor) || "#38bdf8";
   const [showFeaturedSkills, setShowFeaturedSkills] = useState(false);
 
-  const handleSkillsChange = (field: "descriptions", value: string[]) => {
+  const handleSkillsChange = (
+    field:
+      | "technicalTitle"
+      | "technicalDescriptions"
+      | "softSkillsTitle"
+      | "softSkillsDescriptions",
+    value: string | string[]
+  ) => {
     dispatch(changeSkills({ field, value }));
   };
   const handleFeaturedSkillsChange = (
@@ -33,29 +49,68 @@ export const SkillsForm = () => {
   ) => {
     dispatch(changeSkills({ field: "featuredSkills", idx, skill, rating }));
   };
-  const handleShowBulletPoints = (value: boolean) => {
-    dispatch(changeShowBulletPoints({ field: form, value }));
+  const handleShowTechnicalBulletPoints = (value: boolean) => {
+    dispatch(changeShowBulletPoints({ field: "skills", value }));
+  };
+  const handleShowSoftSkillsBulletPoints = (value: boolean) => {
+    dispatch(changeShowBulletPoints({ field: "softSkills", value }));
   };
 
   return (
-    <Form form={form}>
+    <Form form="skills">
       <div className="col-span-full grid grid-cols-6 gap-3">
         <div className="col-span-full">
+          <Input
+            label="Technical Skills Title"
+            labelClassName="col-span-full"
+            name="technicalTitle"
+            placeholder="Technical"
+            value={technicalTitle}
+            maxLength={40}
+            onChange={handleSkillsChange}
+          />
           <BulletListTextarea
-            label="Skills List"
+            label="Description"
             labelClassName="col-span-full"
             labelAction={
               <BulletListIconButton
-                showBulletPoints={showBulletPoints}
-                onClick={handleShowBulletPoints}
+                showBulletPoints={technicalBulletPoints}
+                onClick={handleShowTechnicalBulletPoints}
               />
             }
-            name="descriptions"
-            placeholder="Bullet points"
-            value={descriptions}
-            maxLength={120}
+            name="technicalDescriptions"
+            placeholder="One skill per line"
+            value={technicalDescriptions}
+            maxLength={420}
             onChange={handleSkillsChange}
-            showBulletPoints={showBulletPoints}
+            showBulletPoints={technicalBulletPoints}
+          />
+        </div>
+        <div className="col-span-full">
+          <Input
+            label="Soft Skills Title"
+            labelClassName="col-span-full"
+            name="softSkillsTitle"
+            placeholder="Soft Skills"
+            value={softSkillsTitle}
+            maxLength={40}
+            onChange={handleSkillsChange}
+          />
+          <BulletListTextarea
+            label="Description"
+            labelClassName="col-span-full"
+            labelAction={
+              <BulletListIconButton
+                showBulletPoints={softSkillsBulletPoints}
+                onClick={handleShowSoftSkillsBulletPoints}
+              />
+            }
+            name="softSkillsDescriptions"
+            placeholder="Optional second list"
+            value={softSkillsDescriptions}
+            maxLength={420}
+            onChange={handleSkillsChange}
+            showBulletPoints={softSkillsBulletPoints}
           />
         </div>
         <div className="col-span-full mb-4 mt-6 border-t-2 border-dotted border-gray-200" />

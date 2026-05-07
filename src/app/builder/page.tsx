@@ -15,9 +15,7 @@ import { useState } from "react";
 const BuilderContent = () => {
   const settings = useAppSelector(selectSettings);
   const [previewColumnWidthPx, setPreviewColumnWidthPx] = useState<number>();
-  const { isCollapsed, showPreview, togglePreview } = useWorkbenchCollapse({
-    documentSize: settings.documentSize as "A4" | "Letter",
-  });
+  const { isCollapsed, showPreview, togglePreview } = useWorkbenchCollapse();
 
   useEffect(() => {
     window.dispatchEvent(new CustomEvent("resume:refresh-preview"));

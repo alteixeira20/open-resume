@@ -37,7 +37,7 @@ export const WorkbenchHeader = ({
           {description}
         </div>
       </div>
-      {actions && !titleActions && (
+      {actions && (
         <div className={cx(WORKBENCH_UI.header.actionsClass, actionsClassName)}>
           {actions}
         </div>

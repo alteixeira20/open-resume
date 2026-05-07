@@ -1,45 +1,55 @@
-.PHONY: help install build run lint test ats-score verify clean fclean docker-build docker-up docker-down docker-logs update docker-prod-local docker-prod-local-logs
+.PHONY: help install build run lint test typecheck audit audit-prod verify clean fclean docker-build docker-up docker-down docker-logs update docker-prod-local docker-prod-local-logs
 
 help:
-	@printf "CVForge Makefile targets:\n"
-	@printf "  make install   Install dependencies\n"
-	@printf "  make build     Build production bundle\n"
-	@printf "  make run       Start dev server\n"
-	@printf "  make lint      Run eslint\n"
-	@printf "  make test      Run tests (watch)\n"
-	@printf "  make ats-score Run ATS score CLI (pass ARGS=...)\n"
-	@printf "  make verify    Run lint + test:ci + build\n"
-	@printf "  make fclean    Remove node_modules and build artifacts\n"
-	@printf "  make update    Update and redeploy (host)\n"
-	@printf "  make docker-prod-local Run production container locally\n"
-	@printf "  make docker-prod-local-logs Tail local production container logs\n"
-	@printf "\nExamples:\n"
-	@printf "  make run\n"
-	@printf "  make ats-score ARGS=\"--file resume.pdf --json\"\n"
+        @printf "CVForge Makefile targets:\n"
+        @printf "  make install   Install dependencies\n"
+        @printf "  make build     Build production bundle\n"
+        @printf "  make run       Start dev server\n"
+        @printf "  make lint      Run eslint\n"
+        @printf "  make test      Run tests (watch)\n"
+        @printf "  make typecheck Run typescript type-check\n"
+        @printf "  make audit     Run npm audit\n"
+        @printf "  make audit-prod Run npm audit (production only)\n"
+        @printf "  make verify    Run full quality gate (lint, typecheck, test, build, audit)\n"
+        @printf "  make ats-score Run ATS score CLI (pass ARGS=...)\n"
+        @printf "  make fclean    Remove node_modules and build artifacts\n"
+        @printf "  make update    Update and redeploy (host)\n"
+        @printf "  make docker-prod-local Run production container locally\n"
+        @printf "  make docker-prod-local-logs Tail local production container logs\n"
+        @printf "\nExamples:\n"
+        @printf "  make run\n"
+        @printf "  make ats-score ARGS=\"--file resume.pdf --json\"\n"
 
 install:
-	npm ci || npm install
-	npx update-browserslist-db@latest
+        npm ci || npm install
+        npx update-browserslist-db@latest
 
 build: install
-	npm run build
+        npm run build
 
 run:
-	npm run dev
+        npm run dev
 
 lint:
-	npm run lint
+        npm run lint
 
 test:
-	npm run test
+        npm run test
 
-ats-score:
-	npm run ats-score -- $(ARGS)
+typecheck:
+        npm run typecheck
+
+audit:
+        npm run audit
+
+audit-prod:
+        npm run audit:prod
 
 verify:
-	npm run lint
-	npm run test:ci
-	npm run build
+        npm run verify
+
+ats-score:
+        npm run ats-score -- $(ARGS)
 
 docker-build:
 	docker compose build

@@ -64,9 +64,7 @@ export default function ResumeParser() {
   const [builderHandoffName, setBuilderHandoffName] = useState<string | null>(
     null
   );
-  const { isCollapsed, showPreview, togglePreview } = useWorkbenchCollapse({
-    documentSize: parserRegion === "eu" ? "A4" : "Letter",
-  });
+  const { isCollapsed, showPreview, togglePreview } = useWorkbenchCollapse();
   const previewContainerRef = useRef<HTMLDivElement | null>(null);
   const handoffObjectUrlRef = useRef<string | null>(null);
   const [previewScale, setPreviewScale] = useState(1);

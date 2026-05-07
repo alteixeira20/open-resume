@@ -2,12 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-export type DocumentSize = "A4" | "Letter";
 const WORKBENCH_COLLAPSE_WIDTH_PX = 900;
-
-interface UseWorkbenchCollapseOptions {
-  documentSize?: DocumentSize;
-}
 
 interface WorkbenchCollapseResult {
   isCollapsed: boolean;
@@ -15,10 +10,7 @@ interface WorkbenchCollapseResult {
   togglePreview: () => void;
 }
 
-export function useWorkbenchCollapse(
-  options: UseWorkbenchCollapseOptions = {}
-): WorkbenchCollapseResult {
-  void options;
+export function useWorkbenchCollapse(): WorkbenchCollapseResult {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
 

@@ -2,7 +2,7 @@
 import { useState } from "react";
 import type { AtsScoreResult } from "lib/ats-score";
 import { cx } from "lib/cx";
-import { formatBreakdown, scoreCategoryInsights, scoreColor } from "lib/ats-display";
+import { ATS_SCORE_WEIGHTS, formatBreakdown, scoreCategoryInsights, scoreColor } from "lib/ats-display";
 import { Card } from "components/ui";
 
 interface AtsScoreCardProps {
@@ -45,9 +45,9 @@ export const AtsScoreCard = ({ result }: AtsScoreCardProps) => {
           </p>
           <div className="mt-3 grid gap-2 sm:grid-cols-3">
             {[
-              "Parsing: 40 points",
-              "Structure: 20 points",
-              "Readability: 10 points",
+              `Parsing: ${ATS_SCORE_WEIGHTS.parsing} points`,
+              `Structure: ${ATS_SCORE_WEIGHTS.structure} points`,
+              `Readability: ${ATS_SCORE_WEIGHTS.readability} points`,
             ].map((item) => (
               <div
                 key={item}
@@ -58,7 +58,7 @@ export const AtsScoreCard = ({ result }: AtsScoreCardProps) => {
             ))}
           </div>
           <p className="mt-2 text-xs text-[color:var(--color-text-muted)]">
-            The three categories total 70 points, rescaled to 100. This tool
+            The three categories total 100 points. This tool
             checks whether your CV is well-structured for text parsing — it does
             not evaluate content, relevance, or job fit.
           </p>

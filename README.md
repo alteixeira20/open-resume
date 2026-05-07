@@ -144,13 +144,28 @@ Verify from your proxy container:
 docker exec nginx wget -qO- http://cvforge:3000 | head
 ```
 
-## Testing
-> **Highlights:** parser heuristics, ATS scoring, and key UI flows have test coverage.
+## Testing & Quality Checks
+> **Highlights:** parser heuristics, ATS scoring, and key UI flows have test coverage. The project uses a strict quality gate for all changes.
 
+### Development Checks
+Run these during development to ensure code quality:
 ```sh
-npm run lint
-npm run test:ci
-npm run build
+npm run lint          # Run ESLint
+npm run typecheck     # Run TypeScript type-check
+npm run test:ci       # Run all Jest tests
+npm run build         # Build the production bundle
+npm run audit:prod    # Check for production vulnerabilities (0 expected)
+```
+
+### Full Verification
+Run the full quality gate before pushing changes:
+```sh
+npm run verify        # Runs lint, typecheck, test, build, and audit:prod
+```
+
+Or via Makefile:
+```sh
+make verify
 ```
 
 - Parser coverage: section grouping, bullet extraction, subsection splitting, feature scoring

@@ -1,14 +1,32 @@
 import type { AtsScoreResult } from "lib/ats-score";
 
+export const ATS_SCORE_WEIGHTS = {
+  parsing: 60,
+  structure: 25,
+  readability: 15,
+} as const;
+
 export const formatBreakdown = (
   result: AtsScoreResult | null
 ): Array<{ label: string; value: number; max: number }> => {
   if (!result) return [];
 
   return [
-    { label: "Parsing", value: result.breakdown.parsing, max: 60 },
-    { label: "Structure", value: result.breakdown.structure, max: 25 },
-    { label: "Readability", value: result.breakdown.readability, max: 15 },
+    {
+      label: "Parsing",
+      value: result.breakdown.parsing,
+      max: ATS_SCORE_WEIGHTS.parsing,
+    },
+    {
+      label: "Structure",
+      value: result.breakdown.structure,
+      max: ATS_SCORE_WEIGHTS.structure,
+    },
+    {
+      label: "Readability",
+      value: result.breakdown.readability,
+      max: ATS_SCORE_WEIGHTS.readability,
+    },
   ];
 };
 
